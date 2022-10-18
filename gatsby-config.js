@@ -13,12 +13,13 @@ module.exports = {
     siteTitle: `Tae.log`,
     siteTitleAlt: `Tae.log - Today I Learned`,
     siteHeadline: `Tae.log - Today I Learned`,
-    siteUrl: `https://overtae.github.io/tae-log/`,
+    siteUrl: `https://taelog.site/`,
     siteDescription: `공부한 것들을 올리는 블로그입니다.`,
     siteImage: `/banner.jpg`,
     author: `@overtae`,
   },
   plugins: [
+    `gatsby-plugin-cname`,
     {
       resolve: `@lekoarts/gatsby-theme-minimal-blog`,
       // See the theme's README for all available options
