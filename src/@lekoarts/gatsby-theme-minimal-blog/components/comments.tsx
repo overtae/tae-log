@@ -17,8 +17,8 @@ const Comments: React.FC<IUtterancesProps> = React.memo(({ repo, theme }) => {
       src,
       repo,
       theme,
-      'issue-term': 'pathname',
-      label: '💬 comments: ',
+      'issue-term': 'title',
+      label: '💬 comments',
       crossOrigin: 'anonymous',
       async: 'true',
     };
