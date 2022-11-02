@@ -4,9 +4,7 @@ import type { MBPostProps } from '@lekoarts/gatsby-theme-minimal-blog/src/compon
 import Comments from './comments';
 
 const PostFooter = ({ post }: MBPostProps) => {
-  return (
-    <Comments repo='overtae/blog-comments' theme={'preferred-color-scheme'} />
-  );
+  return <Comments repo='overtae/tae-log' theme={'preferred-color-scheme'} />;
 };
 
 export default PostFooter;
