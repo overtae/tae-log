@@ -1,6 +1,13 @@
+import Comments from '@/components/post/detail/Comments'
 import PostBody from '@/components/post/detail/PostBody'
 import PostHeader from '@/components/post/detail/PostHeader'
-import { getPostDetail, getPostPaths, parsePostAbstract } from '@/lib/post'
+import TableOfContents from '@/components/post/detail/TableOfContents'
+import {
+  getPostDetail,
+  getPostPaths,
+  parsePostAbstract,
+  parseToc,
+} from '@/lib/post'
 import { Metadata } from 'next'
 
 type Props = {
@@ -44,15 +51,23 @@ export function generateStaticParams() {
 const PostDetail = async ({ params }: Props) => {
   const { mainCategory, subCategory, slug } = await params
   const post = await getPostDetail(`${mainCategory}/${subCategory}`, slug)
+  const toc = parseToc(post.content)
 
   return (
     <div className="grid w-full grid-cols-1 gap-4 px-4 md:grid-cols-4">
       <header className="w-full md:col-span-3">
         <PostHeader post={post} />
       </header>
+      <aside className="md:row-span-3">
+        <TableOfContents toc={toc} />
+      </aside>
       <article className="prose prose-stone relative dark:prose-invert sm:prose-base md:prose-lg lg:prose-xl md:col-span-3">
         <PostBody post={post} />
       </article>
+      <section className="md:col-span-3">
+        <hr className="my-4" />
+        <Comments />
+      </section>
     </div>
   )
 }
