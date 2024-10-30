@@ -1,3 +1,4 @@
+import MdxComponents from '@/components/mdx'
 import { Post } from '@/types/post'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import rehypeSlug from 'rehype-slug'
@@ -11,6 +12,7 @@ const PostBody = ({ post }: PostBodyProps) => {
   return (
     <MDXRemote
       source={post.content}
+      components={MdxComponents}
       options={{
         mdxOptions: {
           remarkPlugins: [remarkGfm],
