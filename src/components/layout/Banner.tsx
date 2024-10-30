@@ -7,7 +7,7 @@ import Image from 'next/image'
 const Banner = () => {
   const isMounted = useIsMounted()
   const { resolvedTheme } = useTheme()
-  const bannerImage = resolvedTheme === 'dark' ? 'banner_dark' : 'banner_light'
+  const bannerImage = resolvedTheme === 'dark' ? 'banner-dark' : 'banner-light'
   const background = resolvedTheme === 'dark' ? 'bg-[#1E1E1E]' : 'bg-[#F3F3F3]'
 
   if (!isMounted) return null

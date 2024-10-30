@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <header className="flex w-full select-none justify-between px-6 py-4 backdrop-blur-xl">
       <section className="flex items-center gap-2">
-        <Image src={'/icons/logo.png'} alt="logo" width={32} height={32} />
+        <Image src={'/images/logo.png'} alt="logo" width={32} height={32} />
         <Link href={'/blog'} className="text-lg font-semibold">
           {blog.subTitle}
         </Link>

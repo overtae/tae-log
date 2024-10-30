@@ -4,7 +4,7 @@ export const author: Author = {
   name: '태영이',
   introduce: '안녕하세요 :)',
   location: 'Seoul, Korea',
-  thumbnailURL: '/images/author_thumbnail.png',
+  thumbnailURL: '/images/author-thumbnail.png',
   socialLinks: [
     {
       label: 'Email',
