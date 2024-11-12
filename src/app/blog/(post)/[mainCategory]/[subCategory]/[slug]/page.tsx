@@ -11,7 +11,7 @@ import {
 import { Metadata } from 'next'
 
 type Props = {
-  params: { mainCategory: string; subCategory: string; slug: string }
+  params: Promise<{ mainCategory: string; subCategory: string; slug: string }>
 }
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL
@@ -21,13 +21,12 @@ export const dynamicParams = false
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { mainCategory, subCategory, slug } = await params
   const post = await getPostDetail(`${mainCategory}/${subCategory}`, slug)
-  const title = `${post.title}`
 
   return {
-    title,
+    title: post.title,
     description: post.description,
     openGraph: {
-      title,
+      title: post.title,
       description: post.description,
       type: 'article',
       publishedTime: post.date,

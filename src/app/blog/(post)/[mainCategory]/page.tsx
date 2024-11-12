@@ -4,7 +4,7 @@ import { getCategoryPublicName, getMainCategoryList } from '@/lib/post'
 import { Metadata } from 'next'
 
 type Props = {
-  params: { mainCategory: string }
+  params: Promise<{ mainCategory: string }>
 }
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL

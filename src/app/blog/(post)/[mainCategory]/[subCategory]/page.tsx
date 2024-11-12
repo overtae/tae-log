@@ -9,7 +9,7 @@ import {
 import { Metadata } from 'next'
 
 type Props = {
-  params: { mainCategory: string; subCategory: string }
+  params: Promise<{ mainCategory: string; subCategory: string }>
 }
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL
