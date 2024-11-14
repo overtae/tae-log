@@ -1,4 +1,3 @@
-import { Quote } from 'lucide-react'
 import { BlockquoteHTMLAttributes } from 'react'
 
 const Blockquote = ({
