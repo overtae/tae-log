@@ -51,7 +51,8 @@ const parsePostDetail = async (postPath: string) => {
   const { data, content } = matter(file)
   const grayMatter = data as PostMatter
   const date = dayjs(grayMatter.date).locale('ko').format('YYYY년 MM월 DD일')
-  return { ...grayMatter, date, content }
+  const tags = grayMatter.tags || []
+  return { ...grayMatter, date, tags, content }
 }
 
 // category path을 category name으로 변경 : main/sub -> subname, main -> mainname
