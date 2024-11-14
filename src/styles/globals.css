@@ -70,3 +70,166 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================ 
+* Code Block Style
+============================================ */
+
+/* Prevents Overflow and Adds Padding */
+.prose pre {
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.prose pre [data-line] {
+  padding: 0 1rem;
+}
+
+/* Multiple Themes */
+.prose code[data-theme*=' '] span {
+  color: var(--shiki-light);
+}
+
+.dark .prose code[data-theme*=' '] span {
+  color: var(--shiki-dark);
+}
+
+.prose pre[data-theme*=' '],
+.prose code[data-theme*=' '],
+.prose code[data-theme*=' '] > span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark .prose pre[data-theme*=' '],
+.dark .prose code[data-theme*=' '],
+.dark .prose code[data-theme*=' '] > span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/* ============================================ 
+* Fenced Code Block Style
+============================================ */
+
+/* Scrollbar */
+.prose figure[data-rehype-pretty-code-figure] pre::-webkit-scrollbar {
+  @apply h-2;
+}
+
+.prose figure[data-rehype-pretty-code-figure] pre::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-neutral-400/0;
+}
+
+.prose
+  figure[data-rehype-pretty-code-figure]
+  pre:hover::-webkit-scrollbar-thumb {
+  @apply bg-neutral-300/100;
+}
+
+.dark
+  .prose
+  figure[data-rehype-pretty-code-figure]
+  pre:hover::-webkit-scrollbar-thumb {
+  @apply bg-neutral-600/100;
+}
+
+/* Line Numbers */
+.prose code[data-line-numbers] {
+  counter-reset: line;
+}
+
+.prose code[data-line-numbers] > span[data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 2rem;
+  margin-right: 1rem;
+  text-align: right;
+  color: var(--shiki-light);
+}
+
+.dark .prose code[data-line-numbers] > span[data-line]::before {
+  color: var(--shiki-dark);
+}
+
+.prose code[data-line-numbers-max-digits='2'] > span[data-line]::before {
+  width: 2rem;
+}
+
+.prose code[data-line-numbers-max-digits='3'] > span[data-line]::before {
+  width: 3rem;
+}
+
+/* Highliting - Lines */
+.prose code span[data-highlighted-line] {
+  @apply border-l-2 border-l-yellow-400 bg-yellow-400 bg-opacity-10;
+}
+
+.dark .prose code span[data-highlighted-line] {
+  @apply border-l-2 border-l-yellow-600 bg-yellow-400 bg-opacity-5;
+}
+
+/* Highliting - Chars */
+.prose code span mark[data-highlighted-chars] {
+  @apply rounded-md border-b border-b-yellow-400 bg-yellow-400/20 px-1 py-0.5;
+}
+
+.dark .prose code span mark[data-highlighted-chars] {
+  @apply rounded-md border-b border-b-yellow-400/80 bg-yellow-400/20 px-1 py-0.5;
+}
+
+/* Top bar */
+.prose figure[data-rehype-pretty-code-figure] {
+  @apply relative overflow-visible;
+}
+
+.prose figure[data-rehype-pretty-code-figure]::before {
+  @apply relative z-10 inline-block w-full rounded-tl-lg rounded-tr-lg bg-neutral-200 px-4 pt-1 md:pt-0;
+  content: url("data:image/svg+xml,%3Csvg width='52' height='12' viewBox='0 0 52 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_27_60)'%3E%3Ccircle cx='6' cy='6' r='6' fill='%23FF4848'/%3E%3Ccircle cx='26' cy='6' r='6' fill='%23FFD900'/%3E%3Ccircle cx='46' cy='6' r='6' fill='%2382ED40'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_27_60'%3E%3Crect width='52' height='12' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E ");
+}
+
+.dark .prose figure[data-rehype-pretty-code-figure]::before {
+  @apply bg-neutral-700;
+  content: url("data:image/svg+xml,%3Csvg width='52' height='12' viewBox='0 0 52 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_26_42)'%3E%3Ccircle cx='6' cy='6' r='6' fill='%23FF4E4E'/%3E%3Ccircle cx='26' cy='6' r='6' fill='%23FFDD55'/%3E%3Ccircle cx='46' cy='6' r='6' fill='%2370FF53'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_26_42'%3E%3Crect width='52' height='12' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
+}
+
+.prose figure[data-rehype-pretty-code-figure] pre {
+  @apply -top-8 pt-12 lg:-top-9 lg:pt-14;
+}
+
+.prose figure[data-rehype-pretty-code-figure] pre::before {
+  @apply absolute right-0 top-0 z-20 px-4 py-1.5 text-end text-sm text-amber-500 lg:py-2;
+  content: attr(data-language);
+}
+
+.dark .prose figure[data-rehype-pretty-code-figure] pre::before {
+  @apply text-amber-400;
+}
+
+/* Title */
+.prose figcaption[data-rehype-pretty-code-title] {
+  @apply absolute top-0 z-20 m-0 w-full truncate px-20 py-1.5 text-center text-neutral-600 md:py-1;
+}
+
+.dark .prose figcaption[data-rehype-pretty-code-title] {
+  @apply text-neutral-200;
+}
+
+/* Captions */
+.prose figcaption[data-rehype-pretty-code-caption] {
+  @apply relative -top-8 w-full text-center lg:-top-9;
+}
+
+/* ============================================ 
+* Inline Code Block Style
+============================================ */
+
+.prose span[data-rehype-pretty-code-figure] code::before,
+.prose span[data-rehype-pretty-code-figure] code::after {
+  content: '';
+}
+
+.prose span[data-rehype-pretty-code-figure] code {
+  @apply rounded-md px-2 py-1;
+}
