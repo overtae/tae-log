@@ -32,7 +32,7 @@ const Callout = ({
       className={`my-4 flex items-start gap-3 rounded-lg px-4 py-3 text-primary prose-headings:my-0.5 prose-p:my-1 prose-pre:m-0 ${calloutStyles[type]}`}
     >
       {icon && <p>{icon}</p>}
-      <span className="flex-1">{children}</span>
+      <span className="w-full min-w-0 flex-1">{children}</span>
     </div>
   )
 }
