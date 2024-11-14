@@ -1,16 +1,17 @@
-import { Quote } from 'lucide-react'
+import { Quote as QuoteIcon } from 'lucide-react'
 import { BlockquoteHTMLAttributes } from 'react'
 
-const Blockquote = ({
+const Quote = ({
   children,
   cite,
   ...props
 }: BlockquoteHTMLAttributes<HTMLQuoteElement>) => {
   return (
     <blockquote
-      className="relative border-l-2 border-muted-foreground italic text-gray-800"
+      className="relative mx-4 my-8 border-0 p-4 text-center italic text-gray-800"
       {...props}
     >
+      <QuoteIcon className="absolute left-1/2 top-0 ml-4 mt-2 -translate-x-1/2 fill-muted-foreground stroke-0" />
       <span className="text-muted-foreground [&>p:after]:content-none [&>p:before]:content-none">
         {children}
       </span>
@@ -23,4 +24,4 @@ const Blockquote = ({
   )
 }
 
-export default Blockquote
+export default Quote
