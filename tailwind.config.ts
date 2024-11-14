@@ -53,6 +53,14 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        callout: {
+          DEFAULT: 'hsl(var(--callout))',
+          primary: 'hsl(var(--callout-primary))',
+          info: 'hsl(var(--callout-info))',
+          warning: 'hsl(var(--callout-warning))',
+          success: 'hsl(var(--callout-success))',
+          danger: 'hsl(var(--callout-danger))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

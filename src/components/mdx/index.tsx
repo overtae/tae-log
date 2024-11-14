@@ -5,6 +5,7 @@ import HorizontalRule from '@/components/mdx/HorizontalRule'
 import Image from '@/components/mdx/Image'
 import ExternalLink from '@/components/mdx/Link'
 import Toggle from '@/components/mdx/Toggle'
+import Quote from '@/components/mdx/Quote'
 import { MDXComponents } from 'mdx/types'
 
 const MdxComponents: MDXComponents = {
@@ -14,6 +15,7 @@ const MdxComponents: MDXComponents = {
   blockquote: Blockquote as any,
   Callout,
   Toggle,
+  Quote,
 }
 
 export default MdxComponents

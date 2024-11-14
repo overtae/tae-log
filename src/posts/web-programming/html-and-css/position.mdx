@@ -1,0 +1,181 @@
+---
+title: '[HTML & CSS] position 속성 알아보기'
+date: '2022-02-03'
+description: '요소의 위치 동작을 정의하는 position'
+tags:
+  - 'position'
+---
+
+## position 속성을 사용하는 이유
+
+웹 문서의 요소(element)들이 배치되는 방식을 정해주기 위해 사용한다.
+
+position 속성이 static인 경우를 제외하고 보통 위치(좌표)를 정해주는 top, bottom, left, right 속성과 함께 사용된다.
+
+## `position: static;`
+
+position 속성의 기본값이 `static`이다.
+
+문서의 흐름에 따라 요소들이 자동으로 배치된다.
+
+top, bottom, left, right 속성으로 위치 설정이 **불가**하며 z-index 속성으로 수직 위치 설정도 불가하다.
+
+### static div 태그 배치
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="static div"
+  src="https://codepen.io/overtae/embed/preview/rNYLrzR?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+block 요소는 세로로, inline 요소는 가로로 자동으로 배치된다.
+
+만약 자식 요소의 position 속성이 absolute라면 기준이 되어주지 않는다.
+
+### static 부모와 absolute 자식의 관계
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="static & absolute"
+  src="https://codepen.io/overtae/embed/preview/XWzKPrJ?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+## `position: relative;`
+
+`static`과 동일하게 문서의 흐름에 따라 요소들이 자동으로 배치되지만,
+
+top, bottom, z-index 등의 속성 사용이 **가능**하고 자식 absolute의 기준점 역할도 해준다.
+
+### relative div 태그 배치
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="relative div"
+  src="https://codepen.io/overtae/embed/preview/rNYmYvm?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+`static`과 동일하게 배치된다.
+
+### relative 부모와 absolute 자식의 관계
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="relative & absolute"
+  src="https://codepen.io/overtae/embed/preview/dyZWVBV?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+## `position: absolute;`
+
+문서의 흐름에 따르지 않고, 가장 가까운 부모(body, relative, absolute, fixed)를 기준으로 삼아 상대적으로 배치된다.
+
+위치가 정해져 있기 때문에 자식 absolute의 기준점 역할이 가능하다.
+
+top, bottom, z-index 등의 속성 사용이 가능하다.
+
+### absolute div 태그 배치
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="absolute div"
+  src="https://codepen.io/overtae/embed/preview/NWwjwoG?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+div 3개가 하나로 겹쳐진 것을 볼 수 있다.
+
+### absolute 부모와 absolute 자식의 관계
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="absolute & absolute"
+  src="https://codepen.io/overtae/embed/preview/MWOmOxm?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+위의 경우 자식의 `positon: absolute;`는 생략해도 된다.
+
+## `position: fixed;`
+
+문서의 흐름에 따르지 않고, 뷰포트를 기준으로 배치된다.
+
+<Toggle open summary="뷰포트(viewport)란?">
+
+뷰포트는 웹 브라우저에서 사용자에게 보이는 부분을 뜻한다.
+
+</Toggle>
+
+뷰포트를 기준으로 배치되므로 스크롤을 내려도 지정된 자리에 고정되어있다.
+
+`fixed` 또한 자식 absolute의 기준점 역할이 가능하고, top, bottom, z-index 등의 속성 사용도 가능하다.
+
+### fixed div 태그 배치
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="fixed div"
+  src="https://codepen.io/overtae/embed/preview/yLPbpgP?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+absolute와 동일하다.
+
+### fixed 부모와 absolute 자식의 관계
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="fixed & absolute"
+  src="https://codepen.io/overtae/embed/preview/vYWmpGo?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+결과 화면에서 스크롤을 내려도 두 박스가 고정되어있는 것을 확인할 수 있다.
+
+<Callout type="info" icon="💡">
+
+이 게시물은 [cssreference.io](https://cssreference.io/property/position/) 사이트를 참고하였습니다.
+
+</Callout>

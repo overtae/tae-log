@@ -1,0 +1,126 @@
+---
+title: '[HTML & CSS] 자주 쓰이는 element'
+date: '2022-08-07'
+description: '텍스트 입력 박스, 콤보 박스, 표 그리기, 링크 연결'
+---
+
+### 텍스트 입력 받기
+
+```html
+<input type="text" />
+```
+
+![실행 화면](/posts/web-programming/html-and-css/basic-04.png)
+
+위에서 사용한 input 태그 같은 경우에 시작은 `<input`을 이용했지만 종료는 `/>`로 하였다.
+
+이처럼 종료 태그가 없는 element도 있다.
+
+보통 태그 안에 무언가가 들어갈 때 종료 태그를 사용한다.
+
+ex) h1, p, button ...
+
+### 숫자 입력 받기
+
+```html
+<input type="number" />
+```
+
+![실행 화면](/posts/web-programming/html-and-css/basic-05.png)
+
+type을 number로 설정할 경우 숫자만 입력 받는 박스를 만들 수 있다.
+
+### 콤보 박스
+
+```html
+<select>
+  <option>서울</option>
+  <option>대전</option>
+  <option>대구</option>
+  <option>부산</option>
+</select>
+```
+
+![실행 화면](/posts/web-programming/html-and-css/basic-06.png)
+
+콤보 박스의 경우 select 태그를 이용해 넣을 수 있다.
+
+select 태그에도 height이나 font-size, color 등의 디자인 속성을 추가해줄 수 있다.
+
+### 표
+
+```html title="index.html"
+<body>
+  <table>
+    <thead class="myThead">
+      <tr>
+        <th>제목 1</th>
+        <th>제목 2</th>
+        <th>제목 3</th>
+      </tr>
+    </thead>
+    <tbody class="myTbody">
+      <tr>
+        <td>내용 1</td>
+        <td>내용 2</td>
+        <td>내용 3</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+```
+
+```css title="style.css"
+.myThead > tr > th {
+  border: 1px solid black;
+  /*    굵기 선의 종류 색상 */
+  /*    1px   실선   검은색 */
+}
+
+.myTbody > tr > td {
+  border: 1px solid black;
+}
+```
+
+먼저 각각의 태그들에 대해 알아보자.
+
+|       |                        |
+| ----- | ---------------------- |
+| table | 표를 의미              |
+| thead | 표의 첫줄, 헤드 영역   |
+| tbody | 표의 아래쪽, 바디 영역 |
+| tr    | 하나의 행              |
+| td    | 제목 셀                |
+| td    | 각각의 셀              |
+
+만약 table에 따로 스타일을 주지 않는다면 각 셀마다 구분선이 없어 보기 불편하다.
+
+따라서 td 태그에 스타일을 주는데 각 셀마다 스타일을 지정해주기엔 너무 번거로우니 thead와 tbody에 한 번만 지정해주면 된다.
+
+만약 이렇게 주게 된다면 `>`를 이용해 경로 설정을 해주어야 하는데, `myThead > tr > td` 이런 식으로 주면 된다.
+
+![실행 화면](/posts/web-programming/html-and-css/basic-07.png)
+
+테두리가 떨어져 있는데 이를 합쳐주려면 `border-collapse: collapse;`를 `table` 태그 스타일에 주면 된다.
+
+![실행 화면](/posts/web-programming/html-and-css/basic-08.png)
+
+### 링크
+
+#### 보고 있는 탭에서 바로 연결
+
+```html
+<a href="https://overtae.github.io/blog/">블로그 홈</a>
+```
+
+#### 새로운 탭으로 연결
+
+```html
+<a href="https://overtae.github.io/blog/" target="_blank">블로그 홈</a>
+```
+
+<Callout type="info" icon="💡">
+
+이 게시물은 [개발자의품격](https://www.youtube.com/watch?v=cb7VlXqFla4)님의 유튜브를 참고하였습니다.
+
+</Callout>

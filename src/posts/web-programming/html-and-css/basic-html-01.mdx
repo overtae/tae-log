@@ -1,0 +1,120 @@
+---
+title: '[HTML & CSS] HTML 기본개념 익히기 1'
+date: '2022-01-17'
+description: 'HTML은 어떻게 구성 되어 있을까'
+tags:
+  - 'HTML'
+---
+
+### HTML이란?
+
+Hypertext Markup Language의 준말로 웹 브라우저에서 보여지도록 디자인 된 문서로 표준화 된 마크업 언어를 사용한다.
+
+가장 기본적인 빌딩 블럭(building block)으로 웹 컨텐츠의 구조와 의미를 결정하게 된다.
+
+CSS나 JavaScript는 부가적인 요소로 HTML이 없다면 단독으로 웹사이트를 만들지 못한다.
+
+<Quote>
+
+여기서 마크업 언어란 무엇일까?
+
+</Quote>
+
+이는 일반적인 텍스트와 문법적으로 구분하기 위해 문서에 주석처리한 것을 말한다.
+
+```html
+<recipe>
+  <!-- recipe 태그의 시작 -->
+
+  <title>커피 레시피</title>
+  <!-- '커피 레시피'라는 컨텐츠를 담고 있는 title 태그 -->
+
+  <ingredientlist>
+    <ingredient>물</ingredient>
+    <ingredient>커피가루</ingredient>
+  </ingredientlist>
+</recipe>
+<!-- recipe 태그의 끝 -->
+```
+
+위의 html 문서를 보면 recipe 태그 안에 title, ingrdientlist 이 두 개의 태그가 포함되어 있고, ingrdientlist는 ingredient라는 자식태그를 포함하고 있다.
+
+즉 태그를 이용하여 구조적으로 작성된 언어를 마크업 언어라 한다.
+
+### HTML의 구조
+
+```html
+<!doctype html>
+<!-- 이 문서의 타입이 html이라 명시 -->
+<html>
+  <head>
+    <!-- 
+        head 태그 안에는 사용자에게 보여지는 정보는 없고 메타 데이터만 존재한다.
+        보통 제목이나 부가 설명, 아이콘, 외부 파일 연결 등의 내용을 적는다.
+     -->
+    <meta charset="utf-8" />
+    <!-- 이 페이지에 쓰이는 문자의 포맷을 정의한다. -->
+    <meta name="viewport" content="width=device-width" />
+    <!-- 이 디바이스 스크린의 너비를 다 사용한다. -->
+    <title>HTML 기본 구조</title>
+  </head>
+
+  <body>
+    <!-- 
+        body 태그는 사용자에게 보여지는 가장 중요한 최상위 컨테이너이다.
+     -->
+    <h1>헤딩 1</h1>
+    <button>버튼</button>
+  </body>
+</html>
+```
+
+#### W3C
+
+위의 h1이나 button 같은 태그는 누가, 어떻게 만드는 것일까?
+
+<Toggle open summary="W3C (World Wide Web Consortium)">
+
+W3C는 웹의 표준화를 추진하는 곳으로 여러 교육 기관과 다양한 기업들이 모여있다.
+
+W3C에서 태그를 정의하면 모든 브라우저에서는 그 표준에 맞게 웹을 구현해야한다.
+
+</Toggle>
+
+#### MDN
+
+태그들을 하나하나 외울 수는 없고 만약 새로 추가가 된다면 어디에서 확인을 해야할까?
+
+바로 [MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element) 사이트를 통해 확인할 수 있다.
+
+태그를 클릭하면 예제와 브라우저 호환성도 나와있어 정말 편리하다.
+
+#### 이상한 태그
+
+만약 정의가 되어있지 않은 태그를 사용할 경우 브라우저가 알아서 사용자가 문서를 읽을 수 있게끔 도와준다.
+
+그렇다면 어떻게 오류가 있는지 확인을 해야할까.
+
+[Validator](https://validator.w3.org/) 사이트에서 웹 주소나 html 문서를 입력하면 잘못된 부분이 있는지 검사를 해준다.
+
+### 웹 사이트의 구조
+
+[MDN](https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure) 사이트를 확인해보면 웹 사이트의 기본 구조에 대해 나와있다.
+
+- header
+- navigation bar
+- main content
+- sidebar
+- footer
+
+꼭 위의 다섯개의 구조를 가져야 하는 건 아니지만 이런 식으로 나누라는 예제이다.
+
+body 태그 안에 모든 것을 다 넣을 경우 길이도 길어지고 어디까지가 헤더인지 구분이 어렵기 때문에 나눠서 작성을 하는 것이다.
+
+이 블로그도 위의 다섯가지로 나누어져 있다.
+
+<Callout type="info" icon="💡">
+
+이 게시물은 [드림코딩 by 엘리](https://www.youtube.com/watch?v=i0FN-OwJ7QI)님의 유튜브를 참고하였습니다.
+
+</Callout>

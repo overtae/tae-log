@@ -1,0 +1,66 @@
+---
+title: '[HTML & CSS] Reset CSS'
+date: '2022-01-09'
+description: '기본으로 설정되어 있는 여백 초기화'
+tags:
+  - 'CSS'
+---
+
+## margin? padding?
+
+쉽게 말하자면 테두리(border)를 기준으로 안쪽 영역을 패딩(padding), 바깥쪽 영역을 마진(margin)이라 한다.
+
+![](/posts/web-programming/html-and-css/paddingmargin.png)
+
+## Reset CSS란?
+
+```html title="index.html"
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div></div>
+  </body>
+</html>
+```
+
+```css title="style.css"
+body {
+  background-color: darkolivegreen;
+}
+
+div {
+  width: 100px;
+  height: 100px;
+  background-color: palegoldenrod;
+}
+```
+
+![index.html](/posts/web-programming/html-and-css/resetcss-01.png)
+
+> 따로 마진을 설정해주지 않았는데 왼쪽과 위쪽에 공백이 있다. body 태그에 기본적으로 설정되어있는 마진이 있는 것이다.
+
+위와 같이 웹 브라우저마다 기본적으로 설정되어있는 마진(margin)이나 색상(color)을 동일하게 설정해주는 것을 Reset CSS라 한다.
+
+이를 해줌으로써 각기 다른 웹 브라우저에서 동일한 스타일을 적용할 수가 있다.
+
+## 설정 방법은?
+
+html 문서와 연결된 css 파일 **제일 위쪽**에 설정해주고픈 태그들을 콤마로 구분해 적고 대괄호 안에 설정할 내용을 적어주면 된다.
+
+```css title="style.css"
+body {
+  margin: 0;
+  padding: 0;
+}
+```
+
+![index.html](/posts/web-programming/html-and-css/resetcss-02.png)
+
+왼쪽 위의 여백이 사라진 걸 확인할 수 있다.

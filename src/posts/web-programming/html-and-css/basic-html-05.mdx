@@ -1,0 +1,127 @@
+---
+title: '[HTML & CSS] 기초 적용해보기'
+date: '2022-02-10'
+description: '제목, 목록, 입력 양식, 이미지 태그'
+---
+
+### 주석 처리
+
+html과 css의 주석처리 방법은 서로 다르다.
+
+- html : `<!--`과 `-->` 사이에 글을 적어주면 된다.
+- css : `/*`과 `*/` 사이에 글을 적어주면 된다.
+
+```html
+<!-- html 주석 -->
+```
+
+```css
+/* css 주석 */
+```
+
+단축키 `Ctrl + /`을 사용해도 된다.
+
+### 제목 태그
+
+제목 태그는 `<h1>` 부터 `<h6>`까지 있으며 숫자가 커질수록 글씨 크기는 작아진다.
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="&lt;h1&gt; ~ &lt;h6&gt;"
+  src="https://codepen.io/overtae/embed/preview/yLPbXQg?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+### 목록 태그
+
+목록 태그는 `<ul>` 태그 안에 `<li>` 태그를 적어주면 된다.
+
+순서가 있는 `<ol>` 태그 안에 `<li>` 태그를 적어주는 방법도 있다.
+
+목록 앞에 점이 찍혀있는데 이를 없애고 싶다면 `list-style: none;`을 적어주면 된다.
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="list"
+  src="https://codepen.io/overtae/embed/preview/rNYmwoG?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+### 입력 양식 태그
+
+`<form>` 태그 안에 `<input>` 태그를 적어주면 된다.
+
+`<input>` 태그에는 텍스트를 입력 받는 `<input type="text">`와 서버에 데이터를 전송하는 `<input type="submit">`등의 여러가지 타입이 있다.
+
+`<input>` 태그의 경우 인라인 태그이기 때문에 한 줄로 배치된다.
+
+여러 줄로 배치를 하고 싶다면 목록 태그를 이용하면 된다.
+
+- `password` -입력한 값이 보이지 않는 텍스트 박스이다.
+- `radio` -동일한 name을 가진 요소들끼리는 중복 선택이 불가능한 체크 박스이다. -위에서 노란색과 파란색은 중복으로 선택이 불가하지만 보라색은 가능한 것을 볼 수 있다.
+- `checkbox` -중복 선택이 가능한 체크 박스이다. -`checked`를 써주면 체크된 상태로 표시된다.
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="form"
+  src="https://codepen.io/overtae/embed/preview/WNXjEvo?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+<Callout>
+
+**설명 더보기 :** [MDN](https://developer.mozilla.org/ko/docs/Web/HTML/Element/Input)
+
+</Callout>
+
+#### 버튼 디자인하기
+
+버튼의 경우 웹 브라우저마다 디자인이 다르고 submit 버튼은 데이터를 검증하지 않고 데이터베이스에 전송하기 때문에 `<div>` 태그를 이용하여 버튼을 만든다.
+
+- `color: white;` : 글자색
+- `line-height: 30px;` : 글의 높이, `div`의 높이와 동일하게 해 세로로 가운데에 있게 하기 위해 사용했다.
+- `text-align: center;` : 가운데 정렬
+- `cursor: pointer;` : 마우스 커서를 올렸을 때 손가락 모양으로 표시된다.
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="button"
+  src="https://codepen.io/overtae/embed/preview/qBVmXpG?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+### 이미지 넣기
+
+`<img>` 태그를 사용하여 이미지를 넣어줄 수 있다.
+
+이때 이미지 파일이 있는 경로를 잘 확인해 올바른 상대 경로로 입력을 해주는 것이 중요하다.
+
+```html
+<img src="imageName.png" /> <img src="../image/imageName.png" />
+```
+
+<Callout type="info" icon="💡">
+
+이 게시물은 [타모디자인TAMO](https://www.youtube.com/watch?v=5i30L-bEUCg)님의 유튜브를 참고하였습니다.
+
+</Callout>

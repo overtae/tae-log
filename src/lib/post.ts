@@ -9,7 +9,7 @@ import matter from 'gray-matter'
 import path from 'path'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
-const BASE_PATH = 'src\\posts'
+const BASE_PATH = 'src/posts'
 const POSTS_PATH = path.join(process.cwd(), BASE_PATH)
 
 // 모든 MDX 파일 조회
@@ -33,11 +33,12 @@ const parsePost = async (postPath: string): Promise<Post> => {
 // MDX의 개요 파싱
 // url, category path, slug
 export const parsePostAbstract = (postPath: string) => {
-  const filePath = postPath
-    .slice(postPath.indexOf(BASE_PATH))
-    .replace(`${BASE_PATH}\\`, '')
+  const formattedPostPath = postPath.replaceAll('\\', '/')
+  const filePath = formattedPostPath
+    .slice(formattedPostPath.indexOf(BASE_PATH))
+    .replace(`${BASE_PATH}/`, '')
     .replace('.mdx', '')
-  const paths = filePath.split('\\')
+  const paths = filePath.split('/')
   const slug = paths.pop() || ''
   const categoryPath = paths.slice(0, 2).join('/')
   const url = `/blog/${categoryPath}/${slug}`
@@ -50,7 +51,8 @@ const parsePostDetail = async (postPath: string) => {
   const { data, content } = matter(file)
   const grayMatter = data as PostMatter
   const date = dayjs(grayMatter.date).locale('ko').format('YYYY년 MM월 DD일')
-  return { ...grayMatter, date, content }
+  const tags = grayMatter.tags || []
+  return { ...grayMatter, date, tags, content }
 }
 
 // category path을 category name으로 변경 : main/sub -> subname, main -> mainname

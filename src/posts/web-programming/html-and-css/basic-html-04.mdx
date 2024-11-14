@@ -1,0 +1,133 @@
+---
+title: '[HTML & CSS] 효율적인 CSS 작성'
+date: '2022-01-20'
+description: '중요한 선택자들'
+tags:
+  - '선택자'
+---
+
+### 선택자란?
+
+<span style={{color: 'cornflowerblue'}}>p</span> \{ <span style={{ color: 'yellowgreen' }}>color</span>: <span style={{ color: 'tomato' }}>red</span>; <span style={{ color: 'yellowgreen' }}>padding</span>: <span style={{ color: 'tomato' }}>5px</span>; \}
+
+- <span style={{ color: 'cornflowerblue' }}>파란색</span> : 선택자 ( selector )
+- <span style={{ color: 'yellowgreen' }}>초록색</span> : 속성 ( property )
+- <span style={{ color: 'tomato' }}>빨간색</span> : 속성값 ( property-value )
+- <span style={{ color: 'yellowgreen' }}>속성</span> + <span style={{ color: 'tomato' }}>
+    속성값
+  </span> : 선언( Declaration )
+- 선언 + 선언 + ... : 선언 블록( Declaration block )
+
+### 전체 선택자 ( Universal Selector )
+
+```css
+* {
+  margin: 0;
+}
+```
+
+위와 같이 `*`를 전체 선택자라고 하고 모든 element에 적용된다.
+
+### 태그 선택자 ( Type Selector )
+
+태그명(p, a, h1, ...)을 가지고 디자인을 지정한다.
+
+동일한 태그에 모두 적용된다.
+
+### 클래스 선택자 ( Class Selector )
+
+클래스명을 가지고 디자인을 지정한다.
+
+```css
+.myColor {
+  color: red;
+}
+```
+
+전 포스트에서 사용하던 것이 바로 클래스 선택자이다.
+
+클래스명 앞에 `.`을 붙이는 걸 잊지 말자.
+
+#### 순서에 따른 우선도
+
+CSS 파일에서 밑에 있을수록 우선도가 높다.
+
+```html title="index.html"
+<p>hello</p>
+```
+
+```css title="style.css"
+* {
+  font-size: 10px;
+}
+p {
+  font-size: 15px;
+}
+.myFontSize {
+  font-size: 20px;
+}
+```
+
+만약 위와 같이 작성되어 있다면 hello의 크기는 20px로 적용된다.
+
+### ID 선택자 ( ID Selector )
+
+각 element마다 id를 지정해줄 수 있는데 이때 id는 유일해야 한다.
+
+모든 element에 id를 동일하게 줄 수 없다는 의미이다.
+
+ID 선택자의 경우 앞에 `#`를 붙여 사용한다.
+
+```css
+#myid {
+  background: yellow;
+}
+```
+
+### 하위 선택자 ( Descendant Combinator )
+
+```css
+.myTbody td {
+  border: 1px solid black;
+}
+```
+
+만약 table 태그에 myTbody란 클래스를 줬을 때, 그 하위에 있는 모든 td 태그를 찾아 적용한다.
+
+선택자로 클래스를 주어도 되고 태그나 id 등등을 주어도 된다.
+
+```css
+div td {
+} /* 태그 */
+
+#myid td {
+} /* id */
+```
+
+### 자식 선택자 ( Child Selector )
+
+앞의 포스트에서 테이블에 스타일을 지정해줄 때 사용했던 `>`를 의미한다.
+
+```css
+.myTbody > tr > td {
+  border: 1px solid black;
+}
+```
+
+하위 선택자와는 다르게 하나하나 경로를 설정해주어야 한다.
+
+```css
+.myTbody > tr:first-child {
+}
+
+.myTbody > tr:last-child {
+}
+```
+
+`first-child`와 `last-child`로 첫번째 자식과 마지막 자식을 선택할 수 있다.
+
+<Callout type="info" icon="💡">
+
+이 게시물은 [개발자의품격](https://www.youtube.com/watch?v=cb7VlXqFla4)님의 유튜브를 참고하였습니다.
+
+</Callout>

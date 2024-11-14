@@ -17,13 +17,13 @@ const TableOfContents = ({ toc }: TableOfContentsProps) => {
       <div className="md:mb-4 md:px-4 md:py-2">
         <div className="mb-1 font-bold">목차</div>
         <ul className="text-xs font-normal text-muted-foreground">
-          {toc.map((item) => {
+          {toc.map((item, index) => {
             const isH3 = item.indent === 1
             const isIntersecting = activeId === item.link
 
             return (
               <li
-                key={item.link}
+                key={item.link + index}
                 className={cn(
                   isH3 && 'ml-2',
                   isIntersecting && 'md:font-semibold md:text-primary',
