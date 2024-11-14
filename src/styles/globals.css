@@ -33,6 +33,12 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --callout: 0 0% 79%;
+    --callout-primary: 0 0% 52%;
+    --callout-info: 197 100% 77%;
+    --callout-success: 84 66% 73%;
+    --callout-warning: 39 100% 71%;
+    --callout-danger: 357 81% 69%;
   }
   .dark {
     --background: 20 14.3% 4.1%;
@@ -59,6 +65,12 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --callout: 24 9.8% 10%;
+    --callout-primary: 206 6% 46%;
+    --callout-info: 194 52% 48%;
+    --callout-success: 120 45% 45%;
+    --callout-warning: 35 95% 43%;
+    --callout-danger: 2 81% 65%;
   }
 }
 
@@ -219,6 +231,11 @@ body {
 /* Captions */
 .prose figcaption[data-rehype-pretty-code-caption] {
   @apply relative w-full text-center;
+}
+
+/* with details */
+.prose details figure[data-rehype-pretty-code-figure] pre {
+  @apply mt-0;
 }
 
 /* ============================================ 
