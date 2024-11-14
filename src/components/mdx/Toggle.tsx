@@ -3,11 +3,16 @@ import { PropsWithChildren } from 'react'
 
 interface ToggleProps {
   summary: string
+  open?: boolean
 }
 
-const Toggle = ({ summary, children }: PropsWithChildren<ToggleProps>) => {
+const Toggle = ({
+  summary,
+  children,
+  open = false,
+}: PropsWithChildren<ToggleProps>) => {
   return (
-    <details open className="group my-4">
+    <details className="group my-4" open={open}>
       <summary className="hover:text-muted-primary relative mb-2 w-fit cursor-pointer list-none py-2 pl-9 pr-4 text-primary">
         <span className="absolute left-0 top-1/2 -translate-y-1/2 rotate-0 text-lg transition-all duration-300 group-open:rotate-90">
           <ChevronRight />
