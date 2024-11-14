@@ -1,0 +1,29 @@
+---
+title: '[JavaScript] '
+date: '2023-00-00'
+description: '모던 자바스크립트 Deep Dive CH00'
+---
+
+<Callout icon="⭐">
+
+asdf
+
+</Callout>
+
+<Toggle open summary="⭐">
+
+asd
+
+</Toggle>
+
+<Callout type="info" icon="💡">
+
+이 게시물은 [모던자바스크립트 Deep Dive 교재](https://book.naver.com/bookdb/book_detail.nhn?bid=16710547)를 참고하였습니다.
+
+</Callout>
+
+=== image ===
+/posts/web-programming/javascript
+
+=== post ===
+/blog/web-programming/javascript/

@@ -1,0 +1,168 @@
+---
+title: '[HTML & CSS] display 속성 알아보기'
+date: '2022-02-05'
+description: '요소의 화면표시 동작을 정의하는 display'
+tags:
+  - 'display'
+---
+
+### display 속성이란?
+
+요소를 화면에 어떻게 배치할 것인지를 정해주는 속성이다.
+
+### `display: none;`
+
+처음부터 html 문서에 존재하지 않았던 것처럼 요소를 제거한다. (눈에 보이지 않게 된다.)
+
+### `display: inline;`
+
+일반적인 텍스트처럼 동작한다.
+
+높이(height)와 폭(width)을 지정해도 적용되지 않는다.
+
+대표적으로 `<span>` 태그가 있다.
+
+### `display: block;`
+
+요소 하나가 한 줄을 차지한다.
+
+대표적으로 `<div>` 태그가 있다.
+
+### inline vs. block
+
+<iframe
+  height="300"
+  className="w-full"
+  scrolling="no"
+  title="inline vs. block"
+  src="https://codepen.io/overtae/embed/preview/LYOyLLQ?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+></iframe>
+
+- `<div>` : 가로 한 줄을 전부 차지한다.
+- `<span>` : 내용물 만큼의 영역만 차지한다.
+
+### `display: flex;`
+
+요소 스스로는 블록 요소처럼 동작하고 자식 요소들은 플렉스 박스 항목으로 변환된다.
+
+![](/posts/web-programming/html-and-css/display-01.png)
+
+#### 주 축과 교차 축
+
+주 축과 교차 축의 방향은 `flex-direction` 속성에 의해 결정된다.
+
+##### `flex-direction`
+
+- row : 기본값으로 텍스트 방향과 같은 방향으로 정렬된다.
+- row-reverse : 텍스트 방향의 반대 방향으로 정렬된다.
+- column : 위에서 아래로 정렬된다.
+- column-reverse : 아래에서 위로 정렬된다.
+
+- **주 축 main axis**
+
+  - flex item이 배치되고 있는 방향의 축이다.
+  - 가로 방향 : row, row-reverse
+  - 세로 방향 : column, column-reverse
+
+- **교차축 cross axis**
+  - 메인축과 직각을 이루는 축이다.
+
+### flex item 정렬
+
+교차 축을 따라 정렬하는 `align-items` 속성과 주 축을 따라 정렬하는 `justify-content` 속성이 있다.
+
+#### align-items
+
+##### `align-items: stretch;`
+
+아무것도 지정하지 않았을 때 적용되는 기본 값으로 flex container의 높이에 맞춰 수직 공간을 채운다.
+
+##### `align-items: flex-start;`
+
+교차 축의 시작 부분에 정렬된다.
+
+기본적으로 교차 축은 수직이므로 flex item은 컨테이너의 상단 선에 맞추어 정렬된다.
+
+![](/posts/web-programming/html-and-css/display-02.png)
+
+붉은 선(교차 축의 시작)에 맞추어 정렬된 것을 볼 수 있다.
+
+##### `align-items: flex-end;`
+
+교차 축의 끝 부분에 정렬된다.
+
+기본적으로 교차 축은 수직이므로 flex item은 컨테이너의 하단 선에 맞추어 정렬된다.
+
+![](/posts/web-programming/html-and-css/display-03.png)
+
+붉은 선(교차 축의 끝)에 맞추어 정렬된 것을 볼 수 있다.
+
+##### `align-items: center;`
+
+교차 축의 중간 부분에 정렬된다.
+
+기본적으로 교차 축은 수직이므로 flex item은 컨테이너의 세로 중앙에 맞추어 정렬된다.
+
+![](/posts/web-programming/html-and-css/display-04.png)
+
+붉은 선(교차 축의 중간)에 맞추어 정렬된 것을 볼 수 있다.
+
+##### `align-items: base-line;`
+
+flex item들의 밑변을 기준으로 정렬된다.
+
+![](/posts/web-programming/html-and-css/display-05.png)
+
+붉은 선(밑변)에 맞추어 정렬된 것을 볼 수 있다.
+
+#### justify-content
+
+##### `justify-content: flex-start;`
+
+주 축의 시작 부분에 정렬된다.
+
+![](/posts/web-programming/html-and-css/display-06.png)
+
+##### `justify-content: flex-end;`
+
+주 축의 끝 부분에 정렬된다.
+
+![](/posts/web-programming/html-and-css/display-07.png)
+
+##### `justify-content: center;`
+
+주 축의 중간 부분에 정렬된다.
+
+![](/posts/web-programming/html-and-css/display-08.png)
+
+##### `justify-content: space-between;`
+
+flex item들 **사이 간격**을 균등하게 분배한다.
+
+이때 컨테이너 시작과 끝에 **여백이 생기지 않는다.**
+
+![](/posts/web-programming/html-and-css/display-09.png)
+
+##### `justify-content: space-around;`
+
+flex item들 **주변 간격**을 균등하게 분배한다.
+
+이때 컨테이너 시작과 끝에 **여백이 생긴다.**
+
+![](/posts/web-programming/html-and-css/display-10.png)
+
+컨테이너 시작과 끝에 여백이 생겼지만, 요소들 사이의 여백과 다른 것을 볼 수 있다.
+
+이때 `justify-content: space-evenly`를 사용하면 여백이 같아진다.
+
+하지만 지원하지 않는 브라우저(엣지, 인터넷 익스플로러)가 있기 때문에 조심해야한다.
+
+<Callout type="info" icon="💡">
+
+이 게시물은 [cssreference.io](https://cssreference.io/property/display/) 사이트를 참고하였습니다.
+
+</Callout>
