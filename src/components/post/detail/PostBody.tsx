@@ -3,6 +3,19 @@ import { Post } from '@/types/post'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
+import rehypePrettyCode, { type Options } from 'rehype-pretty-code'
+
+/** @type {import('rehype-pretty-code').Options} */
+const options: Options = {
+  theme: {
+    dark: 'material-theme-darker',
+    light: 'material-theme-lighter',
+  },
+  defaultLang: 'plaintext',
+  tokensMap: {
+    fn: 'entity.name.function',
+  },
+}
 
 interface PostBodyProps {
   post: Post
@@ -16,7 +29,7 @@ const PostBody = ({ post }: PostBodyProps) => {
       options={{
         mdxOptions: {
           remarkPlugins: [remarkGfm],
-          rehypePlugins: [rehypeSlug],
+          rehypePlugins: [rehypeSlug, [rehypePrettyCode, options]],
         },
       }}
     />
