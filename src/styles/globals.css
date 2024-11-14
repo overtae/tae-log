@@ -194,10 +194,6 @@ body {
   content: url("data:image/svg+xml,%3Csvg width='52' height='12' viewBox='0 0 52 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_26_42)'%3E%3Ccircle cx='6' cy='6' r='6' fill='%23FF4E4E'/%3E%3Ccircle cx='26' cy='6' r='6' fill='%23FFDD55'/%3E%3Ccircle cx='46' cy='6' r='6' fill='%2370FF53'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_26_42'%3E%3Crect width='52' height='12' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
 }
 
-.prose figure[data-rehype-pretty-code-figure] pre {
-  @apply -top-8 pt-12 lg:-top-9 lg:pt-14;
-}
-
 .prose figure[data-rehype-pretty-code-figure] pre::before {
   @apply absolute right-0 top-0 z-20 px-4 py-1.5 text-end text-sm text-amber-500 lg:py-2;
   content: attr(data-language);
@@ -218,7 +214,7 @@ body {
 
 /* Captions */
 .prose figcaption[data-rehype-pretty-code-caption] {
-  @apply relative -top-8 w-full text-center lg:-top-9;
+  @apply relative w-full text-center;
 }
 
 /* ============================================ 
