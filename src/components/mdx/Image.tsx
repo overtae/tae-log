@@ -1,11 +1,11 @@
 import NextImage from 'next/image'
-
 interface ImageProps {
   src: string
   alt: string
+  title: string
 }
 
-const Image = ({ src, alt }: ImageProps) => {
+const Image = ({ src, alt, title }: ImageProps) => {
   return (
     <>
       <NextImage
@@ -17,7 +17,7 @@ const Image = ({ src, alt }: ImageProps) => {
       />
       {alt !== '' && (
         <span className="mb-8 mt-2 block w-full text-center text-sm text-gray-500 dark:text-gray-400">
-          {alt}
+          {title ? <a href={title}>{alt}</a> : alt}
         </span>
       )}
     </>
