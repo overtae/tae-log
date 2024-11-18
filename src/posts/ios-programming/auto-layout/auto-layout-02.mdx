@@ -1,0 +1,138 @@
+---
+title: '[Auto Layout] Xcode에서 Auto Layout 알아보기'
+date: '2022-01-11'
+description: 'iOS Auto Layout 정리 - 2'
+tags:
+  - 'constraint'
+  - 'relation'
+  - 'priority'
+  - 'multiplier'
+---
+
+### Xcode 실습으로 알아보는 제약 조건
+
+![add constraints](/posts/ios-programming/auto-layout/alEx.png)
+
+Constraint는 스토리 보드 아래쪽에 오른쪽에서 세번째 버튼(Pin Tool)을 눌러 설정이 가능하다.
+
+![size inspector](/posts/ios-programming/auto-layout/inspector.png)
+
+위 이미지는 Constraint를 추가한 후 Xcode 오른쪽에 Inspector 창을 확인했을때의 화면이다.
+
+`온도변환` 버튼을 기준으로 생성된 파란색 선(Constraint)를 누르거나 위 이미지의 네모난 박스를 눌러보면 조금 더 상세한 속성이 나온다.
+
+![size inspector detail](/posts/ios-programming/auto-layout/inspector2.PNG)
+
+위 이미지는 `온도변환` 버튼의 위쪽 Constraint를 눌렀을 때 나오는 화면이다.
+
+#### First Item? Relation? Second Item?
+
+전 포스트에서 오토 레이아웃은 두 뷰의 관계를 기반으로 한 레이아웃이라 설명했다.
+
+수학적으로 생각을 해보면 이항 관계, 즉 방정식인 것이다.
+
+그렇기 때문에 오토 레이아웃도 선형 방정식으로 정의된다.
+
+`FirstItem.Attribute = Multiplier * SecondItem.Attribute`<br/>
+
+위 식을 보면 Inspector 창에 있던게 조금은 이해가 된다.
+
+```swift
+First Item : 온도변환.Top
+// FirstItem이 온도변환이다.
+// FirstItem의 Attribute가 Top이다.
+
+Relation : Equal
+// '='(Relationshop)이 Equal이다.
+
+Second Item : BMI 계산.Bottom
+// SecondItem이 BMI 계산이다.
+// SecondItem의 Attribute가 Bottom이다.
+```
+
+**Multiplier?** [아래](#multiplier)에서 알아보도록 하자.
+
+#### leading? trailing?
+
+![](/posts/ios-programming/auto-layout/leadandtrail.png)
+
+leading과 trailing에 대한 설명은 위 이미지를 보면 된다.
+
+`Safe Area.trailing = 오토레이아웃.trailing + 129`는 Safe Area.trailing은 오토레이아웃.trailing보다 129만큼 뒤에 있다는걸 의미한다.
+
+만약 `오토레이아웃.trailing`과 `Safe Area.trailing`의 순서를 바꾼다면 어떻게 될까.
+
+![](/posts/ios-programming/auto-layout/reverse.png)
+
+바로 위 이미지에 `Reverse First And Second Item`을 눌러주기만 하면 바로 바꿀 수 있다.
+
+아까 설명한 수식에 따르면 `+`가 `-`로 바뀌게 될 것이다.
+
+![reverse 결과](/posts/ios-programming/auto-layout/reverse2.png)
+
+#### Relation?
+
+만약 레이블의 길이가 늘어나거나 줄어든다면 어떻게 처리될까.
+
+![](/posts/ios-programming/auto-layout/relation3.png)
+
+끝부분이 잘리게 된다. 이를 방지하기 위해 Relation에는 세가지 옵션이 있다.
+
+- Less Than or Equal (작거나 같음 `<=`)
+- Equal (같음 `=`)
+- Greater Than or Equal (크거나 같음 `>=`)
+
+![](/posts/ios-programming/auto-layout/relation.png)
+
+간단하게 수식의 등호 부분에 `<=`나 `>=`를 넣어 생각하면 된다.
+
+레이블이 늘어난다는 것은 `오토레이아웃.trailing`이 오른쪽으로 늘어나면서 `Safe Area.trailing - 129` 보다 커진다는 것이다.
+
+![](/posts/ios-programming/auto-layout/relation4.png)
+
+위 이미지는 앞에서 FirstItem과 SecondItem의 위치를 바꿨기 때문에 **_"오토오토레이아웃.trailing이 Safe Area.trailing에서 `- 129`를 한 값보다 더 클 수 있다."_**라는 뜻이다.
+
+만약 바꾸지 않았다면 `Greater Than or Equal` 대신 `Less Than or Equal`을 사용해야 한다.
+
+#### Priority
+
+Priority는 1부터 1000까지의 값으로 클수록 높은 우선순위를 가진다.
+
+101, 999 같은 값을 사용할 수는 있지만 권장하는건
+
+- 1000 (Required)
+- 750 (High)
+- 500 (Middle)
+- 250 (Low)
+
+위의 네 값이다.
+
+프로젝트에선 어떻게 적용될까.
+
+![](/posts/ios-programming/auto-layout/priority1.png)
+
+왼쪽을 보면 오토레이아웃 레이블에 bottom constraint가 2개가 적용된 걸 볼 수 있다.
+
+하나는 1000의 priority를 가진 아래에서 200만큼 떨어뜨리라는 것이고, 나머지 하나는 250의 priority를 가진 아래에서 536만큼 떨어뜨리라는 것이다.
+
+당연히 우선순위가 더 높은 아래에서 200만큼 떨어뜨리라는 constraint가 적용이 된 걸 확인할 수 있다.
+
+#### Multiplier
+
+![](/posts/ios-programming/auto-layout/mul1.png)
+
+위 이미지처럼 두 view를 만들어 Equal Heights를 주었다. (Equal Widths는 주지 않았다.)
+
+그 후 Multiplier를 조정해보았다.
+
+![](/posts/ios-programming/auto-layout/finalmul.png)
+
+`BlueView.Height = Multiplier * YellowView.Height`<br/>
+
+위 수식이 적용되었다고 보면 된다.
+
+<Callout type="info">
+
+이 게시물은 [Zedd](https://zeddios.tistory.com/380 "Zedd님 블로그")님의 포스트와 [developer.apple.com](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/AutolayoutPG/index.html) 사이트를 참고하였습니다.
+
+</Callout>

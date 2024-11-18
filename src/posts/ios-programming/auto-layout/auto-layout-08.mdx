@@ -1,0 +1,75 @@
+---
+title: '[Auto Layout] 코드로 적용해보는 오토 레이아웃 1'
+date: '2022-01-15'
+description: 'iOS Auto Layout 정리 - 8'
+---
+
+### 테두리 그리기
+
+```swift
+@IBOutlet weak var mybtn: UIButton!
+
+override func viewDidLoad() {
+    super.viewDidLoad()
+
+    mybtn.layer.cornerRadius = 7
+    mybtn.layer.borderColor = UIColor.lightGray.cgColor
+    mybtn.layer.borderWidth = 2
+}
+```
+
+[layer](https://developer.apple.com/documentation/uikit/uiview/1622436-layer)는 [CALayer](https://developer.apple.com/documentation/quartzcore/calayer) 클래스의 인스턴스 프로퍼티이다.
+
+위의 코드에서 사용한 프로퍼티들에 대해 자세히 알아보자.
+
+#### cornerRadius
+
+```swift
+var cornerRadius: CGFloat { get set }
+```
+
+둥근 모서리를 그릴 때 사용하는 반지름이다.
+
+0보다 큰 값을 주어 둥글게 만들 수 있다.
+
+테두리나 배경색에만 적용이 되고 이미지엔 적용이 되지 않는다.
+
+만약 적용을 하고 싶다면 masksToBounds를 True로 설정해주면 된다.
+
+```swift
+mybtn.layer.cornerRadius = mybtn.bounds.width * 0.5
+```
+
+위의 소스처럼 해당 요소의 너비의 절반만큼을 반지름으로 줄 수도 있다.
+
+bounds는 요소의 원래 크기를 의미한다.
+
+#### borderColor
+
+```swift
+var borderColor: CGColor? { get set }
+```
+
+테두리의 색을 의미하며 기본값은 검정색으로 되어있다.
+
+[이 곳](https://developer.apple.com/documentation/uikit/uicolor/standard_colors)에서 사용 가능한 색들을 확인 가능하다.
+
+#### borderWidth
+
+```swift
+var borderWidth: CGFloat { get set }
+```
+
+테두리의 너비를 의미하며 기본값은 0이다.
+
+너비를 지정해주면 현재 borderColor에 지정된 색으로 테두리를 그린다.
+
+지정된 inset의 값으로 경계에 테두리가 그려진다.
+
+만약 테두리가 안의 내용과 너무 붙어있는게 싫다면 inset을 주면 될 것 같다.
+
+<Callout type="info">
+
+이 게시물은 [KxCoding](https://www.youtube.com/watch?v=673jZ19WK58)님의 유튜브와 [developer.apple.com](developer.apple.com)사이트를 참고하였습니다.
+
+</Callout>

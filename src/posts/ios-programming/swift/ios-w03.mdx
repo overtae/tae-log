@@ -1,0 +1,334 @@
+---
+title: 'Swift 문법 2'
+date: '2021-09-21'
+description: 'iOS프로그래밍기초(21-2학기) 강의 정리'
+tags:
+  - 'Optional'
+  - 'nil'
+  - '연산자'
+  - '제어문'
+---
+
+### Int형 vs Optional Int형
+
+```swift
+var x : Int = 5
+print(x) // 5
+var y : Int? = 5
+print(y) // Optional(5)
+var z : Int!
+print(z) // nil
+z = 3
+print(z) // Optional(3)
+```
+
+### 옵셔널 타입
+
+```swift
+print(Int("100")) // Optional(100)
+print(Int("hundred")) // nil
+```
+
+### 강제 언래핑 1
+
+```swift
+var x : Int? = 1
+var y : Int = 10
+print(x!) // 1 (forced upwrapping)
+print(y) // 10
+x = x!+2 // x = x+2 (X)
+print(x) // Optional(3)
+y = x! // y = x (X)
+print(y) // 3
+```
+
+#### - nil 값은 강제 언래핑 불가
+
+```swift
+var x : Int?
+x = 5
+if x != nil { // x!=nil (X)
+    print(x!)
+}
+else {
+    print("nil")
+}
+// 5
+x = nil
+if x != nil {
+    print(x!)
+}
+else {
+    print("nil")
+}
+// nil
+```
+
+### 강제 언래핑 2 : optional binding
+
+```swift
+var x : Int?
+x = 5
+if var xx = x {
+    print(x, xx) // Optional(5) 5
+    xx += 5
+    print(x, xx) // Optional(5) 10
+    x = xx
+    print(x, xx) // Optional(10) 10
+}
+else {
+    print("nil")
+}
+x = nil // 값이 없을 경우 if문의 조건이 거짓이 된다.
+if let x = x {
+    print(x)
+}
+else {
+    print("nil")
+}
+// nil
+```
+
+#### - 여러 옵셔널 변수를 한번에 언래핑
+
+```swift
+var red : String? = "#FF0000"
+var blue : String?
+blue = "#0000FF"
+if let color1 = red, let color2 = blue { // ,는 &&조건
+    print(color1, color2) // #FF0000 #0000FF
+}
+else { // 하나라도 nil일 경우
+    print("nil")
+}
+```
+
+#### - 이를 이용하여 강제 언래핑 2의 코드 변형
+
+```swift
+var x : Int?
+var y : Int?
+x = 5
+y = 5
+if let xx = x , let yy = y {
+    print(x, xx) // Optional(5) 5
+    print(y, yy) // Optional(5) 5
+}
+else {
+    print("nil")
+}
+```
+
+### Int? vs Int!
+
+```swift
+let x : Int? = 10
+let y : Int = x!
+let z = x
+print(x, y, z)
+// Optional(10) 10 Optional(10)
+print(type(of:x), type(of:y), type(of:z))
+// Optional<Int> Int Optional<Int>
+let a : Int! = 10
+let b : Int = a // Optional로 사용될 수 없다면 자동으로 unwrap
+let c : Int = a! // 풀어서 넣는 것도 가능
+let d = a // Optional로 사용될 수 있으므로 Optional형
+let e = a + 10 // unwrap
+print(a, b, c, d, e)
+// Optional(10) 10 10 Optional(10) 20
+print(type(of:a), type(of:b), type(of:c), type(of:d), type(of:e))
+// Optional<Int> Int Int Optional<Int> Int
+```
+
+### 비교 연산자
+
+```swift
+class Person {}
+let person1 = Person()
+let person2 = Person()
+let person3 = person1
+print(person1 === person2) // false
+print(person1 === person3) // true (주소가 같다)
+```
+
+### 범위 연산자
+
+```swift
+let names = ["A", "B", "C", "D", "E"]
+for name in names[2...3] { // 닫힌 범위 연산자
+    print(name, terminator:" ") // C D
+}
+print("\n")
+for name in names[2...] {
+    print(name, terminator:" ") // C D E
+}
+print("\n")
+for name in names[...2] { // 반 열린 범위 연산자
+    print(name, terminator:" ") // A B C
+}
+print("\n")
+for name in names[..<2] {
+    print(name, terminator:" ") // A B
+}
+```
+
+### Nil 합병 연산자
+
+```swift
+let defaultAge = 1
+var age : Int?
+var myDefaultAge = age ?? defaultAge // age가 nil이므로 defaultAge 1 할당
+print(myDefaultAge) // 1
+age = 21
+print(age) // Optional(21)
+var myAge = age ?? defaultAge // age가 nil이 아니므로 age 21 할당
+print(myAge) // 21
+```
+
+### 조건-증가 for문
+
+```swift
+/*
+for var i = 0; i < 5; i+=1 {
+    print(i) // has been removed in Swift 3
+}
+*/
+for i in 0..<5 {
+    print(i) // 0 1 2 3 4
+}
+```
+
+#### - i 생략 가능
+
+```swift
+for _ in 0..<3 {
+    print("tree", terminator:" ") // tree tree tree
+}
+```
+
+### 배열의 항목 접근
+
+```swift
+let animals = ["cat", "dog", "snake", "dragon", "butterfly"]
+for i in animals[3...] {
+    print(i) // dragon butterfly
+}
+```
+
+### dictionary의 항목 접근
+
+```swift
+let ageOfFamily = ["My" : 21, "Mother" : 50, "Father" : 52, "GrandMa" : 74]
+for (fam, age) in ageOfFamily {
+    print("\(fam) age is \(age)")
+}
+/*
+Father age is 52
+Mother age is 50
+My age is 21
+GrandMa age is 74 */
+```
+
+### while 반복문
+
+```swift
+var cnt = 0
+while cnt < 100 {
+    cnt += 7
+}
+print(cnt) // 105
+```
+
+### repeat-while 반복문 : do…while 대신
+
+```swift
+var x = 0
+repeat { // 적어도 한번은 실행
+    x -= 1
+    print(x)
+} while (x > 0)
+// -1
+```
+
+### 반복문에서 빠져나오기 : break
+
+```swift
+for i in 1..<10 {
+    if i > 5 { break } // 문장이 한 줄이어도 {} 필요
+    print(i)
+}
+// 1
+// 2
+// 3
+// 4
+// 5
+```
+
+### continue
+
+```swift
+for i in 1...10 {
+    if i % 2 != 0 { continue }
+    // continue 이후의 모든 코드를 건너뛰고 반복문의 시작 위치로 돌아감
+    print(i)
+} // 2 4 6 8 10
+```
+
+### if문 조건에서 콤마는 &&의 의미이다.
+
+```swift
+var a = 1, b = 2, c = 2, d = 3
+if a<b && c<d {
+    print("true")
+} // true
+if a<b, c<d {
+    print("true")
+} // true
+```
+
+### 다중 if-else문
+
+```swift
+var num = 3
+if (num == 1 || num == 3) {
+    print("남성")
+}else if (num == 2 || num == 4) {
+    print("여성")
+}else {
+    print("한국인 아님")
+}
+// 남성
+if (num == 1 || num == 2) {
+    print("1900년~1999년 출생자")
+}else if (num == 3 || num == 4) {
+    print("2000년 이후 출생자")
+}
+// 2000년 이후 출생자
+```
+
+### switch-case문 (BMI 계산 결과 판정)
+
+```swift
+let weight = 60.0
+let height = 170.0
+let bmi = weight / (height*height*0.0001)
+var body = ""
+switch bmi {
+case 40...:
+    body = "3단계 비만"
+case 30..<40:
+    body = "2단계 비만"
+case 25..<30:
+    body = "1단계 비만"
+case 18.5..<25:
+    body = "정상"
+case ..<18.5:
+    body = "저체중"
+default:
+    body = "판정 불가"
+}
+print("BMI:\(bmi), 판정:\(body)")
+// BMI:20.761245674740483, 판정:정상
+```
+
+_- iOS프로그래밍기초(21-2학기) 한성현교수님 강의 내용 변형 및 요약_

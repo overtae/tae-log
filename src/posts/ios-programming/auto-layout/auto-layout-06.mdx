@@ -1,0 +1,77 @@
+---
+title: '[Auto Layout] 학기말 프로젝트 Auto Layout 적용기 2'
+date: '2022-01-14'
+description: 'iOS Auto Layout 정리 - 6'
+---
+
+### BMI screen
+
+![](/posts/ios-programming/auto-layout/project6.png)
+
+키와 몸무게를 입력 받아 체질량 지수를 계산해주는 화면이다.
+
+![](/posts/ios-programming/auto-layout/project12.png)
+
+원래 화면 너비가 넓어질 경우 키와 몸무게를 입력받는 공간을 한 줄로 정렬하고 싶었지만 컨테이너 뷰도 잡아보고 스택으로도 잡아보다 원하는 그림이 나오지 않아 결국 두 줄로 정렬하였다.
+
+이 역시 더 알아보고 공부한 다음 꼭 화면 너비에 따라 정렬 방향이 바뀌는 반응형 UI를 만들어 보고 싶다.
+
+![](/posts/ios-programming/auto-layout/project4.png)
+
+![](/posts/ios-programming/auto-layout/project5.png)
+
+먼저 Height 레이블과 키를 입력 받는 텍스트 필드, Weight 레이블과 몸무게를 입력 받는 텍스트 필드를 각각 스택으로 묶었다.
+
+그 다음 모든 요소들을 스택으로 묶어 y축으로 일정한 간격을 가지게끔 하였다.
+
+그리고 그 스택을 화면 정중앙에 오도록 하였고 높이를 Safe Area보다 100포인트만큼 작게 주었다.
+
+가로를 화면에 맞게 늘리면 아이패드 화면에서 UI가 너무 납작해져서 12:27의 비율로 가로의 길이를 주었다.
+
+다음으로 체중계 이미지를 제외한 모든 요소들의 너비를 스택의 너비와 같게 하였다.
+
+너비가 정해졌으니 각각의 요소들마다 일정한 비율을 주어 어떠한 화면에서든 가로로 길쭉한 직사각형 모양이 되게끔 하였다.
+
+### temperature screen
+
+![](/posts/ios-programming/auto-layout/project10.png)
+
+상단의 세그먼트 컨트롤로 섭씨를 화씨로 변환할지, 화씨를 섭씨로 변환할지 선택한 후에 온도를 입력 받아 변환 버튼을 누르면 아래쪽 텍스트 필드에 변환된 온도를 보여주는 화면이다.
+
+![](/posts/ios-programming/auto-layout/project11.png)
+
+BMI screen이랑 비슷하게 레이아웃을 주었다.
+
+![](/posts/ios-programming/auto-layout/project8.png)
+
+![](/posts/ios-programming/auto-layout/project9.png)
+
+BMI screen과 순서는 비슷하다.
+
+처음에 변환할 온도를 입력받는 텍스트 필드(Value)와 단위를 표시해주는 레이블(First Temp)을 스택(C Stack)으로 묶었다.
+
+아래쪽에 변환된 온도가 나오는 텍스트 필드와 레이블도 스택(F Stack)으로 묶었다.
+
+그리고 모든 요소들을 다시 스택으로 묶은 다음 가운데 정렬을 하였다.
+
+BMI screen에서 처럼 각각의 너비를 같게 하였고 C Stack과 F Stack의 경우 텍스트 필드에 가로 hugging priority를 낮춰 너비에 맞게 늘어나게끔 하였다.
+
+추가로 스택과 각각의 요소들에 비율을 설정해서 아이패드 화면에서 너무 넙적해지지 않도록 하였다.
+
+### 세로 모드 고정
+
+가로 모드까지 대응하게 오토 레이아웃을 추가하고 싶었지만 결국 못했기 때문에 세로로 화면을 고정시키기로 했다.
+
+![](/posts/ios-programming/auto-layout/project19.png)
+
+```swift
+func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+    return UIInterfaceOrientationMask.portrait
+}
+```
+
+방법은 정말 간단하다.
+
+위의 소스를 Appdelegate 파일에 추가해주면 된다.
+
+이 함수에 관한 자세한 설명은 [developer.apple.com](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623107-application) 사이트에 나와있다.

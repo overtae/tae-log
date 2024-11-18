@@ -1,0 +1,30 @@
+---
+title: '간단한 iOS App 개발'
+date: '2021-11-16'
+description: 'iOS프로그래밍기초(21-2학기) 강의 정리'
+tags:
+  - 'Xcode'
+  - 'mac'
+  - 'swift'
+---
+
+break point란 xcode에서 작업을 할 때 행 번호 왼쪽을 클릭하면 생기는 중단점이다. 실행 시 해당 줄에서 멈춘다. 오른쪽으로 드래그하여 삭제가 가능하다. 
+
+
+변수나 함수의 이름을 바꿨을 경우 프로그램 빌드에 실패할 수 있다. main.storyboard – view controller – connections inspector에서 확인 후 문제가 있는 연결을 삭제해주면 된다.
+
+
+아이콘이나 이미지 파일들은 Assets.xcassets에 넣어주면 된다.
+
+
+image view를 통해 이미지를 화면에 표시할 수 있다. 이미지를 삽입할 때 비율을 유지하며 영역에 맞추기( Aspect Fit ), 비율을 유지하며 영역에 꽉 차게 맞추기( Aspect Fill ), 비율 상관없이 영역에 꽉 차게 맞추기( Scale To Fill ) 등 여러 가지 모드가 있다.
+
+
+LaunchScreen은 앱 로딩 시 나오는 화면이며 LaunchScreen.storyboard에서 수정 가능하다. 스토리보드 아래쪽에 있는 Constraints로 다양한 해상도에 맞춰서 화면이 나오게 할 수 있다.
+
+
+스토리보드의 document outline에서 요소들의 순서를 바꿔줌으로써 겹쳐졌을 때의 요소들간 우선순위를 지정해줄 수 있다. 
+버튼 함수에는 태그를 포함해 여러 가지 정보를 담고 있는 sender가 있다. 기본적으로 태그값은 0이지만 attributes inspector에서 변경할 수 있다. 이를 이용해 다양한 버튼들을 구별할 수 있다. 
+
+
+_- iOS프로그래밍기초(21-2학기) 한성현교수님 강의 내용 변형 및 요약_

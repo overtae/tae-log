@@ -1,0 +1,386 @@
+---
+title: 'Swift 문법 3'
+date: '2021-09-28'
+description: 'iOS프로그래밍기초(21-2학기) 강의 정리'
+tags:
+  - 'guard'
+  - 'switch-case'
+  - 'where'
+  - '함수'
+---
+
+### guard~let의 활용
+
+```swift
+var x = 10
+while true {
+    guard x > 0 else { break } // x > 0이 거짓일 때 실행
+    print(x, terminator:" ") // 10 8 6 4 2
+    x -= 2
+}
+```
+
+### if~let vs guard~let
+
+```swift
+// if let
+func printScent(topNotes:String, middleNotes:String?, baseNotes:String) {
+    if let mNotes = middleNotes { // middleNotes가 nil이 아니면
+        print("Top Notes : \(topNotes) \nMiddle Notes : \(mNotes) \nBase Notes : \(baseNotes)\n")
+    }
+    else {
+        print("중간 향이 없네요")
+    }
+    }
+printScent(topNotes: "Fruit", middleNotes: "Herbal", baseNotes: "Vanilla")
+// Top Notes : Fruit Middle Notes : Herbal Base Notes : Vanilla
+printScent(topNotes: "Fruit", middleNotes: nil, baseNotes: "Vanilla") // 중간 향이 없네요
+```
+
+```swift
+// guard let
+func printScent(topNotes:String, middleNotes:String?, baseNotes:String) {
+    guard let mNotes = middleNotes else { // middleNotes가 nil이면
+        print("중간 향이 없네요")
+        return // early exit
+    }
+    print("Top Notes : \(topNotes) \nMiddle Notes : \(mNotes) \nBase Notes : \(baseNotes)\n") // mNotes를 guard문 밖에 있는 코드가 사용 가능
+    }
+printScent(topNotes: "Fruit", middleNotes: "Herbal", baseNotes: "Vanilla")
+// Top Notes : Fruit Middle Notes : Herbal Base Notes : Vanilla
+printScent(topNotes: "Fruit", middleNotes: nil, baseNotes: "Vanilla") // 중간 향이 없네요
+```
+
+### guard문
+
+```swift
+func divideByTwo(value: Int?) {
+    guard let num = value, num >= 2 else {
+        print("수가 없거나 2보다 작다.") // 조건이 거짓일 때 실행
+        return
+    }
+    print(num/2) // 수가 있고, 2보다 크거나 같을 때 실행(조건이 참)
+}
+divideByTwo(value: 1) // 수가 없거나 2보다 작다.
+divideByTwo(value: 20) // 10
+divideByTwo(value: nil) // 수가 없거나 2보다 작다.
+```
+
+### switch-case문
+
+```swift
+var grade = "B"
+switch grade
+{
+case "A":
+    print("A등급") // 적어도 하나의 실행 문장이 필요하다.
+case "B":
+    print("B등급")
+case "C":
+    print("C등급")
+case "D":
+    print("D등급")
+default:
+    print("E등급")
+} // B등급
+```
+
+### switch-case문 결합하기
+
+```swift
+var num = 13
+switch num
+{
+case 2, 3, 5, 7, 11, 13, 17, 19:
+    print("소수입니다.")
+case 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20:
+    print("소수가 아닙니다.")
+default:
+    print("범위를 벗어났습니다.")
+}
+```
+
+### switch-case문에서의 범위 지정
+
+```swift
+let weight = 60.0
+let height = 170.0
+let bmi = weight / (height*height*0.0001)
+var body = ""
+switch bmi {
+case 40...:
+    body = "3단계 비만"
+case 30..<40:
+    body = "2단계 비만"
+case 25..<30:
+    body = "1단계 비만"
+case 18.5..<25:
+    body = "정상"
+case ..<18.5:
+    body = "저체중"
+default:
+    body = "판정 불가"
+}
+print("BMI:\(bmi), 판정:\(body)")
+// BMI:20.761245674740483, 판정:정상
+```
+
+### switch-case에서 where절 사용하기
+
+```swift
+var num = 123
+switch (num)
+{
+case 1...9 where num % 2 == 0:
+    print("한자리 짝수")
+case 10...99 where num % 2 == 0:
+    print("두자리 짝수")
+case 100...999 where num % 2 == 0:
+    print("세자리 짝수")
+default:
+    print("범위 초과 또는 홀수")
+} // 범위 초과 또는 홀수
+```
+
+### 특정 패턴과 결합하여 조건을 추가
+
+```swift
+var num = [1, 3, 5, 7, 9, 11, 13, 15]
+for x in num where x > 10 {
+    print(x, terminator:" ") // 11, 13, 15
+}
+```
+
+### fallthrough : case별로 빠져나가지 않고 아래로 계속 내려가게 함
+
+```swift
+var char : Character = "A"
+switch (char)
+{
+case "a", "A":
+    print("A")
+    fallthrough
+case "b", "B":
+    print("B")
+    fallthrough
+case "c", "C":
+    print("C")
+    fallthrough
+default:
+    print("범위 초과")
+}
+// A
+// B
+// C
+// 범위 초과
+```
+
+### 함수
+
+```swift
+func prtBanana() { // 리턴값이 없을 경우 "->Void" 생략 가능
+    print("Banana!")
+}
+func mulTwo(firstNum: Int, lastNum: Int) -> Int { // 반환 값이 Int
+    return(firstNum*lastNum)
+}
+prtBanana() // Banana!
+print(mulTwo(firstNum: 3, lastNum: 5)) // 15
+```
+
+### C언어에서 Swift 함수 변경 연습
+
+```swift
+/* C, C++
+int sub(int x, int y) {
+    return(x-y);
+}
+*/
+func sub(x: Int, y: Int) -> Int {
+    return(x-y)
+}
+print(type(of:sub)) // (Int, Int) -> Int
+```
+
+### 외부 매개변수명(argument label)과 내부 매개변수명(parameter name)
+
+```swift
+func mul(first x: Int, second y: Int, third z: Int) -> Int {
+    return x*y*z // 함수 정의 시 내부 매개변수명 사용
+}
+var x = mul(first:2, second:4, third:6)
+// 함수 호출 시 외부 매개변수명 사용
+// 외부 매개변수명 생략 시 내부 매개변수명이 외부 매개변수명까지 겸함
+print(x) // 48
+```
+
+### C/C++함수 vs Objective-C함수 : Swift함수로 변경
+
+```swift
+func double(x: Int) -> Int {
+    return x*2
+}
+func setX(x: Int) {
+    xx = x
+}
+func getX() -> Int {
+    return(x)
+}
+func add(_ x: Int, with y: Int) -> Int {
+    return x+y
+}
+func setXY(_ x: Int, second y: Int) {
+    xx = x
+    yy = y
+}
+```
+
+### 4가지 add함수의 함수명
+
+```swift
+func add(x: Int, y: Int) -> Int {
+    print(#function) // 함수명
+    return x+y
+}
+let a = add(x:1, y:2) // add(x:y:)
+func add(one x: Int, two y: Int) -> Int {
+    print(#function)
+    return x+y
+}
+let b = add(one:1, two:2) // add(one:two:)
+func add(_ x: Int, _ y: Int) -> Int { // 외부매개변수명을 생략 (비추천)
+    print(#function)
+    return x+y
+}
+let c = add(1, 2) // add(_:_:)
+func add(_ x: Int, with y: Int) -> Int { // 첫번째 외부매개변수명만 생략
+// Objective-C 언어와의 통일감을 위해 많이 쓰임
+    print(#function)
+    return x+y
+}
+let d = add(1, with:2) // add(_:with:)
+// 함수의 type은 (Int, Int) -> Int로 모두 같고 함수명은 모두 다름
+```
+
+### 함수명과 함수자료형
+
+```swift
+@IBAction func changDatePicker(_ sender: UIDatePicker) { …
+```
+
+- 함수명 : `changeDatePicker(_:)`
+- 자료형 : `(UIDatePicker) -> ( )`
+
+```swift
+func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat { …
+```
+
+- 함수명 : `pickerView(_:rowHeightForComponent:)`
+- 자료형 : `(UIPIckerView, Int) -> CGFloat`
+
+```swift
+func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView { …
+```
+
+- 함수명 : `pickerView(_:viewForRow:forComponent:reusing:)`
+- 자료형 : `(UIPickerView, Int, Int, Optional<UIView>) -> UIView`
+
+```swift
+// returns the number of 'columns' to display.
+func numberOfComponents(in pickerView: UIPickerView) -> Int { …
+```
+
+- 함수명 : `numberOfComponents(in:)`
+- 자료형 : `(UIPickerView) -> Int`
+
+```swift
+// returns the # of rows in each component..
+func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int { …
+```
+
+- 함수명 : `pickerView(_:numberOfRowsInComponent:)`
+- 자료형 : `(UIPickerView, Int) -> Int`
+
+```swift
+func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) { …
+```
+
+- 함수명 : `pickerView(_:didSelectRow:inComponent:)`
+- 자료형 : `(UIPickerView, Int, Int) -> ( )`
+
+### 디폴트 매개변수(argument) 정의하기
+
+```swift
+func prtAge(name: String = "철수", age: Int) -> String {
+    return("\(name)은(는) \(age)살이다.")
+}
+var message = prtAge(name: "태영", age: 21)
+print(message) // 태영은(는) 21살이다.
+print(prtAge(age: 12)) // 철수은(는) 12살이다.
+```
+
+### 함수로부터 여러 개의 결과 반환하기
+
+```swift
+func converter(temperature: Float) -> (celsius: Float, fahrenheit: Float, kelvine: Float) {
+    let celsius = temperature
+    let fahrenheit = 32 + (1.8 * temperature)
+    let kelvine = temperature + 273.15
+    return (celsius, fahrenheit, kelvine) // 튜플
+}
+var tempTuple = converter(temperature: 24)
+print(tempTuple) // (celsius: 24.0, fahrenheit: 75.2, kelvine: 297.15)
+print(tempTuple.celsius) // 24.0
+print(tempTuple.fahrenheit) // 75.2
+print(tempTuple.kelvine) // 297.15
+```
+
+### 2개의 정수를 입력받아 가감승제, 나머지 리턴
+
+```swift
+import Foundation
+func math(x: Int, y: Int) -> (sum: Int, sub: Int, mul: Int, div: Double, rem: Int) {
+    let sum = x + y
+    let sub = x - y
+    let mul = x * y
+    let div = Double(x)/Double(y)
+    let rem = x%y
+    return (sum, sub, mul, div, rem)
+}
+var result = math(x:10, y:3)
+print(result.sum) // 13
+print(result.sub) // 7
+print(result.mul) // 30
+print(String(format: "%.3f", result.div)) // 3.333
+print(result.rem) // 1
+```
+
+### 가변 매개변수 (variadic parameter)
+
+```swift
+func add(numbers:Int...) {
+    var sum = 0
+    for num in numbers {
+        sum += num
+    }
+    print(sum)
+}
+add(numbers:1, 3, 5, 7, 9) // 25
+add(numbers:1, 1, 1, 1) // 4
+add(numbers:1, 2, 3, 4) // 10
+```
+
+### call by reference
+
+```swift
+var myValue = 10
+func doubleValue (value: inout Int) -> Int {
+    value += value
+    return value
+}
+print(myValue) // 10
+print(doubleValue(value : &myValue)) // 20
+print(myValue) // 20
+```
+
+_- iOS프로그래밍기초(21-2학기) 한성현교수님 강의 내용 변형 및 요약_

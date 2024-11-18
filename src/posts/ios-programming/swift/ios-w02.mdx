@@ -1,0 +1,131 @@
+---
+title: 'Swift 문법 1'
+date: '2021-09-13'
+description: 'iOS프로그래밍기초(21-2학기) 강의 정리'
+tags:
+  - '자료형'
+  - '변수'
+  - '상수'
+  - '튜플'
+---
+
+### 변수의 생성과 값 할당, print 함수
+
+```swift
+var endNumber : Int
+endNumber = 3
+for n in 1...endNumber {
+    print("결과", n, separator: " : ", terminator: "\n\n")
+}
+/*
+결과 : 1
+
+결과 : 2
+
+결과 : 3
+*/
+```
+
+### 자료형의 종류와 크기
+
+```swift
+var x =  "summer"
+let xType = type(of:x)
+let xSize = MemoryLayout.size(ofValue: x)
+let intSize = MemoryLayout<Int>.size
+print(xType, xSize, intSize)
+//String 16 8
+```
+
+### type annotations 와 infer
+
+```swift
+//type annotations
+var number: Double
+//infer
+let myNumber =  202012063  // Int형으로  타입  추론
+let eNumber =  2.71828  // Double형으로  타입  추론
+```
+
+### 64비트 부호 있는 정수 데이터 타입의 최솟값과 최댓값 출력
+
+```swift
+print("Int64 Min = \(Int64.min) Int64 Max = \(Int64.max)")
+// Int64 Min = -9223372036854775808 Int64 Max = 9223372036854775807
+```
+
+### 부동 소수점 데이터 타입 : Double
+
+```swift
+var exFloat : Float =  0.123456789  // 소수점 6자리  정확도
+var exDouble : Double =  0.123456789  // 소수점 15자리  정확도
+print(exFloat, exDouble)
+// 0.12345679 0.123456789
+```
+
+### 참 또는 거짓 조건을 처리하는 데이터 타입 : Bool
+
+```swift
+var iceIsHot =  false
+var fireIsHot =  true
+print(type(of:iceIsHot), type(of:fireIsHot)) //Bool Bool
+if iceIsHot {
+    print("Ice is hot.")
+}
+else {
+    print("Ice is cold.")
+}
+// Ice is cold.
+```
+
+### 문자 데이터 타입 : Character
+
+```swift
+var char1 : Character = "O" // Character
+var char2 = "O" //String
+var char3 = "!" //String
+
+print(type(of: char1), type(of: char2), type(of: char3))
+```
+
+### 문자열 데이터 타입 : String
+
+```swift
+var season = "겨울"
+var weather = "눈"
+var message = "\(season)에는 \(weather)이 내린다."
+print(message) // 겨울에는 눈이 내린다.
+```
+
+### 변경 가능한 변수 : var, 변경 불가능한 상수 : let
+
+```swift
+var changable = 123
+changable = 321
+
+let unchangable = 123
+unchangable = 321
+// error: cannot assign to value: 'unchangable' is a 'let' constant
+```
+
+### 여러 값을 하나의 개체에 일시적으로 묶는 튜플 : Tuple
+
+```swift
+let exTuple = ("오늘", 3.5, 15)
+var weight = exTuple.1
+print("나는 \(exTuple.0) \(weight)kg의 아령을 \(exTuple.2)번 들었다.")
+// 나는 오늘 3.5kg의 아령을 15번 들었다.
+
+print(type(of:exTuple))
+// (String, Double, Int)
+
+let (day, _, number) = exTuple
+print(day, number)
+// 오늘 15
+
+let exexTuple = (a:"apple", b:"bear", c:"cat")
+print(exexTuple.b)
+// bear
+```
+
+_- iOS프로그래밍기초(21-2학기) 한성현교수님 강의 내용 변형 및 요약_

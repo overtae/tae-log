@@ -1,0 +1,103 @@
+---
+title: '[Auto Layout] Xcode에서 Auto Layout 적용해보기'
+date: '2022-01-12'
+description: 'iOS Auto Layout 정리 - 3'
+---
+
+### Constraints를 주는 방법들
+
+전 포스트에서는 Pin Tool을 이용한 방법만 다루었다.
+
+이번에는 그 외의 방법들에 대해서 알아보도록 하자.
+
+#### 1. Pin Tool 이용하기
+
+![](/posts/ios-programming/auto-layout/way1.png)
+
+#### 2. Control + Drag 이용하기
+
+![](/posts/ios-programming/auto-layout/wayfin1.png)
+
+Control 키를 누른 상태로 view에서 빈 공간으로 드래그 하여 제약을 추가할 수도 있다.
+
+이때 Shift 키를 누른 상태로 선택을 한다면 두 개 이상의 제약을 동시에 추가할 수 있다.
+
+추가로 Option 키를 누르면 기본값과 다른 제약 옵션을 추가로 보여준다.
+
+드래그 방향에 따라 팝업의 내용이 바뀌게 되니 주의하도록 하자.
+
+위의 이미지는 view에서 위쪽으로 드래그하였기 때문에 Top과 Bottom 옵션이 뜬 걸 확인할 수 있다.
+
+![](/posts/ios-programming/auto-layout/way5.png)
+
+그렇다면 위의 이미지는 어느 방향으로 드래그 한 것일까?
+
+45도 각도로 드래그 한 것이다.
+
+<Callout>
+
+**Pin Tool vs. Control + Drag**
+
+| Pin Tool                          | Control + Drag                     |
+| --------------------------------- | ---------------------------------- |
+| 여러 제약을 한번에 추가할 때 편리 | 두 뷰 사이의 제약을 추가할 때 편리 |
+
+</Callout>
+
+> [아래](#두-뷰-사이의-Constraints-추가하기)에서 두 뷰 사이의 제약 추가에 관해 따로 정리하였다.
+
+![](/posts/ios-programming/auto-layout/wayfin2.png)
+
+Document Outline 영역에서 드래그해도 추가가 가능하다.
+
+이때는 방향 상관 없이 드래그해도 무관하다.
+
+### 두 뷰 사이의 Constraints 추가하기
+
+![](/posts/ios-programming/auto-layout/wayfin5.png)
+
+위 이미지와 같이 한 뷰에서 다른 뷰로 드래그 하면 두 뷰 사이의 제약을 추가할 수 있다.
+
+위에서는 Equal Widths를 주었다.
+
+Multiplier의 값을 수정해 비율을 조정할 수도 있다.
+
+### 오류가 났을 경우
+
+제약을 추가하다 보면 Document Outline에 빨간색 표시가 나타날 때가 있다.
+
+이는 오토 레이아웃에 오류가 발생했다는걸 의미하며 클릭하여 왜 오류가 났는지 확인할 수 있다.
+
+![](/posts/ios-programming/auto-layout/wayfin3.png)
+
+위의 경우엔 Y축 위치에 제약이 없기 때문에 오류가 났다.
+
+Add Missing Constraints를 눌러 제약을 추가할 수는 있지만, 원치 않았던 제약이 추가될 수 있기 때문에 추천하지는 않는다.
+
+#### 노란선?
+
+제약이 추가된 뷰의 위치를 임의로 옮겼을 경우 노란선을 볼 수 있다.
+
+![](/posts/ios-programming/auto-layout/wayyellow.png)
+
+빨간선이 오류가 난 것이라면 노란선은 무엇일까.
+
+이는 추가했던 제약과 현재 위치가 다르다는 것을 의미한다.
+
+만약 이대로 앱을 실행하였을 경우 원래 설정되어있던 제약대로 실행이 된다.
+
+원래의 위치로 가길 원한다면 아래쪽 메뉴의 Update Frames를 눌러주면 된다.
+
+### Canvas Menu
+
+아래쪽 메뉴는 Canvas Menu라고 한다.
+
+![](/posts/ios-programming/auto-layout/wayfin4.png)
+
+각각의 버튼은 위 이미지를 참고하면 알 수 있다.
+
+<Callout type="info">
+
+이 게시물은 [KxCoding](https://www.youtube.com/watch?v=673jZ19WK58)님의 유튜브를 참고하였습니다.
+
+</Callout>

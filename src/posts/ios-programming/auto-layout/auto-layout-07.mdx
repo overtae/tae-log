@@ -1,0 +1,96 @@
+---
+title: '[Auto Layout] 사소한 팁들'
+date: '2022-01-15'
+description: 'iOS Auto Layout 정리 - 7'
+---
+
+### Safe Area 
+
+아이폰 X 이후에 생긴 노치 때문에 Safe Area와의 간격을 0으로 주더라도 가로 화면에서 상태바 영역까지는 채워지지 않는 현상을 볼 수 있다.
+
+![](/posts/ios-programming/auto-layout/al-01.png)
+
+시스템 UI 영역까지 꽉 채우고 싶을 경우 기준을 Safe Area가 아닌 Super View로 설정해주면 된다.
+
+그런데 만약 버튼을 Super View 기준으로 제약을 추가한다면 상태바와 겹치는 일이 생길 것이다.
+
+그러므로 요소들마다 적절한 기준을 잡는게 중요하다.
+
+### Constrain to margins
+
+![](/posts/ios-programming/auto-layout/al-02.png)
+
+오토 레이아웃을 적용할 때 정말 많이 봐왔던 Constrain to margins 체크 박스는 도대체 무엇일까.
+
+[stackoverflow.com](https://stackoverflow.com/questions/25807545/what-is-constrain-to-margin-in-storyboard-in-xcode-6) 사이트의 답변을 참고해봤을때,
+
+iOS8에 기본 설정 되어있는 마진(8포인트)을 사용할 것이냐, 아니냐를 결정하는 체크 박스인 것 같다.
+
+원하는 결과물을 위해선 체크를 해제하는 것이 도움이 된다고 한다.
+
+기본적으로 설정되어있는 마진이라는게 HTML의 reset CSS가 생각나는 것 같다.
+
+[reset CSS 관련 포스트 보러가기](/blog/web-programming/html-and-css/reset-css)
+
+> Constraint 값은 양수로 주는 것이 좋다고 한다.
+> 
+> 만약 음수로 설정했을 경우 First Item과 Second Item을 reverse 해주도록 하자.
+
+### 작업 간편화
+
+각각의 요소마다 제약을 따로 주었을 경우 위치를 조정하고 싶을 때 모든 요소의 제약들을 수정해야 한다.
+
+그렇기 때문에 위치적으로 연관된 요소들은 연관된 제약을 주는게 수정하기 편리하다.
+
+예를 들어, A와 B의 오른쪽 위치가 같을 때 trailing으로 정렬을 한다면 나중에 하나의 값만 수정해줘도 둘 다 바뀌게 된다.
+
+![](/posts/ios-programming/auto-layout/al-03.png)
+
+### User Interaction
+
+뷰를 터치할 일이 없다면 User Interaction Enabled 항목을 체크 해제해주는 것이 좋다.
+
+### Content Insets
+
+뷰의 내부적으로 마진을 주는 옵션이 바로 Content Inset이다.
+
+![](/posts/ios-programming/auto-layout/al-04.png)
+
+CSS에서 패딩과 비슷해보인다.
+
+### CH와 CR
+
+먼저 이 둘이 무엇을 줄인 것인지 알아보자.
+
+- CH : Content Hugging Priority
+- CR : Content Compression Resistance Priority
+
+둘 다 ***Priority***라는 단어가 들어간다.
+
+즉 우선순위를 매기겠다는 것이다.
+
+가로(Horizontal)와 세로(Vertical)에 각각 다르게 매길 수 있다.
+
+#### Hugging Priority
+
+두 뷰의 너비를 지정해주지 않은 상태에서 한 뷰의 우선순위가 상대적으로 낮다면 공간에 맞춰 너비를 키운다.
+
+![](/posts/ios-programming/auto-layout/al-05.png)
+
+위의 이미지에선 노란색의 우선순위가 높으니 노란색은 자신의 크기를 유지하고, 파란색이 크기를 늘리게 된다. 
+
+높이 역시 동일하게 적용된다.
+
+#### Compression Resistance Priority
+
+Hugging이 공간이 남을 때 어떤 걸 늘릴지를 지정해준다면 Compression Resistance는 공간이 부족할 때 어떤 걸 줄일지를 지정해준다.
+
+Hugging과 마찬가지로 우선순위가 높은 게 자신의 크기를 유지한다.
+
+![](/posts/ios-programming/auto-layout/al-06.png)
+
+<Callout type="info">
+
+이 게시물은 [KxCoding](https://www.youtube.com/watch?v=673jZ19WK58)님의 유튜브를 참고하였습니다.
+
+</Callout>
