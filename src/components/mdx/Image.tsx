@@ -13,6 +13,7 @@ const Image = ({ src, alt, title }: ImageProps) => {
         alt={alt}
         width={500}
         height={300}
+        unoptimized={src.includes('.gif')}
         className="mx-auto mb-0 mt-8 aspect-auto w-fit rounded-md"
       />
       {alt !== '' && (
