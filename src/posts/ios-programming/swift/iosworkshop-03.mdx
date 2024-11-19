@@ -12,15 +12,7 @@ tags:
 
 ### 클래스, 객체, 인스턴스
 
-```mermaid
-graph TD;
-    A[클래스] --> |객체| B[인스턴스]
-    A[클래스] --> |객체| C[인스턴스]
-    A[클래스] --> |객체| D[인스턴스]
-    E[고양이] --> |객체| F[미미]
-    E[고양이] --> |객체| G[까미]
-    E[고양이] --> |객체| H[나비]
-```
+<img src="/posts/ios-programming/swift/graph-instance.svg" width="100%" />
 
 위 다이어그램을 보면 알 수 있듯이, 클래스로부터 만들어진 객체를 인스턴스라 한다.
 
@@ -30,10 +22,9 @@ graph TD;
 
 #### as로 upcasting
 
-```mermaid
-graph BT
-    A[자식] --> |upcasting| B[부모]
-```
+<center>
+  <img src="/posts/ios-programming/swift/graph-upcasting.svg" width="150px" />
+</center>
 
 `자식인스턴스 as 부모클래스`를 이용해 자식 인스턴스를 부모 클래스의 객체로 변환한다.
 
@@ -55,10 +46,9 @@ let myControl = myButton as UIControl
 
 #### as! as?로 downcasting
 
-```mermaid
-graph TD;
-    A[부모] --> |downcasting| B[자식]
-```
+<center>
+  <img src="/posts/ios-programming/swift/graph-downcasting.svg" width="150px" />
+</center>
 
 `부모인스턴스 as! 자식클래스`나 `부모인스턴스 as? 자식클래스`를 이용해 부모 인스턴스를 자식 클래스로 변환한다.
 
