@@ -4,6 +4,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import rehypePrettyCode, { type Options } from 'rehype-pretty-code'
+import mdxMermaid from 'mdx-mermaid'
 
 /** @type {import('rehype-pretty-code').Options} */
 const options: Options = {
@@ -28,7 +29,7 @@ const PostBody = ({ post }: PostBodyProps) => {
       components={MdxComponents}
       options={{
         mdxOptions: {
-          remarkPlugins: [remarkGfm],
+          remarkPlugins: [remarkGfm, [mdxMermaid, { output: 'svg' }]],
           rehypePlugins: [rehypeSlug, [rehypePrettyCode, options]],
         },
       }}
