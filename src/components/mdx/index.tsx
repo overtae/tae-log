@@ -6,7 +6,6 @@ import Image from '@/components/mdx/Image'
 import ExternalLink from '@/components/mdx/Link'
 import Toggle from '@/components/mdx/Toggle'
 import Quote from '@/components/mdx/Quote'
-import Mermaid from '@/components/mdx/Mermaid'
 import { MDXComponents } from 'mdx/types'
 
 const MdxComponents: MDXComponents = {
@@ -14,7 +13,6 @@ const MdxComponents: MDXComponents = {
   img: Image as any,
   hr: HorizontalRule as any,
   blockquote: Blockquote as any,
-  mermaid: Mermaid,
   Callout,
   Toggle,
   Quote,
