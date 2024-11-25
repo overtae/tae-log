@@ -1,0 +1,54 @@
+---
+title: '[Auto Layout] Auto Layout이란?'
+date: '2022-01-10'
+description: 'iOS Auto Layout 정리 - 1'
+tags:
+  - 'constraint'
+  - 'frame-based layout'
+---
+
+### 오토 레이아웃(Auto Layout)의 정의
+
+[developer.apple.com](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/AutolayoutPG/index.html) 사이트를 보면,
+
+`Auto Layout dynamically calculates the size and position of all the views in your view hierarchy, based on constraints placed on those views.`라고 적혀있다.
+
+위 문장은 `오토 레이아웃은 해당 뷰에 설정된 제약 조건(constraints)를 기반으로 계층뷰(view hierarchy)에 있는 모든 뷰들의 크기와 위치를 동적으로 계산한다.` 라는 뜻이다.
+
+정말 간단하게 말하자면 다양한 비율에서 동일한 화면을 보여주기 위해 사용하는게 오토 레이아웃인 것이다.
+
+![해상도별 화면](/posts/ios-programming/auto-layout/viewEx.png)
+
+<Quote>
+
+**해상도마다 다른 뷰를 만들면 되는거 아닌가요?**
+
+</Quote>
+
+그렇게 한다면 스토리 보드 파일도 많아지고 앱을 실행할 때 따로 기종을 확인해야 하는 번거로움이 생긴다.
+
+### Auto Layout & Frame-Based Layout
+
+![Frame-Based Layout](/posts/ios-programming/auto-layout/frame-layout.png)
+
+전통적으로 앱들은 각 뷰에 대한 프레임을 프로그래밍 방식으로 설정하여 사용자 인터페이스(User Interface)를 배치한다.
+
+이는 모든 뷰에 대한 크기와 위치를 계산해야 하고 변경 사항이 발생할 경우 영향을 받은 모든 뷰에 대해 프레임을 다시 계산해야 한다.
+
+변화가 생기면 원하는 대로 바꿀 수 있기 때문에 프레임을 프로그래밍 방식으로 정의할 경우 유연성과 파워가 극대화된다.
+
+하지만 모든 변경 사항을 직접 관리해야 하므로 설계, 디버그 및 유지 관리에 상당한 노력이 필요하다.
+
+![Auto Layout](/posts/ios-programming/auto-layout/auto-layout.png)
+
+프레임 레이아웃은 뷰를 담고 있는 틀에 대해 생각한다고 하면 오토 레이아웃은 뷰들의 관계에 대해 생각한다.
+
+오토 레이아웃은 두 뷰 사이의 관계에 제약 조건(Constraints)을 설정하여 사용자 인터페이스를 정의한다.
+
+이러한 조건을 기반으로 각 뷰의 크기와 위치를 계산해 변경 사항들에 동적으로 대응하는 레이아웃을 만들 수 있다.
+
+<Callout type="info">
+
+이 게시물은 브랜디 [김주희](http://labs.brandi.co.kr/2018/05/30/kimjh.html "브랜디 김주희님 포스트")님의 포스트와 [developer.apple.com](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/AutolayoutPG/index.html) 사이트를 참고하였습니다.
+
+</Callout>

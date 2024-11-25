@@ -1,0 +1,295 @@
+---
+title: 'Swift 문법 5'
+date: '2021-10-09'
+description: 'iOS프로그래밍기초(21-2학기) 강의 정리'
+tags:
+  - '클래스'
+  - 'Failable initializer'
+  - '상속'
+  - 'override'
+---
+
+### 1. 클래스 메서드
+
+```swift
+class Animal {
+    var type : String = "dog"
+    var age : Int = 1
+    var weight : Double = 2.0
+    func display() { // 인스턴스 메서드
+    print("type : \(type)\nage : \(age)\nweight : \(weight)kg")
+    }
+    class func cM() { // 클래스 메서드
+        print("cM is a class method")
+    }
+    static func scM() { // 클래스 메서드
+        print("scM is a class method")
+    }
+}
+var coco : Animal = Animal()
+coco.display()
+// type : dog  age : 1  weight : 2.0kg
+Animal.cM() // cM is a class method
+Animal.scM() // scM is a class method
+// 클래스 메서드는 클래스가 호출
+```
+
+### 2. 인스턴스 초기화하기 : init()
+
+```swift
+class Animal {
+    var type : String // = "dog" 초기값 생략 가능
+    var age : Int // = 1
+    var weight : Double // = 2.0
+    func display() {
+    print("type : \(type)\nage : \(age)\nweight : \(weight)kg")
+    }
+    init(hisType: String, hisAge: Int, hisWeight: Double) {
+        self.type = hisType
+        age = hisAge
+        weight = hisWeight
+    } // designated initializer => default initializer는 사라짐
+}
+// var coco : Animal = Animal() // default initializer 호출 : 오류
+var coco : Animal = Animal(hisType: "dog", hisAge: 4, hisWeight: 4.7)
+coco.display()
+// type : dog  age : 4  weight : 4.7kg
+```
+
+### 3. self
+
+```swift
+class Animal {
+    var type : String
+    var age : Int
+    var weight : Double
+    func display() {
+    print("type : \(type)\nage : \(age)\nweight : \(weight)kg")
+    }
+    init(type: String, age: Int, weight: Double) {
+        self.type = type // 프로퍼티 앞 self.는 현재 클래스 내 프로퍼티
+        self.age = age // 매개변수와 구분하기 위해 필요
+        self.weight = weight
+    }
+}
+var coco : Animal = Animal(type: "dog", age: 4, weight: 4.7)
+coco.display()
+// type : dog  age : 4  weight : 4.7kg
+```
+
+### 4. 계산 프로퍼티(computed property)의 getter
+
+```swift
+class Animal {
+    var type : String
+    var age : Int
+    var weight : Double
+    var gram : Double { // computed property
+        // get { setter가 없을 경우 생략 가능
+            return weight * 1000
+        // }
+    }
+    func display() {
+    print("type : \(type)\nage : \(age)\nweight : \(weight)kg")
+    }
+    init(type: String, age: Int, weight: Double) {
+        self.type = type
+        self.age = age
+        self.weight = weight
+    }
+}
+var coco : Animal = Animal(type: "dog", age: 4, weight: 4.7)
+coco.display()
+// type : dog  age : 4  weight : 4.7kg
+print("\(coco.gram)g") // 4700.0g
+```
+
+### 5. 계산 프로퍼티(computed property)의 setter
+
+```swift
+class Animal {
+    var type : String
+    var age : Int
+    var weight : Double
+    var gram : Double { // computed property
+        get {
+            return weight * 1000
+        }
+        set /*(newValue)*/ { 
+            weight = newValue / 1000
+        } // 매개변수명이 newValue일 경우 (newValue) 생략 가능
+    }
+    func display() {
+    print("type : \(type)\nage : \(age)\nweight : \(weight)kg")
+    }
+    init(type: String, age: Int, weight: Double) {
+        self.type = type
+        self.age = age
+        self.weight = weight
+    }
+}
+var coco : Animal = Animal(type: "dog", age: 4, weight: 4.7)
+coco.display()
+// type : dog  age : 4  weight : 4.7kg
+print("\(coco.gram)g") // 4700.0g, getter 호출
+print("\(coco.weight)kg") // 4.7
+coco.gram = 5200 // setter 호출
+print("\(coco.weight)kg") // 5.2kg
+```
+
+### 6. 생성자 중첩(method overloading)
+
+```swift
+class Animal {
+    var type : String = "unknown"
+    var age : Int = 1
+    var weight : Double = 2.0
+    func display() {
+    print("type : \(type)\nage : \(age)\nweight : \(weight)kg")
+    }
+    init(type: String, age: Int, weight: Double) {
+        self.type = type
+        self.age = age
+        self.weight = weight
+    }
+    init(age: Int) {
+        self.age = age
+    }
+}
+var coco : Animal = Animal(type: "dog", age: 4, weight: 4.7)
+var mimi : Animal = Animal(age: 2)
+coco.display()
+// type : dog  age : 4  weight : 4.7kg
+mimi.display()
+// type : unknown  age : 2  weight : 2.0kg
+```
+
+### 7. failable initialize
+
+```swift
+class Animal {
+    var type : String
+    var age : Int
+    var weight : Double
+    func display() {
+    print("type : \(type)\nage : \(age)\nweight : \(weight)kg")
+    }
+    init?(type: String, age: Int, weight: Double) {
+    if type.count > 10 || age <= 0 {
+        return nil
+    } else {
+        self.type = type
+        self.age = age
+    }
+    self.weight = weight
+    } // failable initialize
+}
+// 1. 옵셔널 형으로 선언 후 옵셔널 바인딩
+var coco : Animal? = Animal(type: "dog", age: 4, weight: 4.7)
+if let coco1 = coco {
+    coco1.display() // type : dog  age : 4  weight : 4.7kg
+}
+// 2. 인스턴스 생성과 동시에 옵셔널 바인딩
+if let nana = Animal(type: "cat", age: 1, weight: 1.2) {
+    nana.display() // type : cat  age : 1  weight : 1.2kg
+}
+// 3. 인스턴스 생성하면서 바로 강제 언래핑(주의:nil일 경우 크래시)
+var tutu : Animal = Animal(type: "hamster", age: 2, weight: 0.74)!
+tutu.display() // type : hamster  age : 2  weight : 0.74kg
+// 4. 옵셔널 인스턴스를 사용시 강제 언래핑(주의:nil일 경우 크래시)
+var mimi : Animal? = Animal(type: "whale", age: 5, weight: 300000)
+mimi!.display() // type : whale  age : 5  weight : 300000.0kg
+```
+
+### 8. 과제
+
+#### 8-1. UIBarButtonItem 클래스의 init()메서드의 overloading, failable initialize에 대해 설명하시오.
+
+- overloading : 같은 이름(init())의 함수가 여러 개 있다.
+- failable initializer : init 뒤에 ‘?’를 붙임으로써 인스턴스를 옵셔널 형으로 만든다.
+
+#### 8-2. 해당 클래스의 인스턴스를 2가지 이상의 방법으로 만들어 보시오.
+
+```swift
+let nextButton : UIBarButtonItem = UIBarButtonItem(title: "next", style: .plain, target: self, action: #Selector(swip(_:)))
+let rightButton : UIBarButtonItem = UIBarButtonItem(image: button_img, style: .plain, target: self, action: nil)
+```
+
+### 9. 클래스 상속
+
+```swift
+class Health {
+    var height : Float
+    var weight : Float
+    func display() {
+        print("키 : \(height)cm 몸무게 : \(weight)kg")
+    }
+    init(height: Float, weight: Float) {
+        self.height = height
+        self.weight = weight
+    }
+}
+class subHealth : Health { }
+var guest : subHealth = subHealth(height: 166.2, weight: 54.7)
+guest.display() // 키 : 166.2cm 몸무게 : 54.7kg
+print(guest.weight) // 54.7
+```
+
+### 10. 부모 메서드 호출 시 super 사용
+
+```swift
+class Health {
+    var height : Float
+    var weight : Float
+    func display() {
+        print("키 : \(height)cm 몸무게 : \(weight)kg")
+    }
+    init(height: Float, weight: Float) {
+        self.height = height
+        self.weight = weight
+    }
+}
+class subHealth : Health {
+    var bloodPressure : String
+    func displayS() {
+        print("키 : \(height)cm 몸무게 : \(weight)kg 혈압 : \(bloodPressure)")
+    }
+    init(height: Float, weight: Float, bloodPressure: String) {
+        self.bloodPressure = bloodPressure
+        super.init(height: height, weight: weight)
+    } // error: 'super.init' isn't called on all paths before returning from initializer
+}
+var guest : subHealth = subHealth(height: 166.2, weight: 54.7, bloodPressure: "고혈압")
+guest.display() // 키 : 166.2cm 몸무게 : 54.7kg
+guest.displayS() // 키 : 166.2cm 몸무게 : 54.7kg 혈압 : 고혈압
+```
+
+### 11. 부모와 자식에 같은 메서드가 있으면 자식 우선 : override
+
+```swift
+class Health {
+    var height : Float
+    var weight : Float
+    func display() {
+        print("키 : \(height)cm 몸무게 : \(weight)kg")
+    }
+    init(height: Float, weight: Float) {
+        self.height = height
+        self.weight = weight
+    }
+}
+class subHealth : Health {
+    var bloodPressure : String
+    override func display() {
+        print("키 : \(height)cm 몸무게 : \(weight)kg 혈압 : \(bloodPressure)")
+    }
+    init(height: Float, weight: Float, bloodPressure: String) {
+        self.bloodPressure = bloodPressure
+        super.init(height: height, weight: weight)
+    }
+}
+var guest : subHealth = subHealth(height: 166.2, weight: 54.7, bloodPressure: "고혈압")
+guest.display() // 키 : 166.2cm 몸무게 : 54.7kg 혈압 : 고혈압
+```
+
+_- iOS프로그래밍기초(21-2학기) 한성현교수님 강의 내용 변형 및 요약_

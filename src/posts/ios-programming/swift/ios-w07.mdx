@@ -1,0 +1,212 @@
+---
+title: 'Swift 문법 6'
+date: '2021-10-16'
+description: 'iOS프로그래밍기초(21-2학기) 강의 정리'
+tags:
+  - 'extension'
+  - '접근제어'
+  - 'protocol'
+  - 'enum'
+---
+
+## 오버로딩과 오버라이딩
+
+- 오버로딩 (overloading) : 하나의 클래스 안에 같은 이름의 함수가 여러 개 있는 것
+- 오버라이딩 (overriding) : 부모 클래스에서 정의된 함수를 자식 클래스가 재정의 하는 것, override 키워드 필수
+
+```swift
+class Health {
+    var height : Float
+    var weight : Float
+    func display() {
+        print("키 : \(height)cm 몸무게 : \(weight)kg")
+    }
+    init(height: Float, weight: Float) {
+        self.height = height
+        self.weight = weight
+    }
+}
+class subHealth : Health {
+    var bloodPressure : String
+    override func display() { // 오버라이딩
+        print("키 : \(height)cm 몸무게 : \(weight)kg 혈압 : \(bloodPressure)")
+    }
+    init(height: Float, weight: Float, bloodPressure: String) {
+        self.bloodPressure = bloodPressure
+        super.init(height: height, weight: weight)
+    }
+}
+var guest : subHealth = subHealth(height: 166.2, weight: 54.7, bloodPressure: "고혈압")
+guest.display() // 키 : 166.2cm 몸무게 : 54.7kg 혈압 : 고혈압
+```
+
+## UIProgressView 클래스
+
+| [UIProgressView](https://developer.apple.com/documentation/uikit/uiprogressview) |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 기능                                                                             | 시간 경과에 따른 진행 상황을 보여준다.                                                                  |
+| 생성자                                                                           | ```init(progressViewStyle: UIProgressView.Style)```                                                     |
+| ```init(frame: CGRect)  init?(coder: NSCoder)```                                 |
+| 주요 함수                                                                        | `func setProgress(Float, animated: Bool)`                                                               |
+| 예제                                                                             | ```let myProgressView: UIProgressView = UIProgressView(frame: CGRect(x:0, y:0, width:100, height:5))``` |
+| ```myProgressView.setProgress(0.3, animated: true)```                            |
+
+## Extention : 확장
+
+하위 클래스를 생성 또는 참조하지 않고 기존 클래스에 메서드, 생성자, 계산 프로퍼티(computed property) 등의 기능을 추가하기 위해 사용된다.
+
+```swift
+extension Double {
+     var sec : Double {
+         return self * 60 * 60
+     }
+ }
+ 
+ let hour: Double = 2.5
+ print("\(hour)hour = \(hour.sec)seconds") // 2.5hour = 9000.0seconds
+ print(1.5.sec) // 5400.0 소수점이 있어도 .으로 사용 가능
+```
+
+## Access modifiers : 접근 속성
+
+클래스, 메서드, 멤버의 접근 가능성을 설정하며 구성 요소를 캡슐화 하는 데 사용된다.
+언어별로 디폴트 접근 속성(생략 가능)이 있다. (C# : internal, C++ : private, Java : package, Swift : internal) 
+Swift에는 private, fileprivate, internal, public, open의 다섯 가지 속성이 있다. 
+
+  |              |                                                                                                                                                    |
+  | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | open, public | 모듈의 모든 소스 파일 내에서와 정의한 모듈을 가져오는 다른 모듈의 소스 파일 에서도 접근 가능 (단, open 접근은 클래스 및 클래스 멤버에만 적용 가능) |
+  | internal     | 해당 모듈(ex. 앱)의 모든 소스 파일 내에서 사용 가능                                                                                                |
+  | fileprivate  | 현재 소스 파일 내에서만 사용 가능                                                                                                                  |
+  | private      | 현재 블록 내에서만 사용 가능                                                                                                                       |
+
+## protocol : 프로토콜
+
+특정 클래스와 관련없는 함수들의 선언 집합을 의미한다. (ex. 자바나 C#의 interface)
+Swift에서 상속할 때 부모 클래스는 하나만 가능하다. 만약 콜론 다음에 여러 개가 온다면 나머지는 프로토콜이다. 그러나 프로토콜은 다중 상속(부모 프로토콜 여러 개)도 가능하다
+
+```swift
+class 클래스명: 부모명, 프로토콜명{}
+// 부모가 있다면 부모 다음에 표기 (부모로부터 상속, 프로토콜 채택)
+class 클래스명: 프로토콜명{}
+// 부모가 없을 경우 바로 표기 가능
+protocol 프로토콜명 : 부모프로토콜1, 부모프로토콜2{}
+// 프로토콜 다중 상속
+```
+
+### Swift 상속과 protocol 채택
+
+- 프로토콜 채택(adopt) : 클래스, 구조체, 열거형, extension에 가능
+- 상속 : 클래스만 가능
+
+### 정의, 채택, 준수
+
+```swift
+protocol Showable {
+    var x : Int { get set } // 읽기 & 쓰기 가능, { get } : 읽기만 가능
+    func show() // 선언만
+}
+class Ray : Showable { // 채택 adopt
+    var x : Int = 5 // 준수 conform
+    func show() { print("보인다") } // 준수 conform
+}
+let eye = Ray()
+print(eye.x) // 5
+eye.show() // 보인다
+```
+
+### 예제 1
+
+```swift
+protocol B {
+    func bb(x: Int) -> Int
+}
+class C { }
+class A : C, B {
+    func bb(x: Int) -> Int {
+        return x * 2
+    }
+}
+let a = A()
+print(a.bb(x: 3)) // 6
+```
+
+### 예제 2
+
+```swift
+protocol Buyable { // 프로토콜
+    func calc(money: Int, price: Int) -> ()
+}
+class Item {
+    var item: String = ""
+    var price: Int
+    init(item: String, price: Int) {
+        self.item = item
+        self.price = price
+    }
+    init(price: Int) { // 오버로딩
+        self.price = price
+    }
+    func display() {
+        print("품목: \(item) 가격: \(price)")
+    }
+}
+class Cheap : Item, Buyable { // 상속
+    var memo: String
+    init(price: Int, memo: String) {
+        self.memo = memo
+        super.init(price: price)
+    }
+    func calc(money: Int, price: Int) -> () {
+        print("가격: \(price)원 지불한 돈: \(money) 거스름돈: \(money-price)원") 
+    }
+    override func display() { // 오버라이딩
+        print("내용: \(memo) 지출: \(price) 원")
+    }
+}
+var aa = Cheap(price: 65000, memo: "신발 구입")
+aa.display()
+// 내용: 신발 구입 지출: 65000 원
+aa.calc(money: 3000, price: 1800)
+// 가격: 1800원 지불한 돈: 3000 거스름돈: 1200원
+```
+
+## enum : 열거형
+
+관련있는 데이터들이 멤버로 구성되어 있는 자료형 객체를 의미한다
+
+### 정의
+
+```swift
+enum Family {
+    case Mother, Father, GrandMother, GrandFather, Me
+}
+print(Family.Me) // Me
+var female = Family.Mother
+female = .Me // 두번째 부터 열거형명 생략 가능
+print(female, type(of:female)) // Me Family
+```
+
+### 멤버별 기능 정의
+
+```swift
+enum Family {
+    case Mother, Father, GrandMother, GrandFather, Me
+}
+var hangeul : Family
+hangeul = .GrandFather
+switch hangeul {
+case .Mother:
+    print("엄마")
+case .Father:
+    print("아빠")
+case .GrandMother:
+    print("할머니")
+case .GrandFather:
+    print("할아버지")
+case .Me:
+    print("나")
+} // 할아버지
+```
+
+_- iOS프로그래밍기초(21-2학기) 한성현교수님 강의 내용 변형 및 요약_

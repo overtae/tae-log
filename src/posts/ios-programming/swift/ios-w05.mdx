@@ -1,0 +1,226 @@
+---
+title: 'Swift 문법 4'
+date: '2021-10-06'
+description: 'iOS프로그래밍기초(21-2학기) 강의 정리'
+tags:
+  - '1급 객체'
+  - '1급 시민'
+  - 'closure'
+  - 'class'
+  - 'stored property'
+---
+
+# BMI를 판정하는 calcBMI() 함수 정의
+
+```swift
+import Foundation
+func calcBMI(weight : Double, height : Double) -> String {
+    let bmi = weight / (height*height*0.0001)
+    let shortenedBmi = String(format: "%.1f", bmi)
+    var body = ""
+
+switch bmi {
+case 40...:
+    body = "3단계 비만"
+case 30..<40:
+    body = "2단계 비만"
+case 25..<30:
+    body = "1단계 비만"
+case 18.5..<25:
+    body = "정상"
+default:
+    body = "저체중"
+}
+    return "BMI:\(shortenedBmi), 판정:\(body)"
+}
+print(calcBMI(weight:58.2, height: 159.9))
+// BMI:22.8, 판정:정상
+```
+
+# Ⅰ. 1급 객체
+
+Swift의 함수는 아래 3가지 조건을 충족하여 1급 객체이다.
+
+## 1. 함수를 변수에 저장 가능
+
+```swift
+func cToF (temperature : Float) -> Float {
+    return temperature * 1.8 + 32
+}
+let ondo = cToF // 함수를 자료형처럼 사용
+// 자료형 : (Float) -> Float
+print(cToF(temperature:36.5))
+print(ondo(36.5)) // 매개변수명 쓰지 않음
+// 97.7
+```
+
+## 2. 함수를 매개변수로 사용
+
+```swift
+func cToF (temperature : Float) -> Float {
+    return temperature * 1.8 + 32
+}
+let ondo = cToF
+func outputConversion(converterFunc: (Float) -> Float, value: Float) {
+    let result = converterFunc(value) // ondo(36.5)
+    print("Result = \(result)")
+}
+outputConversion(converterFunc:ondo, value: 36.5) // Result = 97.7
+```
+
+## 3. 함수를 리턴값으로 사용
+
+```swift
+func cToF (temperature : Float) -> Float {
+    return temperature * 1.8 + 32
+}
+func fToC (temperature : Float) -> Float {
+    return (temperature - 32) / 1.8
+}
+let cf = cToF
+let fc = fToC
+func decideFunction (ondo : Bool) -> (Float) -> Float {
+    if ondo {
+        return cf
+    } else {
+        return fc
+    }
+}
+```
+
+### - 실습
+
+```swift
+func add(num1: Int, num2: Int) -> Int {
+    return num1 + num2
+}
+func sub(num1: Int, num2: Int) -> Int {
+    return num1 - num2
+}
+let toAdd = add
+let toSub = sub
+print(add(num1: 5, num2: 2)) // 7
+print(toAdd(5, 2)) // 7
+func addsub(Fun: (Int, Int) -> Int, x: Int, y: Int) {
+    let result = Fun(x, y)
+    print("Result : \(result)")
+}
+addsub(Fun:toAdd, x: 5, y: 2) // toAdd(5, 2) , Result : 7
+addsub(Fun:toSub, x: 5, y: 2) // toSub(5, 2) , Result : 3
+func decideFun(b: Bool) -> (Int, Int) -> Int {
+    if b {
+        return toAdd
+    } else {
+        return toSub
+    }
+}
+let r = decideFun(b:true)
+print(type(of:r)) // (Int, Int) -> Int
+print(r(5, 2)) // toAdd(5, 2) , 7
+```
+
+# Ⅱ. 클로저
+
+## 표현식 1
+
+```swift
+let double = { (x: Int, y: Int) -> Int in
+    return x * y
+}
+// print(double(x: 2, y: 5)) ERROR : argument labels 쓰면 안된다.
+print(double(2, 5)) // 10
+print(type(of:double)) // (Int, Int) -> Int
+```
+
+## 표현식 2
+
+```swift
+let half = { (x: Float, y: Float) -> Float in
+    return x / y
+}
+print(half(2, 5)) // 0.4
+print(type(of:half)) // (Float, Float) -> Float
+```
+
+## 축약 표현들
+
+```swift
+let divide = {(x: Float, y: Float) -> Float in
+    return x / y
+}
+print(divide(5, 2)) // 2.5
+
+let sub = {(x: Float, y: Float) -> Float in
+    return x - y
+}
+print(sub(5, 2)) // 3.0
+
+func math(x: Float, y: Float, cal: (Float, Float) -> Float) -> Float {
+    return cal(x, y)
+}
+print(math(x: 5, y: 2, cal: divide)) // 2.5
+print(math(x: 5, y: 2, cal: sub)) // 3.0
+
+var result = math(x: 5, y: 2, cal: {(val1: Float, val2: Float) -> Float in
+    return val1 / val2
+})
+print(result) // 2.5
+
+result = math(x: 5, y: 2, cal: {
+    $0 / $1
+}) // 리턴형, 자료형 생략, 단축인자 사용, return 생략
+print(result)
+
+result = math(x: 5, y: 2) {(val1: Float, val2: Float) -> Float in
+    return val1 / val2
+} // 후행 클로저
+print(result) // 2.5
+
+result = math(x: 5, y: 2) {
+    $0 / $1
+} // 후행 클로저 축약
+print(result) // 2.5
+```
+
+# Ⅲ. 클래스
+
+## 저장 프로퍼티 추가
+
+```swift
+class Food{
+    var name : String = "apple" // 저장 프로퍼티 (stored property), 초기값 필요
+    var mount : Int! // nil
+    var weight : Double?
+}
+```
+
+## 인스턴스 메서드
+
+```swift
+class Food{
+    var name : String = "사과"
+    var mount : Int = 0
+    func display() { // 인스턴스 메서드
+        print("\(name)이(가) \(mount)개 있다.")
+    }
+}
+```
+
+## 메서드와 프로퍼티 접근
+
+```swift
+class Food{
+    var name : String = "사과"
+    var mount : Int = 0
+    func display() { // 인스턴스 메서드
+        print("\(name)이(가) \(mount)개 있다.")
+    }
+}
+var myBag : Food = Food() // default initializer
+var yourBag = Food() // : Food 생략 가능
+myBag.display() // 사과이(가) 0개 있다.
+yourBag.mount = 12
+print(yourBag.mount) // 12
+```
+
+_- iOS프로그래밍기초(21-2학기) 한성현교수님 강의 내용 변형 및 요약_

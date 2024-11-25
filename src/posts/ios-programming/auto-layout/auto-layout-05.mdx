@@ -1,0 +1,113 @@
+---
+title: '[Auto Layout] 학기말 프로젝트 Auto Layout 적용기 1'
+date: '2022-01-13'
+description: 'iOS Auto Layout 정리 - 5'
+---
+
+### launch screen
+
+![](/posts/ios-programming/auto-layout/project21.png)
+
+먼저 최종 결과 화면이다.
+
+이미지와 앱 이름이 중앙에 세로로 배치되게 하였다.
+
+![](/posts/ios-programming/auto-layout/project22.png)
+
+순서대로 iPhone 11, iPad, iPhone SE 기종별 화면이다.
+
+아직 글씨 크기를 유동적으로 조절하는 방법을 몰라 패드에선 좀 어색해 보이는게 아쉽다.
+
+다음엔 꼭 코드도 사용해서 더 자연스러운 UI를 만들어 봐야겠다.
+
+![](/posts/ios-programming/auto-layout/project20.png)
+
+이번에 오토 레아이웃을 적용하면서 비율 기능을 정말 많이 사용했다.
+
+적당한 비율을 주면 stack으로 잡았을 때 화면에 맞춰 정렬이 가능해서 편하게 설정할 수 있었다.
+
+이미지 같은 경우는 특히 비율을 고정하는게 다양한 화면에서 예쁘게 나오는 것 같았다.
+
+background는 앱 이름 bmiTae 뒤의 배경이다.
+
+### home screen
+
+![](/posts/ios-programming/auto-layout/project2.png)
+
+최종 홈 화면이다.
+
+사실, 처음에 원했던 화면은 세로 화면일 때는 버튼이 위 아래로 있고 가로 화면일 때는 양 옆으로 위치하게 만들고 싶었지만..
+
+지금의 실력으로는 택도 없어서 결국 포기했다.
+
+기필코 다음엔 성공할 것이다.
+
+![](/posts/ios-programming/auto-layout/project3.png)
+
+런치 스크린과 마찬가지로 패드에선 약간 허전한 느낌을 준다.
+
+![](/posts/ios-programming/auto-layout/project1.png)
+
+오토 레이아웃 적용은 정말 간단했다.
+
+두 버튼을 스택으로 묶고 가운데 정렬만 해주면 된다.
+
+### web screen
+
+![](/posts/ios-programming/auto-layout/project16.png)
+
+위의 하얀 박스에 url을 입력하고 Go 버튼을 누르면 아래 회색 화면에 웹 페이지가 나오는 화면이다.
+
+![](/posts/ios-programming/auto-layout/project18.png)
+
+이 화면은 다른 화면들 보다 비교적 모든 해상도에서 일관적인 레이아웃을 보여주는 것 같다.
+
+![](/posts/ios-programming/auto-layout/project15.png)
+
+제일 먼저 url을 적는 박스와 Go 버튼을 스택으로 묶었다.
+
+그리고 보라색 Label의 너비의 0.95만큼의 너비를 갖게끔 하였다.
+
+이렇게 하면 아마 url 박스의 너비가 원하는 만큼 늘어나지 않을것이다.
+
+이때 url 박스의 Hugging priority를 낮추면 스택 너비에 맞춰 늘어나게 된다.
+
+이에 관련하여 다음에 따로 정리할 계획이다.
+
+Label 너비를 기준으로 한 레이아웃이 있으므로 Label에도 값을 알 수 있는 너비를 지정해주어야 한다.
+
+여기선 아래 Web View의 너비와 같게 하였다.
+
+높이의 경우는 스택보다 1.5배 정도 크게 설정하였다.
+
+또 Web View 너비를 기준으로 한 레이아웃이 있으므로 Web View에도 너비를 지정해주었다.
+
+위 이미지를 보면 leading과 trailing을 Safe Area와 같게 한 것을 알 수 있다.
+
+추가로 Web View의 bottom도 Safe Area의 bottom과 같게 하였다.
+
+최대한 넓은 화면으로 웹 페이지를 볼 수 있게 하고 싶었기 때문이다.
+
+마지막으로, Label을 화면 가로의 중앙에 올 수 있게 하였다.
+
+### video screen
+
+![](/posts/ios-programming/auto-layout/project14.png)
+
+BMI 관련 영상을 볼 수 있는 화면이다.
+
+위의 플레이 버튼은 폴더에 저장된 영상을 보여주고, 아래 회색 박스는 유튜브에서 영상을 가져와 보여준다.
+
+![](/posts/ios-programming/auto-layout/project17.png)
+
+미리보기 화면이다.
+
+![](/posts/ios-programming/auto-layout/project13.png)
+
+여기서도 비율을 정말 많이 사용했다.
+
+레이블, 버튼, 유튜브 영상 심지어 스택에도 사용하였다.
+
+스택의 너비와 레이블 두개, 유튜브 영상의 너비를 같게하고, 버튼은 스택 너비의 반이 되게끔 하였다.
+
+그리고 그 스택을 화면 정중앙에 오도록 하고 화면의 높이보다 100포인트 정도 작게 설정해주었다.
