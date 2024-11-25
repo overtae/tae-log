@@ -1,0 +1,102 @@
+---
+title: '성격 유형 검사하기'
+date: '2024-06-04'
+description: '성격 유형 검사하기 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**성격 유형 검사하기**](https://school.programmers.co.kr/learn/courses/30/lessons/118666)
+
+## 💡 문제
+
+~~ 너무 길어 생략합니다 ~~
+
+### ⚠️ 제한사항
+
+- 1 ≤ `survey`의 길이 ( = n) ≤ 1,000
+  - `survey`의 원소는 "RT", "TR", "FC", "CF", "MJ", "JM", "AN", "NA" 중 하나입니다.
+  - `survey[i]`의 첫 번째 캐릭터는 i+1번 질문의 비동의 관련 선택지를 선 택하면 받는 성격 유형을 의미합니다.
+  - `survey[i]`의 두 번째 캐릭터는 i+1번 질문의 동의 관련 선택지를 선택하면 받는 성격 유형을 의미합니다.
+- `choices`의 길이 = `survey`의 길이
+
+  - `choices[i]`는 검사자가 선택한 i+1번째 질문의 선택지를 의미합니다.
+  - 1 ≤ `choices`의 원소 ≤ 7
+
+    choices | 뜻 | 점수
+    -- | -- | --
+    1 | 매우 비동의 | 첫 번째 유형 3점
+    2 | 비동의 | 첫 번째 유형 2점
+    3 | 약간 비동의 | 첫 번째 유형 1점
+    4 | 모르겠음 | 없음
+    5 | 약간 동의 | 두번째 유형 1점
+    6 | 동의 | 두번째 유형 2점
+    7 | 매우 동의 | 두번째 유형 3점
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (성공)
+
+- choices를 돌며 점수를 얻은 유형의 문자(ex. 'R')를 점수만큼 반복한 문자열을 만든다.
+- 문자가 반복되는 수를 비교해 성격 유형을 구한다.
+  - 이 때, 두 유형이 반복된 수가 같다면 알파벳 순으로 유형을 구해야 한다.
+  - 나는 같거나 크다는 조건을 사용해 알파벳 순으로 구해지게끔 만들었다. 
+
+```kotlin
+class Solution {
+    fun solution(survey: Array<String>, choices: IntArray): String {
+        // RT CF JM AN
+
+        var t = choices.foldIndexed("") { i, t, c ->
+            if (c < 4) t + "${survey[i][0]}".repeat(4-c)
+            else if (c > 4) t + "${survey[i][1]}".repeat(c-4)
+            else t            
+        }
+
+        var answer: String = ""
+
+		// R 유형과 T 유형이 같은 경우 R로 판단된다.
+        answer += if (t.count {it == 'R'} >= t.count {it == 'T'}) "R" else "T"
+        answer += if (t.count {it == 'C'} >= t.count {it == 'F'}) "C" else "F"
+        answer += if (t.count {it == 'J'} >= t.count {it == 'M'}) "J" else "M"
+        answer += if (t.count {it == 'A'} >= t.count {it == 'N'}) "A" else "N"
+
+        return answer
+    }
+}
+```
+
+코드를 보면 같은 형태의 코드가 4줄이나 반복된다. 나는 이 반복을 없애보고 싶었으나, 유형들로 구성된 집합을 만들어서, 그 집합을 순회하면서, 문자열에 어떤 유형이 더 많은지 검사하면서, ... 이런 방식이 될 것 같아 그만두었다. 그래도 마음 한켠에는 더 좋은 방법이 있지 않았을까 하는 아쉬움이 남았다.
+
+### 🔥 다른 사람의 풀이
+
+다양한 풀이가 있었지만, `getOrDefault`를 사용한 풀이가 있어 가져와봤다. 형태를 보아하니 맵 형식의 ans에서 키(유형)에 해당하는 점수를 가져오는데, 만약 키가 없다면 0을 가져오는 느낌인 것 같다. 없을 수도 있는 키에 접근할 때 기본값을 지정해줄 수 있다는 사실을 알게되었다. 
+
+```kotlin
+class Solution {
+    fun solution(survey: Array<String>, choices: IntArray): String {
+        val orders = listOf("RT", "CF", "JM", "AN")
+        return choices
+            .mapIndexed { index, i ->
+                if (i-4 < 0) {
+                    survey[index][0] to -(i-4)
+                } else {
+                    survey[index][1] to (i-4)
+                }
+            }
+            .groupBy { it.first }
+            .map { it.key to it.value.sumOf { v:Pair<Char, Int> -> v.second } }
+            .toMap()
+            .let { ans:Map<Char, Int> ->
+                orders.map {
+                    if (ans.getOrDefault(it[0], 0) >= ans.getOrDefault(it[1], 0)) it[0] else it[1]
+                }
+            }
+            .joinToString("")
+    }
+}
+```
+
+## 💭 후기
+
+앱으로는 MBTI 검사하고, 코테로는 카카오TI 검사하고.. 성격 유형 검사가 정말 유행했었구나를 알 수 있었다. MBTI 테스트 앱이 생각나면서 더 재밌게 풀 수 있었던 문제였다. 그렇지만 무엇이 좋은 풀이인지는 아직 모르겠다. 메소드 체이닝..이라고 하나? 메소드를 길게 이어서 풀이하는 게 좋은 것인지, 반복되는 코드를 아예 없애는 게 좋은 것인지 판단하기 어렵다. 코테를 계속 풀다 보면 언젠가 감이 잡히는 날이 오겠지? 

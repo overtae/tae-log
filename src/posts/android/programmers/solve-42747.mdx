@@ -1,0 +1,114 @@
+---
+title: 'H-Index'
+date: '2024-06-18'
+description: 'H-Index 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**H-Index**](https://school.programmers.co.kr/learn/courses/30/lessons/42747)
+
+## 💡 문제
+
+어떤 과학자가 발표한 논문 n편 중, h번 이상 인용된 논문이 h편 이상이고 나머지 논문이 h번 이하 인용되었다면 h의 최댓값이 이 과학자의 H-Index입니다.
+
+어떤 과학자가 발표한 논문의 인용 횟수를 담은 배열 citations가 매개변수로 주어질 때, 이 과학자의 H-Index를 return 하도록 solution 함수를 작성해주세요.
+
+### ⚠️ 제한사항
+
+- 과학자가 발표한 논문의 수는 1편 이상 1,000편 이하입니다.
+- 논문별 인용 횟수는 0회 이상 10,000회 이하입니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (실패)
+
+- 인용 횟수가 h보다 큰 논문의 수가 h개인 경우 답을 구할 수 있다.
+- 1부터 주어진 논문의 수까지 h에 대입해 맞는 수를 찾으면 된다.
+  - 최대값을 구해야 하기 때문에 last를 사용해주었다. 
+
+```kotlin
+class Solution {
+    fun solution(citations: IntArray): Int {
+        return (1 until citations.size).last { h ->
+            citations.count { it >= h } == h
+        }
+    }
+}
+```
+
+테스트 케이스는 통과했으나, 채점 중 런타임 에러가 발생했다. 질문하기 페이지를 살펴보니 `[0, 0, 0]`이 들어왔을 때를 추가로 생각해줘야 한다고 한다. 바로 테스트 케이스에 추가해 돌려봤더니 `NoSuchElementException`이 발생했다. last가 찾을 요소가 없어 에러가 발생한 것으로 보인다. 
+
+### ✌️ 두 번째 풀이 (실패)
+
+처음엔 last의 조건에 맞는 요소가 없는 경우를 처리해주기 위해 lastOrNull로 변경하고자 했다. 그런데 문득 비효율적인 것 같다는 생각이 들었다. 1부터 논문의 수까지 탐색해 last로 최대값을 찾는 것 보다는 논문의 수부터 1까지 탐색해 조건에 맞는 첫번째 값을 구하면 더 적게 탐색할 수 있을 것 같아 firstOrNull을 사용하기로 했다. 
+
+```kotlin
+class Solution {
+    fun solution(citations: IntArray): Int {
+        return (citations.size downTo 1).firstOrNull { h ->
+            citations.count { it >= h } == h
+        } ?: 0
+    }
+}
+```
+
+> 그러나...
+
+또 실패를 했다. 이번에도 질문하기 페이지를 살펴보니 `[3, 3, 3, 4]`와 같이 같은 수가 여러 개 들어오는 경우를 생각해줘야 한다고 한다. 내 풀이는 3 이상인 수를 세어보니 4개인데, 3과 같지 않으므로 맞는 h를 찾을 수 없어 결국 0을 반환하게 된다. 즉, 3 이상인 수가 3개 **이상** 있는 경우를 세야하는 것이다! 
+
+이걸 보고 문제를 또 다시 읽어보니 _"논문 n편 중, h번 이상 인용된 논문이 h편 이상"_이면 되는 거여서 조건을 `==`이 아니라 `>=`로 줘야하는 것이었다.. 그냥 내가 문제를 잘못 이해했다..
+
+### 👌 세 번째 풀이 (성공)
+
+조건만 바꿔서 채점해보니 성공했다. 문제를 제발 좀 잘 읽도록 하자..
+
+```kotlin
+class Solution {
+    fun solution(citations: IntArray): Int {
+        return (citations.size downTo 1).firstOrNull { h ->
+            citations.count { it >= h } >= h
+        } ?: 0
+    }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+사실 질문하기 페이지를 둘러보면서 정말 많이 보였던 단어가 **"정렬"**이었다. 그렇지만 나는 홍대병이 있기 때문에 정렬 없이 풀래! 하고 내 갈 길을 갔었다. 그래도 정렬을 한 뒤 풀이하는 게 성능면에서 더 좋다고 해서 정렬을 이용한 풀이를 가져왔다. 
+
+내림차순으로 정렬을 하게 되면, 요소의 현재 인덱스에 1을 더한 수를 논문의 수라고 할 수 있다. 논문의 수와 인용된 수를 비교해 더 작은 수들로만 리스트를 만들어 그 중 최대값을 구한다면, 답을 구할 수 있다. 
+
+조금 다르게 말해보면, 요소의 인덱스에 1을 더한 값(인용된 수가 h 이상인 논문의 수)보다 큰 값을 가진 요소들의 인덱스들 중 최대값을 구하는 것이다. 
+
+```kotlin
+import kotlin.math.min
+
+class Solution {
+    fun solution(citations: IntArray) = citations.sortedDescending().mapIndexed { idx, item -> min(idx + 1, item) }.max()
+}
+```
+
+사실 이 코드.. 런타임 에러가 발생한다. `max()` 대신 `maxOrNull() ?: 0`으로 고쳐주면 올바르게 작동한다.
+
+### ✅ 개선한 풀이
+
+나도 비슷한 방식으로 정렬을 사용해서 다시 풀어보았다. 
+
+```kotlin
+class Solution {
+    fun solution(citations: IntArray): Int {
+        val sortedArr = citations.sortedDescending()
+        
+        return (citations.size downTo 1).firstOrNull { h ->
+            sortedArr[h - 1] >= h
+        } ?: 0
+    }
+}
+```
+
+속도가 조금 더 빨라지지 않을까? 해서 풀어보았지만, 10ms도 안넘기던 이전 풀이와는 다르게 평균 20ms의 시간이 소요되었다. 음.. 개선이라기 보다는 정말 다시 풀어본 게 맞는 말일 것 같다. 
+
+## 💭 후기
+
+h-index에 대해 이해하는 데 좀 어려움이 있었다. 질문하기 페이지에도 설명 관련해서 말이 많았다. 그래도 열심히 노트에 h..개 이상인.. 논문.. 등을 적어가며 이해해보았다. 결국 문제를 풀다보니 잘못 이해했다는 것을 알게되었지만, 나중에라도 이해한 게 어디인가. 

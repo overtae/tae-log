@@ -1,0 +1,123 @@
+---
+title: '모의고사'
+date: '2024-05-22'
+description: '모의고사 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**모의고사**](https://school.programmers.co.kr/learn/courses/30/lessons/42840)
+
+## 💡 문제
+
+수포자 삼인방은 모의고사에 수학 문제를 전부 찍으려 합니다. 수포자는 1번 문제부터 마지막 문제까지 다음과 같이 찍습니다.
+
+- 1번 수포자가 찍는 방식: 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, ...
+- 2번 수포자가 찍는 방식: 2, 1, 2, 3, 2, 4, 2, 5, 2, 1, 2, 3, 2, 4, 2, 5, ...
+- 3번 수포자가 찍는 방식: 3, 3, 1, 1, 2, 2, 4, 4, 5, 5, 3, 3, 1, 1, 2, 2, 4, 4, 5, 5, ...
+
+1번 문제부터 마지막 문제까지의 정답이 순서대로 들은 배열 answers가 주어졌을 때, 가장 많은 문제를 맞힌 사람이 누구인지 배열에 담아 return 하도록 solution 함수를 작성해주세요.
+
+### ⚠️ 제한사항
+
+- 시험은 최대 10,000 문제로 구성되어있습니다.
+- 문제의 정답은 1, 2, 3, 4, 5중 하나입니다.
+- 가장 높은 점수를 받은 사람이 여럿일 경우, return하는 값을 오름차순 정렬해주세요.
+
+## ✅ 풀이
+
+### ☝️ 첫 번째 풀이 (실패)
+
+- 수포자들이 찍는 방식 중 반복되는 규칙을 찾아 하나의 배열로 생성했다.
+  - 1번 수포자는 인덱스 0, 2번 수포자는 인덱스 1, 3번 수포자는 인덱스 2이다.
+  - 나머지 연산자를 이용해 설정한 배열의 길이를 넘어선 번호의 답을 구할 수 있다.
+- 수포자들의 점수를 다룰 때도 같은 인덱스로 배열을 생성했다.
+- 점수 배열의 최대값과 같은 인덱스에 1을 더해, 정답을 가장 많이 맞춘 수포자의 번호를 구할 수 있다.
+
+
+```kotlin
+class Solution {
+  fun solution(answers: IntArray): IntArray {
+    val supoja = arrayOf(intArrayOf(1, 2, 3, 4, 5),
+            intArrayOf(2, 1, 2, 3, 2, 4, 2, 5),
+            intArrayOf(3, 3, 1, 1, 2, 2, 4, 4, 5, 5))
+    val score = intArrayOf(0, 0, 0)
+    var answer = IntArray(0)
+
+    answers.mapIndexed { i, answer -> 
+      when (answer) {
+      	// 수포자1과 수포자2 모두 정답일 때, 수포자2는 카운트 되지 않는다.
+        // fallthrough가 안된다..
+        supoja[0][i%supoja[0].size] -> score[0] += 1
+        supoja[1][i%supoja[1].size] -> score[1] += 1
+        supoja[2][i%supoja[2].size] -> score[2] += 1
+      }
+    }
+
+    score.mapIndexed { i, s -> if (s == score.maxOrNull()) answer += i + 1 }
+
+    return answer
+  }
+}
+```
+
+정말 아뿔싸인 상황이다. when 문이 switch case 문을 대체하는 것이기 때문에 당연히 fallthrough 되는 게 기본값인 줄 알았다. 그러나 하나의 조건을 만족하면 다음 조건은 살펴보지도 않는다고 한다. 따로 무언갈 작성해줘야 하나 싶어서 찾아봤지만 fallthrough(2) 이런 식으로 작성해줘야 한대서 그냥 if 문을 써야겠다고 생각했다. 
+
+### ✌️ 두 번째 풀이 (성공)
+
+첫 번째 풀이에서 when을 if문으로 바꿔서 풀이했다. 추가로, 같은 구문이 반복되는 것 같아 0부터 2까지 범위 연산자를 이용해 한 줄로 작성해보았다.
+
+```kotlin
+class Solution {
+  fun solution(answers: IntArray): IntArray {
+    val supoja = arrayOf(intArrayOf(1, 2, 3, 4, 5),
+            intArrayOf(2, 1, 2, 3, 2, 4, 2, 5),
+            intArrayOf(3, 3, 1, 1, 2, 2, 4, 4, 5, 5))
+    val score = intArrayOf(0, 0, 0)
+    var answer = IntArray(0)
+
+    answers.mapIndexed { i, answer -> 
+      (0..2).map {
+        if (supoja[it][i%supoja[it].size] == answer) score[it] += 1
+      }
+    }
+
+    score.mapIndexed { i, s -> if (s == score.maxOrNull()) answer += i + 1 }
+
+    return answer
+  }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+이번 문제는 많은 사람이 겹치게 푼 풀이가 없었다. 있어도 3명..? 그만큼 다양하게 풀이할 수 있는 문제였던 것 같다. 그래도 좀 자주 보였던 게 Pair를 사용한 풀이여서 가져와봤다. 
+
+나는 수포자의 번호를 구할 때 인덱스에 1을 더해 구했지만, Pair를 사용해 (번호, 점수)로 다루면 굳이 인덱스에 1을 더할 필요가 없다!
+
+```kotlin
+class Solution {
+  fun solution(answers: IntArray): IntArray {
+    val studentA = listOf(1, 2, 3, 4, 5, 1, 2, 3, 4, 5)
+    val studentB = listOf(2, 1, 2, 3, 2, 4, 2, 5, 2, 1, 2, 3, 2, 4, 2, 5)
+    val studentC = listOf(3, 3, 1, 1, 2, 2, 4, 4, 5, 5, 3, 3, 1, 1, 2, 2, 4, 4, 5, 5)
+
+    val r = listOf(
+      Pair(1, answers.filterIndexed { index, i -> studentA[index % studentA.size] == i }.count()),
+      Pair(2, answers.filterIndexed { index, i -> studentB[index % studentB.size] == i }.count()),
+      Pair(3, answers.filterIndexed { index, i -> studentC[index % studentC.size] == i }.count())
+    )
+    .sortedByDescending { it.second }
+
+    return when {
+      r[0].second == r[1].second && r[1].second == r[2].second -> intArrayOf(r[0].first, r[1].first, r[2].first)
+      r[0].second == r[1].second -> intArrayOf(r[0].first, r[1].first)
+      else -> intArrayOf(r[0].first)
+    }
+  }
+}
+```
+
+## 💭 후기
+
+코드가 점점 길어져서 작성하면서도 _이게 맞나..? 어..? 정답이네..?_ 이러면서 풀었던 것 같다. 총 문제의 개수가 10,000개 이하라 걱정 없이 냅다 반복을 할 수 있었다. 다른 사람의 풀이에서 최대 값을 구하는 방식이 정말 다양해서 살펴보는 재미가 있던 문제였다.

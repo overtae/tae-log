@@ -1,0 +1,111 @@
+---
+title: '롤케이크 자르기'
+date: '2024-07-02'
+description: '롤케이크 자르기 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**롤케이크 자르기**](https://school.programmers.co.kr/learn/courses/30/lessons/132265)
+
+## 💡 문제
+
+철수는 롤케이크를 두 조각으로 잘라서 동생과 한 조각씩 나눠 먹으려고 합니다. 이 롤케이크에는 여러가지 토핑들이 일렬로 올려져 있습니다. 철수와 동생은 롤케이크를 공평하게 나눠먹으려 하는데, 그들은 롤케이크의 크기보다 롤케이크 위에 올려진 토핑들의 종류에 더 관심이 많습니다. 그래서 잘린 조각들의 크기와 올려진 토핑의 개수에 상관없이 각 조각에 동일한 가짓수의 토핑이 올라가면 공평하게 롤케이크가 나누어진 것으로 생각합니다.
+
+롤케이크에 올려진 토핑들의 번호를 저장한 정수 배열 topping이 매개변수로 주어질 때, 롤케이크를 공평하게 자르는 방법의 수를 return 하도록 solution 함수를 완성해주세요.
+
+### ⚠️ 제한사항
+
+- 1 ≤ topping의 길이 ≤ 1,000,000
+  - 1 ≤ topping의 원소 ≤ 10,000
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (실패)
+
+많이 당했으면서 아직도 정신을 못차리고 시간 복잡도 생각 없이 코드를 싸지르는 모습이다. 문제를 어떻게 풀어야할 지 생각하는 건 쉬웠다. 
+
+- 0부터 n까지 중복을 제거한 배열의 길이를 구한다.
+- n + 1부터 끝까지 중복을 제거한 배열의 길이를 구한다.
+- 두 길이가 같은 경우를 센다. 
+
+역시나 시간 초과 엔딩이 났고, 시간이 많이 걸리는 부분은 역시나 배열을 자르는 부분과 중복 제거 부분에 있다고 생각했다. 
+
+```kotlin
+class Solution {
+    fun solution(topping: IntArray): Int {
+		return topping.indices.count {
+    		topping.slice(0..it).distinct().size == topping.slice(it+1..topping.size-1).distinct().size
+		}
+    }
+}
+```
+
+### ✌️ 두 번째 풀이 (성공)
+
+코틀린에는 중복을 허용하지 않는 Set이란 컬렉션이 있다. 그 중에서도 수정이 가능한 HashSet을 사용해주었다. 구하는 방식도 살짝 다르게 변경했다.
+
+- 철수가 0 부터 롤케이크의 길이까지 잘라서 먹을 수 있는 토핑 종류를 담은 배열을 구한다.
+  - 이 때 토핑들을 HashSet에 담아 중복을 제거한 뒤 그 Set의 길이를 구해 먹을 수 있는 토핑 종류를 구한다.
+  - 철수의 동생은 롤케이크의 길이부터 0까지 잘라서 먹을 수 있는 토핑 종류를 담은 배열을 구한다.
+- 구한 두 배열을 비교해 값이 같은 경우의 수를 센다.
+  - 이 때 철수가 0부터 n까지 잘랐다면 동생은 n+1 부터 끝까지 먹게 된다.
+  - 따라서 두 배열을 비교할 때 철수는 i, 동생은 i+1의 값과 비교해야 한다.
+
+```kotlin
+class Solution {
+    fun solution(topping: IntArray): Int {
+        val size = topping.size
+
+        val left = hashSetOf<Int>()
+        val right = hashSetOf<Int>()
+
+        val l = IntArray(size) {0}
+        val r = IntArray(size) {0}
+
+
+        (0 until size).map {
+            left.add(topping[it])
+            right.add(topping[size-it-1])
+
+            l[it] = left.size
+            r[size-it-1] = right.size
+        }
+
+        return (0 until size-1).count { l[it] == r[it+1] }
+    }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+이 분은 HashMap을 이용해 풀었다. 
+
+- hm2 배열에 동생이 0부터 롤케이크 끝까지 먹을 수 있는 종류와 그 수를 담는다. 
+  - ex. 1 토핑은 3번 먹고, 2 토핑은 2번 먹고, ...
+- topping을 돌며 hm1 배열에는 먹은 토핑을 더하고, hm2에는 hm1이 먹은 토핑을 빼준다.
+  - 이후 hm2에서 해당 토핑의 수가 0이 되면, 아예 hm2에서 토핑을 삭제한다.
+  - hm1과 hm2의 사이즈를 비교해 같은 경우 답에 1을 더한다.
+
+```kotlin
+class Solution {
+    fun solution(topping: IntArray): Int {
+        var cnt = 0
+        val hm1 = HashMap<Int, Int>()
+        val hm2 = HashMap<Int, Int>()
+        for (top in topping) hm2[top] = hm2.getOrDefault(top, 0) + 1
+
+        for (i in topping.indices) {
+            hm1[topping[i]] = hm1.getOrDefault(topping[i], 0) + 1
+            hm2[topping[i]] = hm2.getOrDefault(topping[i], 0) - 1
+            if (hm2.getOrDefault(topping[i], 0) == 0) hm2.remove(topping[i])
+            if (hm1.size == hm2.size) cnt++
+        }
+        return cnt
+    }
+}
+```
+
+## 💭 후기
+
+이 놈의 시간 초과는 계속 뜨는데 나는 아직 코틀린 람다 함수의 시간 복잡도를 잘 몰라서 공부를 더 해야할 것 같다. 

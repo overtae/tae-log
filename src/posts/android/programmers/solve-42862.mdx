@@ -1,0 +1,109 @@
+---
+title: '체육복'
+date: '2024-05-27'
+description: '체육복 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**체육복**](https://school.programmers.co.kr/learn/courses/30/lessons/42862)
+
+## 💡 문제
+
+학생들의 번호는 체격 순으로 매겨져 있어, 바로 앞번호의 학생이나 바로 뒷번호의 학생에게만 체육복을 빌려줄 수 있습니다. 예를 들어, 4번 학생은 3번 학생이나 5번 학생에게만 체육복을 빌려줄 수 있습니다. 체육복이 없으면 수업을 들을 수 없기 때문에 체육복을 적절히 빌려 최대한 많은 학생이 체육수업을 들어야 합니다.
+
+전체 학생의 수 n, 체육복을 도난당한 학생들의 번호가 담긴 배열 lost, 여벌의 체육복을 가져온 학생들의 번호가 담긴 배열 reserve가 매개변수로 주어질 때, 체육수업을 들을 수 있는 학생의 최댓값을 return 하도록 solution 함수를 작성해주세요.
+
+### ⚠️ 제한사항
+
+- 전체 학생의 수는 2명 이상 30명 이하입니다.
+- 체육복을 도난당한 학생의 수는 1명 이상 n명 이하이고 중복되는 번호는 없습니다.
+- 여벌의 체육복을 가져온 학생의 수는 1명 이상 n명 이하이고 중복되는 번호는 없습니다.
+- 여벌 체육복이 있는 학생만 다른 학생에게 체육복을 빌려줄 수 있습니다.
+- 여벌 체육복을 가져온 학생이 체육복을 도난당했을 수 있습니다. 이때 이 학생은 체육복을 하나만 도난당했다고 가정하며, 남은 체육복이 하나이기에 다른 학생에게는 체육복을 빌려줄 수 없습니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (실패)
+
+- lost와 reserve는 서로 겹칠 수 있으므로, 중복된 번호는 제거를 해주어야 한다.
+  - filter를 사용해 중복을 제거하자!
+- 답은 전체 학생 수에서 체육복을 잃어버린 학생 수를 빼주면 구할 수 있다. 즉, lost가 최소가 되어야 수업을 들을 수 있는 학생이 최대가 된다.
+- 여분의 체육복이 있는 학생의 번호에서 1을 더하거나 뺀 수가 lost 배열에 있는지 검사하자.
+  - 있다면 lost 배열에서 해당 번호를 제거하자.
+
+```kotlin
+class Solution {
+    fun solution(n: Int, lost: IntArray, reserve: IntArray): Int {
+        var realReserve = reserve.filter { it !in lost }
+        var realLost = lost.filter { it !in reserve }.toMutableList()
+
+        realReserve.map {
+            when {
+                realLost.contains(it-1) -> realLost.removeAt(realLost.indexOf(it-1))
+                realLost.contains(it+1) -> realLost.removeAt(realLost.indexOf(it+1))
+                else -> 0
+            }
+        }
+
+        return n - realLost.size
+    }
+}
+```
+
+코드를 보면 조건이 it-1이 먼저, it+1이 나중에 있다. 이렇게 조건을 작성하면 만약 reserve 배열이 정렬이 되지 않은 상태로 주어졌을 때, 최대한으로 체육복을 빌려줄 수 없게 된다. 예를 들어 reserve 배열이 `[5, 3]`이면 5번 학생은 6번 학생에게 빌려줄 수 있는데 조건 순서가 -1부터라 4번 학생에게 빌려주게 되는 것이다! 이렇게 되면 3번 학생은 4번 학생에게 빌려주지 못하게 되므로 답을 구할 수 없다.
+
+### ✌️ 두 번째 풀이 (성공)
+
+정말 날먹으로.. reserve 배열을 처음에 오름차순으로 정렬을 해주었다. 풀이에 성공은 했지만, 당연히 더 좋은 방법이 있을거란 생각이 들었다. ~~(왜냐면 파이썬으로는 더 간단하게 풀었기 때문이다)~~
+
+```kotlin
+class Solution {
+    fun solution(n: Int, lost: IntArray, reserve: IntArray): Int {
+        var realReserve = reserve.filter { it !in lost }.sorted()
+        var realLost = lost.filter { it !in reserve }.toMutableList()
+
+        realReserve.map {
+            when {
+                realLost.contains(it-1) -> realLost.removeAt(realLost.indexOf(it-1))
+                realLost.contains(it+1) -> realLost.removeAt(realLost.indexOf(it+1))
+                else -> 0
+            }
+        }
+
+        return n - realLost.size
+    }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+이런 풀이를 원했다. 사실 파이썬으로 풀이할 때, set을 사용해 두 배열을 빼주면 중복을 제거할 수 있어서 코틀린으로도 가능할까? 싶었는데 가능했다! 배열 상태로는 안되고 Set으로 변환을 해주면 가능한 것 같다.
+
+게다가 Set을 사용하면 요소의 인덱스가 아닌 값으로 지울 수 있어서 `realLost.removeAt(realLost.indexOf(it+1))`이런 길다란 코드를 작성하지 않아도 된다! 
+
+또 contains 대신 in을 사용한 것도 인상깊었다. 정말 배울점이 많은 풀이 같다.
+
+```kotlin
+class Solution {
+        fun solution(n: Int, lost: IntArray, reserve: IntArray): Int {
+
+            var answer = n
+            var lostSet = lost.toSet() - reserve.toSet()
+            var reserveSet = (reserve.toSet() - lost.toSet()) as MutableSet
+
+            for (i in lostSet) {
+                when {
+                    i + 1 in reserveSet -> reserveSet.remove(i + 1)
+                    i - 1 in reserveSet -> reserveSet.remove(i - 1)
+                    else -> answer--
+                }
+            }
+            return answer
+        }
+}
+```
+
+## 💭 후기
+
+사실 요즘 계속 혼자서 풀이한 코드가 맘에 들지 않았는데, 잊지 말아햐 할 것은 나는 아직 개쩌는 코틀린 인간이 아니라는 것이다! 다른 사람 코드를 보며 내 코드를 까내리는 게 아니라, 다른 사람의 코드를 선생님처럼 생각할 필요가 있는 것 같다. 나는 아직 코틀린 입문자이고, 지금의 내가 몇 주 전에 풀었던 풀이보다는 더 잘 풀 수 있을 것이기에 스트레스 받지 말자고 생각을 마쳤다. 화이팅! 

@@ -1,0 +1,93 @@
+---
+title: '카펫'
+date: '2024-06-11'
+description: '카펫 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**카펫**](https://school.programmers.co.kr/learn/courses/30/lessons/42842)
+
+## 💡 문제
+
+Leo는 카펫을 사러 갔다가 중앙에는 노란색으로 칠해져 있고 테두리 1줄은 갈색으로 칠해져 있는 격자 모양 카펫을 봤습니다.
+
+Leo가 본 카펫에서 갈색 격자의 수 brown, 노란색 격자의 수 yellow가 매개변수로 주어질 때 카펫의 가로, 세로 크기를 순서대로 배열에 담아 return 하도록 solution 함수를 작성해주세요.
+
+### ⚠️ 제한사항
+
+- 갈색 격자의 수 brown은 8 이상 5,000 이하인 자연수입니다.
+- 노란색 격자의 수 yellow는 1 이상 2,000,000 이하인 자연수입니다.
+- 카펫의 가로 길이는 세로 길이와 같거나, 세로 길이보다 깁니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (성공)
+
+- 전체 면적으로 가능한 (가로, 세로) 길이를 모두 구한다.
+  - 나는 약수 구하듯이 구해주었다.
+- 그 중에서 테두리 1줄을 제외한 `(가로 - 2) * (세로 - 2)`의 면적이 yellow와 같은 경우를 구한다.
+  - 가로는 세로보다 같거나 커야한다.
+  - 나의 경우 제곱근까지만 약수를 구하고, 구해진 약수를 세로로 설정해 풀었다.
+
+```kotlin
+class Solution {
+    fun solution(brown: Int, yellow: Int): IntArray {
+        val all = brown + yellow
+        val sq = Math.sqrt(all.toDouble()).toInt()
+        val divider = (1..sq).filter { all % it == 0 }
+        var answer = intArrayOf()
+
+        divider.map {
+            val (x, y) = all/it to it
+            if ((x - 2) * (y - 2) == yellow)
+                answer = intArrayOf(x, y)
+        }
+
+        return answer
+    }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+ptsd라는 말을 아는가. 나는 약수를 구하는 데에 엄청난 ptsd가 있다. 이전에 시간 제한 때문에 엄청 고생했던 기억이 있기 때문이다. 그래서 약수를 구하는 모든 문제에 걸릴 시간을 생각하게 되는.. 고질병이 생겼다. 이번 문제도 괜히 두려운 마음에 제곱근까지만 구하는 방식을 사용했고, 역시나 괜한 걱정이었다.
+
+게다가 풀이도 나와 전혀 다른 방식으로 풀었다. 나는 brown의 가로, 세로를 기준으로 풀었다면, 이 분은 yellow의 가로, 세로를 기준으로 풀었다. 갈색 너비의 절반은 `(yellow 세로 + yellow 가로 + 2)`와 같다는 것을 이용했다. 다음은 이해를 돕기위한 나의 발그림이다..
+
+![](/posts/android/programmers/42842.png)
+
+yellow 가로를 a로 뒀을 때, 세로는 `yellow/a` 가 되니까 식을 조금 정리해보면 `(yellow/a + a + 2) = brown / 2`가 된다. 이 식을 그.. 이항정리.. 라고 하나..? 아무튼 `/ 2`를 좌변으로 넘기면 각 항에 `* 2`를 해주게 되고, 결과는 `(yellow/a * 2) + (a * 2) + 4 = brown`이 된다! 이 식을 이용하면 다음과 같은 풀이가 나온다. 
+
+```kotlin
+class Solution {
+    fun solution(brown: Int, yellow: Int): IntArray {
+        // a+b+2=brown/2
+        return (1..yellow)
+            .filter { yellow % it == 0 }
+            .first { brown == (yellow / it * 2) + (it * 2) + 4 }
+            .let { intArrayOf(yellow / it + 2, it + 2) }
+    }
+}
+```
+
+### ✅ 개선한 풀이
+
+나도 `(yellow/a * 2) + (a * 2) + 4 = brown` 이 공식을 써보고 싶었다. 그리고 제곱근 사용 없이도 시간 초과가 발생하지 않는다는 것을 알았으니, 다시 풀어보고 싶었다. 개선이 됐는가?는.. 모르겠다.
+
+```kotlin
+class Solution {
+    fun solution(brown: Int, yellow: Int): IntArray {
+        val divider = (1..yellow).filter { yellow % it == 0 }
+        val row = divider.first { 
+            brown == (yellow / it * 2) + it * 2 + 4
+        }
+        
+        return intArrayOf(yellow/row + 2, row + 2)
+    }
+}
+```
+
+## 💭 후기
+
+ptsd는 극복하라고 있는 것 아닐까. 앞으로 숫자가 아무리 커도, 구해야 되는 개수가 적다면 굳이 제곱근을 구하는 일은 하지 말아야겠다. 이번 문제에서는 yellow가 최대 2,000,000이라고 해서 (쉼표 2개 이상 찍혀 있으면 불안함) 지레 겁을 먹었던 것 같다. 

@@ -1,0 +1,146 @@
+---
+title: '숫자 변환하기'
+date: '2024-07-03'
+description: '숫자 변환하기 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**숫자 변환하기**](https://school.programmers.co.kr/learn/courses/30/lessons/154538)
+
+## 💡 문제
+
+자연수 `x`를 `y`로 변환하려고 합니다. 사용할 수 있는 연산은 다음과 같습니다.
+
+`x`에 `n`을 더합니다
+`x`에 2를 곱합니다.
+`x`에 3을 곱합니다.
+자연수 `x`, `y`, `n`이 매개변수로 주어질 때, `x`를 `y`로 변환하기 위해 필요한 최소 연산 횟수를 return하도록 solution 함수를 완성해주세요. 이때 `x`를 `y`로 만들 수 없다면 -1을 return 해주세요.
+
+### ⚠️ 제한사항
+
+- 1 ≤ `x` ≤ `y` ≤ 1,000,000
+- 1 ≤ `n` < `y`
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (실패)
+
+이전에 비슷한 문제들을 몇 번 봤었기 때문에 재귀를 통해 모든 경우의 수를 탐색하면 될거라 생각했다. 그냥 느낌상 y에서 x로 변환하는 게 뭔가뭔가 더 빠를 것 같아서 해봤는데, 사실 별로 다를 건 없었을 것 같다. 어차피 채점 결과는 시간 초과거든..
+
+```kotlin
+class Solution {
+    fun solution(x: Int, y: Int, n: Int): Int {
+        var answer: Int = 1000000
+
+        fun exec(y: Int, cnt: Int) {
+            if (y < x) return
+            if (y == x && cnt < answer) answer = cnt
+            if (y % 2 == 0) exec(y / 2, cnt + 1)
+            if (y % 3 == 0) exec(y / 3, cnt + 1)
+            exec(y - n, cnt + 1)
+        }
+        exec(y, 0)
+        
+        return if (answer == 1000000) -1 else answer
+    }
+}
+```
+
+찾아보니, 내가 위에서 재귀함수를 사용해 탐색하는 방식이 DFS 알고리즘인 것 같았다. DFS 알고리즘은 내가 이전에 정리해 둔 [이 곳](https://overtae.github.io/blog/python%20algorithm/dfs-bfs-02/)을 참고하자.. ~~(왜 정리했는데 알지를 못해)~~
+
+대충 요약하자면 **DFS 알고리즘은 깊이 우선, BFS 알고리즘은 너비 우선 탐색**을 말한다. 이번 문제는 최대한 적은 연산으로 숫자를 변환을 해야 한다. 즉, **최대한 얕게 들어갈 수 있는 노드를 구해야하기 때문에 너비 우선 탐색을 사용**해야 되는 문제였다!
+
+### ✌️ 두 번째 풀이 (성공)
+
+BFS를 써야된다는 것을 알겠고, 또 큐를 사용해야 된다는 것도 알겠다. 하지만 거기서 어떻게 발전시켜야할 지 감이 안잡혀서 오늘은 파이썬이 아닌 자바스크립트 풀이를 참고했다. ㅎㅎ.. 
+
+코드가 정말 신기했는데, 큐가 비어있지 않을 때 무한으로 반복을 시키고 그 반복 내에서 큐에 요소들을 add하는 방식이었다. 반복을 이렇게도 시킬 수 있다는 것을 알게되었다. 내가 이해한 코드의 작동 방식은 다음과 같다.
+
+- 이미 방문한 노드를 다시 탐색하지 않기 위한 HashMap\<연산을 수행한 y값, 방문 여부\> 형태의 visited 해시맵을 선언한다.
+- 연산을 수행한 y와 수행 횟수 쌍을 담아둘 큐를 선언한다.
+- 처음에 한 번, 큐에 y와 탐색 횟수 쌍을 넣어준다.
+- 이후에 큐가 빌 때까지 반복문 내의 코드를 수행한다.
+  - 큐의 첫 요소를 빼와 x와 비교한다.
+  - x와 같다면 탐색횟수를 반환한다.
+  - 아니라면 큐에 연산을 수행한 y와 기존 탐색 횟수에 1을 더한 값 쌍을 넣어준다.
+  - 큐의 요소를 다 탐색했는데도 x가 되지 못했다면 -1을 반환한다.
+
+```kotlin
+import java.util.*
+
+class Solution {
+    fun solution(x: Int, y: Int, n: Int): Int {
+        var visited: HashMap<Int, Boolean> = hashMapOf()
+        var q: Queue<Pair<Int, Int>> = LinkedList()
+        
+        fun exec(y: Int, type: Int) = when (type) {
+            0 -> y - n
+            1 -> if (y % 2 == 0) y / 2 else 0
+            else -> if (y % 3 == 0) y / 3 else 0
+        }
+        
+        fun solve(y: Int, cnt: Int): Int {
+            q.add(y to cnt)
+            
+            while (q.isNotEmpty()) {
+                val (current, count) = q.poll()
+
+                if (current == x) return count
+
+                (0..2).map {
+                    val next = exec(current, it)
+                    if (next >= x && !(visited[next] ?: false)) {
+                        visited[next] = true
+                        q.add(next to count + 1)
+                    }
+                }
+            }
+            return -1
+        }
+        
+        return solve(y, 0)
+    }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+분명.. 시간 초과 때문에 너비 우선 탐색을 해야한다고 들었는데.. 이 분은 깊이 우선 탐색으로 풀이했다. 내 첫 번째 풀이와 다른 점은 답의 최댓값을 20으로 뒀고, `coerceAtMost`라는 함수를 사용했다 정도인 것 같다. 아마도...?
+
+> ✨ [`A.coerceAtMost(B)`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/coerce-at-most.html)
+> 
+> A 객체가 B 객체보다 작은 지 아닌 지 확인한다.
+> A가 더 작으면 A를 반환, 아니면 최대 객체(B)를 반환한다.
+
+길다란 조건문 없이 더 작은 값을 구할 수 있어서 편리한 함수인 것 같다!
+
+```kotlin
+class Solution {
+    var result = 0
+
+    fun solution(x: Int, y: Int, n: Int): Int {
+        val MAX = 20
+        result = MAX
+        dfs(x, y, n)
+        return if(result == MAX) -1 else result
+    }
+
+    fun dfs(x: Int, y: Int, n: Int, cnt: Int = 0) {
+        if(x == y) {
+            result = result.coerceAtMost(cnt)
+            return
+        } else if(x > y || cnt >= result) {
+            return
+        }
+
+        dfs(x * 2, y, n, cnt + 1)
+        dfs(x * 3, y, n, cnt + 1)
+        dfs(x + n, y, n, cnt + 1)
+    }
+}
+```
+
+## 💭 후기
+
+dfs를 쓰던, bfs를 쓰던 시간 초과는 개인 역량 문제였다는 걸로... 그래도 새로운 함수를 알아가는 시간이었으니 나이스라고 하자. 
