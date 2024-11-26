@@ -1,0 +1,110 @@
+---
+title: 'MBTI 앱 만들어보기 - 1'
+date: '2024-05-22'
+description: 'Android 앱 개발 종합반 3주차 강의 - 1'
+tags:
+  - '안드로이드'
+---
+
+## 배경에 그라디언트를 줘보자!
+
+로또 번호 생성 앱에서 했던 것 처럼, drawble 폴더에 xml 파일을 만들어주면 된다. 이번엔 단색으로 칠하는 solid가 아닌, gradient 속성을 사용했다.
+
+```kotlin
+<?xml version="1.0" encoding="utf-8" ?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#ff2d9a59"
+        android:endColor="#ff23729a"
+        android:angle="90" />
+</shape>
+```
+
+## @ 는 뭘까?
+
+Intent 객체를 생성할 때는 컨텍스트와 이동할 대상 액티비티가 필요하다. 그래서 여태 `this`를 사용해 컨텍스트를 넘겨줬었는데! 이번엔 `this` 뒤에 `@MainActivity` 를 붙여줬다. 이게 과연 뭘 뜻하는 것일까?
+
+```kotlin
+btn_start.setOnClickListener {
+    val intent = Intent(this@MainActivity, TestActivity::class.java)
+    startActivity(intent)
+}
+```
+
+찾아보니, `this`가 중첩 클래스 같은 곳에서 사용될 때 부모 클래스를 뜻하는지, 자식 클래스를 뜻하는지 헷갈릴 수 있어서 `@`를 사용해 어떤 클래스를 뜻하는지 지정해준다고 한다. 보기에도 *아! MainActivity를 나타내는구나!* 하고 명확하게 알 수 있어서 좋은 것 같다.
+
+## lateinit
+
+viewPager 라는 뷰를 한 액티비티 내에서 전역으로 사용하고 싶은데, 레이아웃에 접근할 수 있는 건 `onCreate()` 에서 `setcontentView()` 이후에 가능하다. 이럴 때 사용할 수 있는 게 `lateinit` 이다.
+
+```kotlin
+private lateinit var viewPager: ViewPager2
+
+override fun onCreate(savedInstanceState: Bundle?) {
+	...
+	// 화면이 출력된 이후에 viewPager 에 id로 접근할 수 있다.
+	viewPager = findViewById(R.id.viewPager)
+}
+```
+
+lateinit 은 **변수에 객체를 할당하는 것을 선언과 동시에 할 수 없을 때 사용**하고, **초기 값의 할당은 나중에** 할 수 있도록 한다. 단, 초기 값 할당 전까지 변수를 사용할 수 없고, String을 제외한 기본 자료형에는 사용할 수 없다고 한다. 
+
+## intent.flags
+
+로또 앱을 만들 때, 액티비티를 이동한다고 해서 기존의 액티비티가 사라지는 게 아니라고 했었다. 조금 더 자세히 말해보면 **액티비티는 스택(Stack) 구조로 되어있는 태스크(Task)에 차곡차곡 쌓이게 된다**고 한다. 
+
+태스크에 쌓여져 있는 액티비티의 중복을 방지한다던가 흐름을 제어하고 싶을 때! 바로 이 flag를 사용한다. 찾아보니 종류가 엄청 많았다. 필요할 때마다 찾아서 사용하면 될 것 같다. 우선은 오늘 사용된 플래그만 알아보도록 하자. 
+
+다음은 intent에 `FLAG_ACTIVITY_CLEAR_TASK`와 `FLAG_ACTIVITY_NEW_TASK`를 같이 적용하는 코드이다.
+
+```kotlin
+val btn_retry: Button = findViewById(R.id.btn_res_retry)
+btn_retry.setOnClickListener {
+    val intent = Intent(this, MainActivity::class.java)
+    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+    startActivity(intent)
+}
+```
+
+ 그렇다면 각 플래그가 어떤 의미인지 살펴보자. 
+
+- [FLAG_ACTIVITY_CLEAR_TASK](https://developer.android.com/reference/kotlin/android/content/Intent#flag_activity_clear_task)
+    - 새로운 액티비티를 시작하기 전에 같은 태스크에 있는 모든 기존 액티비티를 제거한다.
+    - 새 액티비티가 새로운 태스크의 루트가 된다.
+- [FLAG_ACTIVITY_NEW_TASK](https://developer.android.com/reference/kotlin/android/content/Intent#flag_activity_new_task)
+    - 새로운 액티비티를 새 태스크에서 시작한다.
+    - 새 태스크가 생성되고 해당 태스크의 루트 액티비티로 새 액티비티가 시작된다.
+
+따라서 재시작 버튼을 누르게 되면, 기존 태스크의 모든 액티비티(시작 화면, 질문 화면, 결과 화면)를 제거한 후, 새로운 태스크에서 새로운 액티비티를 시작하게 된다!
+
+## Elvis 연산자 ?:
+
+코틀린에는 nullable 변수라는 것이 존재한다. null을 허용하는 변수이지만, 연산 전에는 꼭 null 값인지 확인해줘야 하는데 이걸 조금 더 편하게 할 수 있게 하는 연산자들이 있다. 오늘은 그 중에서도 엘비스 연산자가 쓰여서, 요것만 알아보겠다. 
+
+엘비스 연산자는 객체가 null이 아니라면 그대로 사용하지만, null이라면 **연산자 우측의 객체로 대체**되어 사용된다. 
+
+```kotlin
+// results에 담긴 값이 없다면 빈 arraylist를 할당한다.
+val results = intent.getIntegerArrayListExtra("results") ?: arrayListOf()
+```
+
+## 다양한 이미지 넣어보기
+
+결과로 나온 MBTI에 맞는 이미지를 보여주려면 어떻게 해야 할까? 유형이 16개나 되는데 하나하나 when 으로 확인해가면서 넣어주어야 할까? 
+
+설마 그럴까. 다 방법이 있었다. 이미지 파일명이 규칙성이 있을 때, `getIdentifier()`를 사용하면 쉽게 파일을 불러와 사용할 수 있다고 한다. 
+
+```kotlin
+val iv_resImg: ImageView = findViewById(R.id.iv_resImg)
+// getIdentifier(리소스 이름, 리소스 타입, 패키지 이름)
+val imageResource = resources.getIdentifier("ic_${resultString.toLowerCase(Locale.ROOT)}", "drawable", packageName)
+
+iv_resImg.setImageResource(imageResource)
+```
+
+## 회고
+
+Intent에 대해 아직 모르는 기능이 많은 것 같다. 모든 기능을 항상 머리에 들고 다닐 수는 없겠지만, _Intent가 이런 역할을 하니 내가 원하는 이런 기능이 Intent에 있겠구나!_라는 생각이 들 정도로는 알아놓고 싶다. 
+가장 기억에 남는 건 `getIdentifier()` 같다. 동적으로 파일명을 생성할 수 있다는 게 많은 부분에 쓰일 것 같은 녀석이다. 
+

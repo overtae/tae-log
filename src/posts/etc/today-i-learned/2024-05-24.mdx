@@ -1,0 +1,173 @@
+---
+title: 'MBTI 앱 만들어보기 - 2'
+date: '2024-05-24'
+description: 'Android 앱 개발 종합반 3주차 강의 - 2'
+tags:
+  - '안드로이드'
+---
+
+## 여러 개의 문자열 다루기
+
+MBTI를 알아내기 위해서 각 유형 별로 3문제씩 존재하고, 각 문제 마다 2개의 답이 있다. 이렇게 많은 문자열들을 뷰에 하나하나 입력해줘야 할까?
+
+물론 구조체 같은 거로 다루는 방법이 있겠지만.. 이번에 사용해본 건 `res/values/strings.xml` 파일에 모든 질문과 답을 넣어두고 name을 사용해 접근하는 방식이었다! xml은 알아가면 알아갈수록 정말 다양한 역할을 하는 자식인 것 같다. 
+
+```xml
+<string name="question1_title">외향형 - 내향형 (E-I)</string>
+<string name="question1_1">Q1. 데이트가 없는 주말에 나는</string>
+<string name="question1_1_answer1">단톡에 연락해서 친구들과 약속을 잡는다</string>
+<string name="question1_1_answer2">침대랑 하루 종일 물아일체가 된다</string>
+```
+
+위와 같이 작성된 문자열들은 다음 코드와 같이 접근할 수 있다.
+
+```kotlin
+<TextView
+  ...
+  android:text="@string/question1_title" />
+```
+
+## ViewPager2
+
+동일한 레이아웃인데 (문자열과 같은) 내용이 다르다면, 각각의 내용에 대해 액티비티를 다 따로 만들어줘야 할까? 아니다. ViewPager2를 이용하면 레이아웃을 재사용 할 수 있다고 한다. 
+
+신기했던건 안드로이드 앱 중에서 화면이 슬라이드 넘기듯이 전환되는 건 대부분 ViewPager2를 사용하는 앱이라고 한다. 개인적으로 안드로이드 폰을 사용했었을 때, 아이폰처럼 쓸어넘겨(?) 뒤로가기 기능이 안되는 앱이 많아서 불편함을 겪었었다. 내가 만들게 될 앱에는 꼭.. 그 기능을 넣고 싶다. 그러기 위해서는 일단 라이브러리를 어떻게 추가하는지 먼저 알아야겠지.
+
+### 1. 라이브러리 추가
+
+몇 번 해봤다고 좀 익숙하게 느껴지는 `build.gradle` 에 라이브러리를 추가해주자! Sync 도 절대 잊지 말고 해줘야 한다.
+
+```kotlin
+dependencies {
+	...
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+}
+```
+
+### 2. 레이아웃에 추가
+
+당연한 얘기겠지만, 레이아웃에 ViewPager2 를 추가해줘야 액티비티 파일에서 접근할 수 있다. 질문 화면의 경우 모든 화면을 다 채워야 하기 때문에 전체 화면을 차지하게 제약 조건을 주었다.
+
+```xml
+<androidx.viewpager2.widget.ViewPager2 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewPager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+```
+
+### 3. Adapter 작성
+
+일단 뭐하는 애인지 모르겠지만 강의를 따라 FragmentStateAdapter 를 상속받는 ViewPageAdapter 클래스를 만들었다. 오 그런데 상속 받을 때 필수로 구현해줘야 되는 멤버들을 친절하게도 자동으로 작성해준다! ~~(물론 마우스 클릭 몇 번 해야함)~~ 저어기 젯브레읍은 돈 내고 써야되는데 이 안드로이드 스튜디오는 무료로 해준다.
+
+![](/posts/etc/today-i-learned/2024-05-24-1.png)
+
+사실 이 Adapter는 두 종류가 있다. 지금 알아도 막 활용하진 못할 것 같아 우선 간단하게만 정리해보았다.
+
+- **FragmentStateAdapter:** Fragment 간 교체만을 원할 때 사용
+- **RecyclerViewAdapter:** 같은 레이아웃에 일부 뷰만 변경하는 경우 사용
+
+자동으로 구현해준 멤버들을 조금 수정해 보면 다음과 같다. 
+
+```kotlin
+class ViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
+  override fun getItemCount(): Int {
+	// 사용할 페이지 수
+    return 4
+  }
+  // position에 해당하는 새로운 Fragment(페이지) 반환
+  override fun createFragment(position: Int): Fragment {
+	// 새로운 페이지 생성
+    return QuestionFragment.newInstance(position)
+  }
+}
+```
+
+### 4. Fragment 작성
+
+현재 페이지에 맞는 하나의 질문 화면을 만드는 함수를 작성해주자. 위에서 `QuestionFragment.newInstance(position)` 를 구현해주는 것이다. 
+
+```kotlin
+companion object {
+  private const val ARG_QUESTION_TYPE = "questionType"
+
+	// 새로운 Fragment는 arguments로 몇 번째 페이지인지를 갖고 있다. 
+  fun newInstance(questionType: Int): QuestionFragment {
+    val fragment = QuestionFragment()
+    val args = Bundle()
+    args.putInt(ARG_QUESTION_TYPE, questionType)
+    fragment.arguments = args
+    return fragment
+  }
+}
+```
+
+여기서 잠깐, **컴패니언 오브젝트**란 무엇일까. 간단하게는 클래스 내부에 있는 오브젝트이고, 조금 더 설명하자면 클래스의 생성 과정 없이 오브젝트 처럼 사용할 수 있게 해준다. 그래서 `newInstance()` 를 사용할 때 **클래스의 인스턴스 생성 없이 바로** `클래스이름.newInstance()` 로 사용할 수 있었던 것이다!
+
+### 5. Fragment의 생명 주기
+
+강의에 이름이 비슷한 함수들이 너무 많이 나와서 도대체 뭐하는 함수일까 궁금했다. `onCreate()`, `onCreateView()`, `onViewCreated()` 를 사용했는데, 알아보니 프래그먼트의 생명주기를 나타낸다고 한다. 오늘은 앱에서 사용된 것들만 간단히 정리해보았다. 
+
+- `onCreate()`
+    - Fragment만 생성된 상태
+    - Fragment View 가 생성되지 않았기 때문에 Fragment 의 View 와 관련된 작업을 두기에 적절하지 않음
+    - Bundle 타입으로 savedInstanceState 파라미터가 함께 제공, 이는 `onSaveInstanceState()` 콜백 함수에 의해 저장된 Bundle 값임
+- `onCreateView()`
+    - 뷰의 생명주기가 INITIALIZED 상태로 업데이트
+    - `onCreateView()` 의 반환값으로 정상적인 Fragment View 객체를 제공했을 때만 Fragment View 의 Lifecycle 이 생성됨
+    - `onCreateView()` 를 통해 반환된 View 객체는 `onViewCreated()` 의 파라미터로 전달
+- `onViewCreated()`
+    - View의 초기값 설정, ViewPager2에 사용될 Adapter 세팅 등에 적절한 상태
+
+![](/posts/etc/today-i-learned/2024-05-24-2.png)
+
+그래서 MBTI 앱에서는 이 아이들을 어떻게 사용했는지 알아보자.
+
+- `onCreate()`
+    - 현재 몇 번째 화면인지 받아온다.
+- `onCreateView()`
+    - 페이지에 맞는 내용(제목, 질문, 답안 등)을 표시한다.
+- `onViewCreated()`
+    - 다음 버튼에 클릭 이벤트 추가
+    - 모든 질문에 답을 했다면, 가장 많은 답을 한 숫자를 저장하고 다음 페이지로 넘어간다.
+
+### 6. 적용
+
+마 참 내. 만들어둔 걸 쓰기만 하는 단계에 왔다. 아까 레이아웃에 추가했던 ViewPager2 뷰를 변수에 할당한다. 
+
+```kotlin
+private lateinit var viewPager: ViewPager2
+
+viewPager = findViewById(R.id.viewPager)
+viewPager.adapter = ViewPagerAdapter(this)
+
+// 사용자 인터렉션으로 화면을 넘길 수 있는가?
+// 다음 버튼을 누를 때만 넘어가게 하기 위해 false
+viewPager.isUserInputEnabled = false
+```
+
+페이지를 넘길때는 currentItem의 숫자를 1씩 늘려주면 아까 작성해주었던 `newInstance()` 가 호출되면서 페이지에 맞는 화면을 생성하게 된다.
+
+```kotlin
+// 다음 페이지로 넘기는 함수
+fun moveToNextQuestion() {
+    if (viewPager.currentItem == 3) {
+        // 마지막 페이지 -> 결과 화면으로 이동
+        val intent = Intent(this, ResultActivity::class.java)
+        intent.putIntegerArrayListExtra("results", ArrayList(questionnaireResults.results))
+        startActivity(intent)
+    } else {
+        val nextItem = viewPager.currentItem + 1
+
+        if (nextItem < viewPager.adapter?.itemCount ?: 0) {
+		    // ViewPagerAdapter의 createFragment() 발생, position(페이지 번호)이 같이 들어옴
+            // true: 페이지가 넘어갈 때 부드럽게 이동할 것인가
+            viewPager.setCurrentItem(nextItem, true)
+        }
+    }
+}
+```
+
+## 회고
+
+몰아치는 파도에 정신없이 끌려다닌 것 같다. 한꺼번에 많은 내용들이 몰아치다 보니 평소 소식좌인 나는 소화를 다 시키지 못하고 체했더랬다. 결국 하루를 더 투자해서 어떻게어떻게 내가 이해한대로 정리하긴 했다. 그치만 나중에 보면 _왜 이따구로 정리했지?_라고 생각할수도.. 뭐 수정이 막힌 것도 아니니 제대로 알고나서 수정하면 되겠지! 그래도 복잡한 만큼 재미는 있었던 앱이었다. 

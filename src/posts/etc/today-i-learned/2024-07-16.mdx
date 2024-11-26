@@ -1,0 +1,38 @@
+---
+title: '나도 안하는 자식 계획을 클래스가 하네'
+date: '2024-07-16'
+description: 'Enum Class와 Sealed Class에 대해 알아보자'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 배달 문제 풀이
+- 치지직 클론 앱 개선하기
+```
+>
+
+## 개요
+
+RecyclerView를 Multiple ViewType을 사용해 구현할 때 Sealed Class가 많이 쓰인다고 한다. 그런데 나는 Enum Class를 이용해 구현했었다. 이 둘의 차이는 뭐고, 왜 Sealed Class가 필요한건지 알아보자.
+
+## Enum Class vs. Sealed Class
+
+우선 Enum Class는 상수로 정의하던 값들을 묶어두기 위해 나왔다. 예를들어 RED, GREEN, BLUE의 값만 허용하기 위해 Color라는 Enum Class로 묶어 값을 제한할 수 있다. Enum Class를 사용하면 when 문이나 if 문에서 특정 값이 누락되는 경우나 이상한 값이 들어오는 일을 방지할 수 있다.
+
+이렇게 개쩔어보이는 Enum Class도 부족한 점이 있는데, 그건 바로 클래스 내부의 값들은 전부 동일한 형태로만 존재할 수 있다는 것이다! Color Enum Class에 갑자기 그라데이션 색을 추가하고 싶어 start와 end 색 정보를 넣고 싶지만, Enum Class이기 때문에 그러지 못한다. 
+
+그래서 있는 게 Sealed Class다. Enum Class와 비슷하지만, 내부의 값들을 다른 형태로 지정할 수 있고 내부의 각 타입들을 Sealed Class라는 범주로 묶을 수도 있다! 이걸 활용하면 다양한 타입의 뷰들을 묶어서 한 번에 다룰 수도 있으며, 각각의 타입에 따라 또 나눌 수도 있기 때문에 Multiple ViewType에 많이 사용된다고 한다.
+
+## 적용
+
+적용은 간단하다. 내부 클래스들이 모두 sealed class를 상속받는 형태로 되어있다. 
+
+```kotlin
+sealed class Color {
+	data class Single(val code: String) : Color()
+    data class Duo(val startCode: String, val ratio: Float, val endCode: String) : Color()
+}
+```

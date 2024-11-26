@@ -1,0 +1,133 @@
+---
+title: '햄버거 만들기'
+date: '2024-05-31'
+description: '햄버거 만들기 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**햄버거 만들기**](https://school.programmers.co.kr/learn/courses/30/lessons/133502)
+
+## 💡 문제
+
+상수가 일하는 가게는 정해진 순서(아래서부터, 빵 – 야채 – 고기 - 빵)로 쌓인 햄버거만 포장을 합니다. 상수에게 전해지는 재료의 정보를 나타내는 정수 배열 ingredient가 주어졌을 때, 상수가 포장하는 햄버거의 개수를 return 하도록 solution 함수를 완성하시오.
+
+### ⚠️ 제한사항
+
+- 1 ≤ `ingredient`의 길이 ≤ 1,000,000
+- `ingredient`의 원소는 1, 2, 3 중 하나의 값이며, 순서대로 빵, 야채, 고기를 의미합니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (실패)
+
+문제가 그저 단순하게 **모든 재료가 주어졌을 때, 만들 수 있는 햄버거의 개수**를 구하면 되는 줄 알았다. 그렇기 때문에 햄버거를 더 이상 만들 수 없을 때까지 replace를 사용해 재료들을 없애는 방식으로 풀이했다.
+
+그러나.. 이렇게 단순히 풀릴리가 없지. 재료가 스택 구조로 쌓이고, 햄버거를 만들때도 **가장 마지막에 들어온 재료부터 그 이전에 들어온 재료를 이용**해야한다. 즉, 테트리스 처럼 1, 2, 3, 1이 쌓이면 지우고 쌓이면 지우고를 반복해야 한다.
+
+내가 푼 풀이는 재료가 들어온 순서에 상관 없이 그저 "1231"만을 찾아 없애는 단순 노동에 불과했다..
+
+```kotlin
+class Solution {
+    fun solution(ingredient: IntArray): Int {
+        var str = ingredient.joinToString("")
+        
+        while (str.contains("1231")) {
+            str = str.replace("1231", "")
+        }
+        
+        return (ingredient.size - str.length) / 4
+    }
+}
+```
+
+### ✌️ 두 번째 풀이 (실패)
+
+코틀린에는 구현되어있는 스택이 없어서 자바의 스택을 이용한다고 한다. 그렇지만, 나는 그냥 스택 사용 없이 풀어보고자 했다.
+
+리스트에 하나씩 넣고 나중에 들어온 요소부터 뺀다면 그것이 스택이기 때문에.. 이용을 했는데, 정답을 구할 수는 있었지만 시간 초과가 발생했다. `ingredient`의 길이가 최대 백만까지 가능해서 성능까지 생각해줘야 하는 문제였다.
+
+혹시 리스트가 문제가 아닐까? 해서 문자열을 사용해서도 풀어보았지만, 유의미한 시간 단축은 없었다.
+
+```kotlin
+class Solution {
+    fun solution(ingredient: IntArray): Int {
+        val burger = listOf(1, 2, 3, 1)
+        var stk = listOf<Int>()
+        var answer = 0
+        
+        for (i in ingredient) {
+            stk += i
+            if (stk.size >= 4 && stk.takeLast(4) == burger) {
+                stk = stk.take(stk.size - 4)
+                answer++
+            }
+        }
+
+        return answer
+    }
+}
+```
+
+### 👌 세 번째 풀이 (성공)
+
+StringBuilder라는 것이 있다고 한다. 이름을 보면 문자열을 만들어주는 애인 것 같은데, 일반 String과 비교해보자면 변경된 문자열의 참조 방식에서 다음과 같은 차이가 있다.
+
+- String: 변경된 문자열을 새로 만들어 참조를 바꾼다.
+- StringBuilder: 참조하고 있는 문자열을 바꾼다.
+
+대충봐도 String은 수정을 할 때마다 새로운 메모리 공간에 값을 만들기 때문에 성능적인 면에서 StringBuilder가 더 좋아보인다. 실제로 문자열의 수정이 잦게 일어나는 경우에는 StringBuilder를 사용하는 게 좋다고 한다. 
+
+이걸 이용해서 두 번째 풀이를 조금 바꿔보았다. 조금 감동 먹었던 것은, delete가 원본 문자열을 냅다 변경한다는 것이다! 항상 대입 연산자를 추가로 작성해서 변경 사항을 반영해줬었는데, 이렇게 편하다니..
+
+```kotlin
+class Solution {
+    fun solution(ingredient: IntArray): Int {
+        val sb = StringBuilder()
+        var answer = 0
+        
+        for (i in ingredient) {
+            sb.append(i)
+            if (sb.length >= 4 && sb.takeLast(4) == "1231") {
+                sb.delete(sb.length-4, sb.length)
+                answer++
+            }
+        }
+
+        return answer
+    }
+}
+```
+
+결과는 성공이다. 생각보다 String 자료형을 조심히 쓸 필요가 있는 것 같다.
+
+### 🔥 다른 사람의 풀이
+
+Stack이나 StringBuilder를 사용한 풀이가 많았는데, 그 중에서도 신기하게 느껴지는 풀이를 가져왔다. 중간에 StringBuilder에 append를 할 때, `'0' + item`이 무슨 뜻인지 너무 궁금했다.
+
+풀이 댓글에 다음과 같이 설명해주신 분이 계셨다. 
+
+>'0' + n 은 char 코드값으로 '0' 의 n 다음 char 를 반환하는데요. '0' 부터 코드가 순서대로 '1'.. '2' 해서 '9' 까지 배치 되어 있어서. (n 이 0~9 일때)'0' + n 은 char 인 n 이 나오게 됩니다.
+
+Int형을 Char형으로 다룰 때 이런 방식이 있다는 것을 알게되는 풀이였다.
+
+```kotlin
+class Solution {
+    fun solution(ingredient: IntArray): Int {
+        var answer: Int = 0
+        val sb = StringBuilder()
+        for(item in ingredient) {
+            sb.append('0'+item)
+            if(sb.length >= 4 && sb.substring(sb.length-4) == "1231") {
+                sb.setLength(sb.length-4)
+                answer++
+            }
+        }
+        return answer
+    }
+}
+```
+
+## 💭 후기
+
+시간 초과는 정답이 틀린 것보다 더 어려운 것 같다. 같은 기능을 하되, 소요 시간을 줄여야 하니까 여러가지 신경쓸 게 많아지는 것 같은 느낌이다. 문제를 풀면서 StringBuilder를 찾아보다 우연히 들어가게 된 게시글에서 > `contains` < 의 시간 복잡도가 최대 O(N)이라는 것을 알게되었다. 혹시나 나중에 `contains`를 사용한 코드가 시간 초과가 발생한다면, 음 중복 요소를 줄이거나 다른 탐색 알고리즘 같은 걸 사용하거나 하는 방식으로 풀어보자. 

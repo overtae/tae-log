@@ -1,0 +1,119 @@
+---
+title: '광고는 어떻게 넣는거지?'
+date: '2024-05-16'
+description: '앱에 배너 광고를 넣어보는 하루'
+tags:
+  - '안드로이드'
+---
+
+## 배너 광고 넣어보기
+
+무료 앱을 받아서 사용해보면, 광고가 정말 정말 많이 나오는 것을 알 수 있다. 이런 광고에 너무 많이 데여서 사실 내 앱에는 넣고 싶지 않았지만.. 방법이라도 알아두자 해서 유튜브 강의를 보고 따라해봤다.
+
+그런데 세상에나, 조금 예전 강의라 그런지 따라만 한다고 뿅하고 되는 게 아니었다. 첫 번째 문제는 구글 광고를 넣기 위해 프로젝트의 `build.gradle` 파일에 `google()` 을 추가하다 발생했다. 
+
+```kotlin
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+<Callout type="warning" icon="⚠️">
+
+Build was configured to prefer settings repositories over project repositories but repository 'Google' was added by build file 'build.gradle.kts'
+
+</Callout>
+
+*“프로젝트 저장소보다 설정 저장소를 선호하도록 빌드가 구성되었지만 빌드 파일 'build.gradle.kts'에서 저장소 'Google'이 추가되었습니다”* 라는 뜻이다. 그래서 어떻게 해야되나 찾아보니 이제는 `build.gradle` 가 아닌, `settings.gradle` 을 사용한다고 한다. — [참고](https://stackoverflow.com/questions/69163511/build-was-configured-to-prefer-settings-repositories-over-project-repositories-b)
+
+스택 오버플로우 센세의 말에 따라서 수정해주니 (사실 이미 추가되어 있었다.) 오류가 해결됐다! 야호
+
+```kotlin
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google() // 요기 추가하자
+        mavenCentral()
+    }
+}
+```
+
+이후에는 다음의 파일 2개를 수정해주면 광고를 달기 위한 준비가 끝이 난다. 어떻게 준비가 제일 어려울 수 있는거냐고..
+
+- `build.gradle.kts (module: app)`
+    
+    ```kotlin
+    dependencies {
+    		...
+        // 추가
+        implementation("com.google.android.gms:play-services-ads:23.0.0")
+    }
+    ```
+    
+- `AndroidManifest.xml`
+    
+    ```kotlin
+    <manifest>
+      <application>
+    	  ...
+        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy"/>
+      </application>
+    </manifest>
+    ```
+    
+
+### 광고 배치 하기
+
+광고를 배치하는 건 정말 쉬웠다. 레이아웃에 google adView 를 끌어다 놓으면 끝이났다. 추가적으로 xml에 adSize나 adUnitId를 적어주긴 해야하지만, MainActivity 파일에 따로 작성해줄 수도 있다고 한다. 하지만 나는 이번에 xml에 작성하는 방식을 선택했다. 
+
+```xml
+<com.google.android.gms.ads.AdView
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    ...
+    ads:adSize="BANNER"
+    ads:adUnitId="ca-app-pub-3940256099942544/9214589741"/>
+```
+
+adSize 종류에 대해 좀 궁금해서 찾아봤더니 [구글 문서](https://developers.google.com/android/reference/com/google/android/gms/ads/AdSize)에 엄청 잘 설명되어 있어서 스을쩍 링크를 저장해놨다.
+
+### 광고 표시 하기
+
+광고의 위치를 지정해주었다면, 이제 광고를 표시할 차례다. 생각보다 코드가 길지 않아서 쉽게 할 수 있었다.
+
+```kotlin
+val binding = ActivityStartBinding.inflate(layoutInflater)
+setContentView(binding.root)
+
+// 광고 띄우기
+// 1. Google 모바일 광고 SDK 초기화
+MobileAds.initialize(this) {}
+
+// 2. 요청 생성
+val adRequest = AdRequest.Builder().build()
+
+// 3. 광고 로드
+binding.adView.loadAd(adRequest)
+```
+
+이제 앱을 실행하면 광고가 쨘 ✨ 어림도 없지. 에러가 쨘 ✨ 뜨라는 광고는 안뜨고 빨간 줄만 반복적으로 뜨고 있다. 영상대로 했는데 도대체 왜…
+
+![](/posts/etc/today-i-learned/2024-05-16-1.png)
+
+> 도대체 왜…!
+
+에러 다음 줄의 경고 메시지를 확인해보면, 잘은 모르겠지만 뭔가 작은 parcel 때문에 실패했다는 얘기 같다. 저 줄을 냅다 검색해보니까 다행히도 나와 같은 상황을 겪은 사람들이 꽤 있었다! 그 중에 [이 곳](https://github.com/flutter/flutter/issues/113427)을 참고해보니 _"에뮬레이터를 껐다 켜봐라, 바꿔봐라"_ 이런 말들이 많아서 나는 에뮬레이터 기기를 바꿔보는 방법으로 시도해봤다.
+
+![](/posts/etc/today-i-learned/2024-05-16-2.png)
+
+드디어..! 광고가 제대로 나온다! 역시 컴퓨터가 이상할 때 껐다 켜보라는 옛 말(최근 말..?)은 틀린 게 하나 없다.
+
+## 회고
+
+알고리즘 문제로 코틀린을 배우다보니까, 앱 관련해서는 하나도 모르는 것 같아 요즘 간단한 앱을 만들어보고 있다. 영상 강의를 보고 만들어봤는데 여태 막히는 곳 없이 수월하게 달려와서 그런가, 안드로이드 스튜디오에서 처음 마주한 에러가 나에게 좀 치명적이었던 것 같다. 예상했던 소요 시간보다 해결하는데 더 오래걸려서, 웹이랑 앱이랑 다르긴 하구나라는 걸 문득 느끼게 됐던 오늘 같다. 특히 개발자 도구의 소중함을 느꼈더라는.. 
+아무튼 안드로이드 스튜디오라는 프로그램에 더 익숙해지고, 에러도 자주 해결해보면서 오늘보다 내일 더 빠르고 안정적이게 개발하는 사람이 되고 싶다.

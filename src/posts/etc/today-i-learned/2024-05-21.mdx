@@ -1,0 +1,183 @@
+---
+title: '로또 번호 앱에 동작 추가하기'
+date: '2024-05-21'
+description: 'Android 앱 개발 종합반 2주차 강의 - 2'
+tags:
+  - '안드로이드'
+---
+
+## 알아보자 onCreate()
+
+프로젝트를 생성할 때마다 보이는데, 도대체 뭐하는 자식일까? 
+
+먼저 `onCreate()`는 액티비티의 생명 주기 중 첫 단계로, **액티비티가 생성될 때 화면을 정의**하는 용도로 사용된다고 한다. 액티비티의 생명주기는 다음에 제대로 알아보고 정리해봐야겠다. 내부에 있는 코드들을 살펴보면 다음과 같다.
+
+```kotlin
+override fun onCreate(savedInstanceState: Bundle?) {
+  // 화면 구성의 변경이 발생할 때, 저장된 상태(액티비티의 이전 상태)를 불러온다.
+  // 저장된 상태? 액티비티의 이전 상태를 저장하며, 액티비티가 처음 생성된 경우 null 이다.
+  super.onCreate(savedInstanceState)
+  
+  // 시스템 표시줄을 투명하게 설정
+  // setContentView 전에 호출
+  enableEdgeToEdge()
+  
+  // R.layout.activity_main: res/layout/activity_main.xml 파일
+  // xml 내용을 파싱해 뷰를 생성, 해당 레이아웃 출력
+  setContentView(R.layout.activity_main)
+  
+  // 요약하면, 뷰에 패딩을 설정해 뷰의 내용이 시스템 바와 겹치지 않게 하는 역할
+  // 뷰에 대한 WindowInsets 리스너를 설정, WindowInsets가 변경될 때 호출
+  ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+    // 시스템 바의 인셋 값을 가져옴, 인셋 값은 상하좌우 네 가지 방향으로 구성
+    val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+    
+    // 가져온 값을 사용해 뷰의 패딩을 설정
+    // 뷰의 내용이 시스템 바와 겹치지 않게 함
+    v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+    
+    // 인셋 객체를 그대로 반환, 시스템에 이 인셋이 사용되었음을 알림
+    insets
+  }
+}
+```
+
+[edgeToEdge 참고](https://developer.android.com/develop/ui/views/layout/edge-to-edge?hl=ko)
+
+정리해보자면, 프로젝트를 생성할 때 쓰여져 있는 코드는 레이아웃 파일 기반의 화면을 시스템 바와의 간섭 없이 표시해주는 역할을 하는 것 같다. 
+
+## lazy
+
+개념으로만 알고 있었는데~~(사실 까먹고 있었..다)~~ 이번에 사용하게 되서 너무 반가웠다. 
+
+lazy를 사용하면, 변수를 사용하는 시점에 초기화 과정이 진행되기 때문에 코드의 실행시간을 최적화 할 수 있다고 한다. 
+
+사용 방법은 다음과 같이 by 키워드에 lazy 라는 람다 함수 형태의 초기화 함수를 작성해주면 된다. 코드에서는 한 줄로 작성했지만, 람다 함수 형태이기 때문에 여러 줄로도 가능하고 이 경우엔 마지막 구문의 결과를 변수에 할당하게 된다. 
+
+```kotlin
+// 화면 요소들 정의: 사용자에게 이벤트를 받을 것이다.
+private val clearButton by lazy { findViewById<Button>(R.id.btn_clear) }
+private val addButton by lazy { findViewById<Button>(R.id.btn_add) }
+private val runButton by lazy { findViewById<Button>(R.id.btn_run) }
+private val numPick by lazy { findViewById<NumberPicker>(R.id.np_num) }
+```
+
+## NumberPicker 다뤄보기
+
+앱에서 넘버피커를 사용해 사용자가 원하는 번호를 선택할 수 있게 했다. 처음 써보는 거라~~(뭔들 처음이 아니겠니)~~ 어떤 식으로 값에 접근하고 설정할 수 있는지 궁금했는데, 알아보니 생각보다 간단했다. 물론 기본적인 것만 써서 그런 걸 수도 있지만 말이다.. 
+
+```kotlin
+private val numPick by lazy { findViewById<NumberPicker>(R.id.np_num) }
+
+// 넘버 피커의 최대, 최소를 지정
+numPick.minValue = 1
+numPick.maxValue = 45
+
+// 선택된 값 가져오기
+numPick.value
+
+// 값 할당도 가능!
+numPick.value = 1
+```
+
+## HashSet
+
+Set은 중복을 허용하지 않는 리스트를 말한다. HashSet은 null 값도 허용하는 Set이라고 한다. 
+
+사용자가 선택한 번호를 담아둘 때 HashSet을 사용했는데, 로또 번호 특성 상 중복을 방지하기 위해 사용한 것 같다. 
+
+```kotlin
+private val pickNumber = hashSetOf<Int>()
+```
+
+## 사용자 지정 번호 추가
+
+그냥 냅다 선택한 번호를 추가하면 되는 줄 알았더니 몇 가지 조건이 있었다.
+
+- 번호가 꽉 차 있으면 추가 불가
+- 사용자 지정 번호는 5개까지만 가능
+- 중복된 번호 추가 불가
+
+각 조건을 확인할 때 when을 사용해 구현했다. if 문보다 보기 편한 것 같다.
+
+```kotlin
+private fun initAddButton() {
+  addButton.setOnClickListener {
+    when {
+      didRun -> showToast("초기화 후에 시도해주세요.")
+      pickNumberSet.size >= 6 -> showToast("숫자는 최대 5개까지 선택할 수 있습니다.")
+      pickNumberSet.contains(numPick.value) -> showToast("이미 선택된 숫자입니다.")
+      else -> {
+        // pickNumberSet에는 사용자가 선택했던 숫자들이 담기고,
+        // 그 길이의 인덱스에 해당하는 공을 보여준다.
+        val textView = numTextViewList[pickNumberSet.size]
+        textView.isVisible = true
+        textView.text = numPick.value.toString()
+        
+        // 숫자 범위에 맞는 색의 공을 배경으로 설정한다.
+        setNumBack(numPick.value, textView)
+        pickNumberSet.add(numPick.value)
+      }
+    }
+  }
+}
+```
+
+### 공 배경 지정
+
+위의 코드에서 나온 setNumBack 함수의 구현 부분이다. 숫자 범위에 맞는 drawable을 background에 할당하는 건 알겠는데.. 마지막 줄이 뭔지 궁금했다.
+
+```kotlin
+// 원 모양의 텍스트 뷰의 배경을 설정
+private fun setNumBack(number: Int, textView: TextView) {
+  val background = when (number) {
+    in 1..10 -> R.drawable.circle_yellow
+    in 11..20 -> R.drawable.circle_blue
+    in 21..30 -> R.drawable.circle_red
+    in 31..40 -> R.drawable.circle_gray
+    else -> R.drawable.circle_green
+  }
+  
+  // drawable 객체를 반환, background로 설정
+  textView.background = ContextCompat.getDrawable(this, background)
+}
+```
+
+[문서](https://developer.android.com/reference/androidx/core/content/ContextCompat#getDrawable(android.content.Context,int))를 살펴보니, drawble 객체를 반환해주는 역할을 하는 것 같다.
+
+```kotlin
+public static @Nullable Drawable getDrawable(@NonNull Context context, @DrawableRes int id)
+```
+
+> `R.drawable.circle_yellow`는 뭘 반환하길래?
+> 
+
+궁금할 땐 확인해보는 것이 인지상정. `println`으로 출력해보니 `2131165314`라 찍혀있었다. drawable 객체가 아니라 id를 뜻하는 것 같다. 그렇기 때문에 `ContextCompat.getDrawable()`을 사용해준 것이다.
+
+## 무작위 로또 번호 생성
+
+나는 무작위 숫자가 필요할 때 Random 밖에 몰라서 `Random.nextInt()` 를 생각했다. 그런데 이 앱에서는 조건이 좀 까다롭다. 
+
+- 1부터 45까지의 정수이다.
+- 사용자가 선택한 숫자는 포함하면 안된다.
+- 로또 번호는 총 6개이고, 중복은 불가하다.
+- 사용자가 선택한 숫자의 개수를 제외한 나머지 숫자를 랜덤으로 구해야 한다.
+
+도대체 어떻게 할까 궁금했는데, shuffled와 take를 사용해 간단히 구현이 가능했다. shuffled를 어떤 식으로 사용하는건지 궁금했었는데, 이런 식으로도 사용되는구나라는 것을 알게 되었다.
+
+```kotlin
+private fun getRandom(): List<Int> {
+  // 사용자가 지정한 번호를 제외한 숫자
+  val numbers = (1..45).filter { it !in pickNumberSet }
+  
+  // numbers를 섞은 후, 6개에서 사용자가 지정한 숫자의 개수를 뺀 만큼 가져온다.
+  // 가져온 숫자들과 pickNumberSet(사용자 지정 숫자들)과 더해준다.
+  // 전체 숫자들을 오름차순으로 정렬한다.
+  return (pickNumberSet + numbers.shuffled().take(6 - pickNumberSet.size)).sorted()
+}
+```
+
+## 회고
+
+언젠가 알아보겠지 하고 미뤄두었던 onCreate에 대해 드디어 알게되었다. 생명주기는 아직 모르지만, 다음에 제대로 알고나서 정리해보고 싶다. 
+강의를 보면서 따라 치는 거라 뷰를 배치하는 것보단 쉽게 느껴졌지만, 강의 없이 기능만 주어졌을 때 _과연 내가 쉽게 구현을 할 수 있을까?_ 하는 의문이 들었다. 그렇지만 이런 종류의 의문은 불안감만 키울 뿐.. 아직 알아가는 단계이고, 앞으로 배울 수 있는 것이 더 많이 남았다는 거에 설렘을 느끼고 있다. 몇 개월 뒤에 이 포스트를 읽고 _뭐야, 이렇게 쉬웠던 거였어?_ 하고 느끼는 날이 오리라 믿는다.

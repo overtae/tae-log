@@ -1,0 +1,123 @@
+---
+title: '뷰페이저 안에 리사이클러뷰 안에 리사이클러뷰...'
+date: '2024-07-25'
+description: '중첩 스크롤 문제를 해결해보자!'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 팀 프로젝트
+```
+>
+
+## 개요
+
+뷰페이저도 가로로 슬라이드 할 수 있고, 리사이클러뷰도 가로로 슬라이드가 가능하다. 만약 방향이 겹친다면, 어떤게 먼저 슬라이드 될까? 
+
+정답은 알 수 없다.. 그래서 [안드로이드](https://developer.android.com/develop/ui/views/animations/vp2-migration?hl=ko#nested-scrollables)에서는 이걸 해결하기 위한 클래스를 제공해준다. 나와있는 걸 복사만 하면 돼서 적용은 정말 쉽지만, 코드 이해는 음... 너무 어려운 것 같다.
+
+## 클래스 작성
+
+먼저 클래스를 하나 만들어준다. 클래스는 [안드로이드 문서](https://github.com/android/views-widgets-samples/blob/master/ViewPager2/app/src/main/java/androidx/viewpager2/integration/testapp/NestedScrollableHost.kt)에 나와있다.
+
+```kotlin
+import android.content.Context
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewConfiguration
+import android.widget.FrameLayout
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
+import kotlin.math.absoluteValue
+import kotlin.math.sign
+
+/**
+ * Layout to wrap a scrollable component inside a ViewPager2. Provided as a solution to the problem
+ * where pages of ViewPager2 have nested scrollable elements that scroll in the same direction as
+ * ViewPager2. The scrollable element needs to be the immediate and only child of this host layout.
+ *
+ * This solution has limitations when using multiple levels of nested scrollable elements
+ * (e.g. a horizontal RecyclerView in a vertical RecyclerView in a horizontal ViewPager2).
+ */
+class NestedScrollableHost : FrameLayout {
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    private var touchSlop = 0
+    private var initialX = 0f
+    private var initialY = 0f
+    private val parentViewPager: ViewPager2?
+        get() {
+            var v: View? = parent as? View
+            while (v != null && v !is ViewPager2) {
+                v = v.parent as? View
+            }
+            return v as? ViewPager2
+        }
+
+    private val child: View? get() = if (childCount > 0) getChildAt(0) else null
+
+    init {
+        touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+    }
+
+    private fun canChildScroll(orientation: Int, delta: Float): Boolean {
+        val direction = -delta.sign.toInt()
+        return when (orientation) {
+            0 -> child?.canScrollHorizontally(direction) ?: false
+            1 -> child?.canScrollVertically(direction) ?: false
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+    override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
+        handleInterceptTouchEvent(e)
+        return super.onInterceptTouchEvent(e)
+    }
+
+    private fun handleInterceptTouchEvent(e: MotionEvent) {
+        val orientation = parentViewPager?.orientation ?: return
+
+        // Early return if child can't scroll in same direction as parent
+        if (!canChildScroll(orientation, -1f) && !canChildScroll(orientation, 1f)) {
+            return
+        }
+
+        if (e.action == MotionEvent.ACTION_DOWN) {
+            initialX = e.x
+            initialY = e.y
+            parent.requestDisallowInterceptTouchEvent(true)
+        } else if (e.action == MotionEvent.ACTION_MOVE) {
+            val dx = e.x - initialX
+            val dy = e.y - initialY
+            val isVpHorizontal = orientation == ORIENTATION_HORIZONTAL
+
+            // assuming ViewPager2 touch-slop is 2x touch-slop of child
+            val scaledDx = dx.absoluteValue * if (isVpHorizontal) .5f else 1f
+            val scaledDy = dy.absoluteValue * if (isVpHorizontal) 1f else .5f
+
+            if (scaledDx > touchSlop || scaledDy > touchSlop) {
+                if (isVpHorizontal == (scaledDy > scaledDx)) {
+                    // Gesture is perpendicular, allow all parents to intercept
+                    parent.requestDisallowInterceptTouchEvent(false)
+                } else {
+                    // Gesture is parallel, query child if movement in that direction is possible
+                    if (canChildScroll(orientation, if (isVpHorizontal) dx else dy)) {
+                        // Child can scroll, disallow all parents to intercept
+                        parent.requestDisallowInterceptTouchEvent(true)
+                    } else {
+                        // Child cannot scroll, allow all parents to intercept
+                        parent.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+이렇게 작성한 클래스로 레이아웃 파일에서 리사이클러뷰를 감싸주면 알아서 잘 해준다. 아주 편리한 안드로이드...

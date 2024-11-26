@@ -1,0 +1,95 @@
+---
+title: '뇌를 비우고 문자열 다루기'
+date: '2024-05-09'
+description: '처음으로 코틀린을 사용해 문자열 문제를 풀어보았다'
+tags:
+  - '안드로이드'
+---
+
+## 인덱스로 접근 가능한 배열
+
+![](/posts/etc/today-i-learned/2024-05-09.png)
+
+이 짤을 아는가. 자신이 믿고 있는 신념의 옳고 그름을 판단하지도 못하는 사람이 바로 나다. 상황은 역시나 알고리즘 문제를 풀다 발생한다.
+
+부호가 없는 숫자 배열과 부호를 나타내는 불리언 배열이 따로 주어지고, 부호까지 있는 숫자들의 총합을 구하면 되는 간단한 문제였다. 이전에 파이썬으로 풀었을 때 `zip()` 을 이용해 풀었던 기억이 나 (사실 나의 이전 풀이를 볼 수 있었다) *‘개쩌는 코틀린인데 `zip()` 이 없겠어?’* 하고 `zip()` 을 이용해 풀이했었다.
+
+그런데 세상에! `zip()` 은 `List` 를 다루는 함수라고 한다. 그래서 내 생각에는 별로 좋진 않은 방법인것 같지만 어거지로 형변환을 해 풀이에 성공을 하긴 했다.
+
+```kotlin
+fun solution(absolutes: IntArray, signs: BooleanArray): Int {
+	return absolutes.toList().zip(signs.toList()).map { if (it.second) it.first else -it.first }.sum()
+}
+```
+
+꾸역승이라는 말이 있다. 승리(성공)는 했지만, 뭔가 찝찝한.. 그런 상태로 다른 사람들의 풀이를 훑어보던 중 나는 나의 신념이 글러먹었음을 인지하게된다.
+
+문제에서 배열이 주어진다고 했다. 배열은 무엇이냐, 굳이굳이 배열 두 개를 묶을 필요 없이 **인덱스로 접근**이 가능한 자식이다. 고작 강의 몇 개, 자료 몇 개 봤다고 나는 기고만장했던 것이다! ~~아니야 이건 다 파이썬 때문…~~
+
+이후에는 인덱스가 있는 `fold()`인 `foldIndexed()` 를 사용해서 다시 풀어보았다. 사용법은 `fold()`와 동일했다.
+
+> 알아보니 인덱스가 있는 `forEachIndexed()` 도 있다고 한다.
+
+```kotlin
+fun solution(absolutes: IntArray, signs: BooleanArray): Int {
+	return absolutes.foldIndexed(0) { idx, total, num -> total + if(signs[idx]) num else -num }
+}
+```
+
+풀고나서 보니.. 내가 `zip()` 이라는 잘못된 신념을 갖고 고군분투했구나라는 생각이 들었다. 이제부터 의식적으로라도 생각을 넓혀보도록 해야겠다.
+
+## 문자열 다루기
+
+코틀린을 사용해 아마 처음으로 문자열 관련 문제를 풀어본 것 같다. 주어지는 핸드폰 번호 중 뒤에서 4자리를 제외한 나머지 부분을 `*`로 바꾸는 문제였다. 문자열을 자르는 함수 중에서도 이름이 조금 익숙한 `substring()` 을 골라 풀이했다. 
+
+사실 처음에 `"*" * (len - 4)` 로 작성했다가 코틀린은 문자열의 곱셈이 안된다고 해서, 같은 역할을 하는 `repeat()` 으로 변경해 풀이했다. 
+
+```kotlin
+fun solution(phone_number: String): String {
+	var len = phone_number.length
+	return "*".repeat(len-4) + phone_number.substring(len-4, len)
+}
+```
+
+그러나 역시나 어김없이 새로운 함수는 존재한다. **문자열의 끝에서부터 원하는 길이 만큼의 문자를 가져오는 `takeLast()` 라는 함수**가 있다고 한다. 컬렉션을 대상으로 같은 동작을 한다고 하니, 알아두면 좋을 것 같다. `takeLast()` 를 사용해 풀이를 바꿔보면 다음과 같다.
+
+```kotlin
+fun solution(phone_number: String): String {
+	var len = phone_number.length
+	return "*".repeat(len-4) + phone_number.takeLast(4)
+}
+```
+
+## 언젠간 쓰겠지 더블콜론 `::`
+
+신기한 게 있어서 어맛, 이건 꼭 알아야 햇! 하는 마음에 정리해보려고 한다. 아직 내 지식으로는 완벽하게 이해하고 정리하긴 힘들어서 루이비통 쇼핑백에 담긴 김밥 느낌으로 작성할 것이다.
+
+더블콜론은 자바의 리플렉션과 같은 용도이다..라고 하는데 자바를 잘 모르니 그냥 코틀린에서 어떻게 쓰이는지만 알아보자.
+
+### 리플렉션
+
+리플렉션은 **런타임 시점에 바이트 코드를 이용해서 내가 참조하려는 값을 찾기 위해 사용**하는 API인데, 더블콜론은 이런 리플렉션을 위해 사용한다. 즉, **클래스나 클래스 내의 메서드, 함수 등을 참조**하는 데 쓰인다.
+
+```kotlin
+fun isEven(x:Int) = x % 2 == 0
+
+// 짝수인 수만 필터링
+(0..9).filter(::isEven) // 함수 참조
+```
+
+위 코드가 가능한 이유는 [코틀린 문서](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/filter.html)를 보면 filter의 원형이 `isEven()` 과 같은 `(Int) -> Boolean` 이기 때문이다.
+
+### 객체의 멤버 접근
+
+다른 용도로는 객체의 멤버(메서드나 프로퍼티)에 접근할 수 있다.
+
+```kotlin
+var numbers = intArrayOf(7, 9, 4, 2)
+
+// 0~9 중 numbers 배열에 포함되지 않는 수 필터링
+(0..9).filterNot(numbers::contains) // IntArray의 contains() 참조
+```
+
+이전 코드와 같은 느낌으로 IntArray의 `contains()` 가 Int를 받아 Boolean을 반환하기 때문에 위와 같은 방식으로 사용이 가능하다고 한다.
+
+아마 내가 더블콜론을 사용하는 날은 좀 멀지 않았을까 싶다..

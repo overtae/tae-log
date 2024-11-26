@@ -1,0 +1,159 @@
+---
+title: '괄호 회전하기'
+date: '2024-06-17'
+description: '괄호 회전하기 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**괄호 회전하기**](https://school.programmers.co.kr/learn/courses/30/lessons/76502)
+
+## 💡 문제
+
+다음 규칙을 지키는 문자열을 올바른 괄호 문자열이라고 정의합니다.
+
+`()`, `[]`, `{}` 는 모두 올바른 괄호 문자열입니다.
+만약 `A`가 올바른 괄호 문자열이라면, `(A)`, `[A]`, `{A}` 도 올바른 괄호 문자열입니다. 예를 들어, `[]` 가 올바른 괄호 문자열이므로, `([])` 도 올바른 괄호 문자열입니다.
+만약 A, B가 올바른 괄호 문자열이라면, AB 도 올바른 괄호 문자열입니다. 예를 들어, `{}` 와 `([])` 가 올바른 괄호 문자열이므로, `{}([])` 도 올바른 괄호 문자열입니다.
+대괄호, 중괄호, 그리고 소괄호로 이루어진 문자열 `s`가 매개변수로 주어집니다. 이 `s`를 왼쪽으로 x (0 ≤ x < (`s`의 길이)) 칸만큼 회전시켰을 때 `s`가 올바른 괄호 문자열이 되게 하는 x의 개수를 return 하도록 solution 함수를 완성해주세요.
+
+### ⚠️ 제한사항
+
+- s의 길이는 1 이상 1,000 이하입니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (성공)
+
+**괄호의 쌍을 맞춘다**는 부분에서 이전에 계산기 과제할 때 알게된 **후위 표기법**이 생각났다. 스택으로 연산자와 피연산자를 다뤘던 것처럼 괄호 문자열도 스택으로 다룬다면 구할 수 있을 거라 생각했다. 
+
+> **💡 후위 표기법?**
+피연산자를 먼저 표기하고, 연산자를 나중에 표기하는 방식
+
+스택을 사용해 가장 최근에 넣은 괄호가 현재의 괄호와 같다면 `pop()`으로 없애주는 방식을 사용했다. 모든 문자열을 다 돌았을 때, 스택에 남아있는 문자가 없다면 올바른 괄호 문자열일 것이다.
+
+`substring()` 을 사용해 문자열의 i부터 마지막 인덱스까지 자르고, 0부터 i까지 잘라 이 둘을 더하는 방식으로 회전시켜주었다. 
+
+```kotlin
+import java.util.Stack
+
+class Solution {
+    fun solution(s: String): Int {
+        var answer: Int = 0
+
+        s.indices.map { i ->
+            val stack = Stack<Char>()
+            val str = s.substring(i) + s.substring(0, i)
+
+            str.map {
+            	// 가장 최근에 들어온 문자
+                val recent = if (stack.isNotEmpty()) stack.peek() else ' '
+
+                when (it) {
+                    ')' -> if (recent == '(') stack.pop() else stack.push(it)
+                    '}' -> if (recent == '{') stack.pop() else stack.push(it)
+                    ']' -> if (recent == '[') stack.pop() else stack.push(it)
+                    else -> stack.push(it)
+                }
+            }
+            // 스택이 비어있으면 올바른 괄호 문자열이다. 
+            if (stack.isEmpty()) answer++
+        }
+
+        return answer
+    }
+}
+```
+
+정말.. 더럽다.. 이제와서 생각해보니 저런 식으로 when을 사용할거면 그냥 if-else를 사용하는 게 나았을 것 같다. 
+
+### 🔥 다른 사람의 풀이
+
+많은 사람들이 비슷하게 풀이한 코드는 없었다. 풀이 방식은 비슷할 수 있어도 코드로 작성되어진 결과물은 조금씩 다 달랐다. 
+
+가져온 풀이는 좋아요가 가장 많은 풀이이다. 올바른 괄호 문자열인지를 판단해주는 함수를 따로 작성해서 더 간단해보인다. 또 나는 괄호의 쌍이 맞는 경우를 다뤘다면, 이 풀이는 **괄호의 쌍이 다른 경우를 판단**했다. 
+
+이 분은 스택을 사용하지 않고 List의 마지막 요소와 비교하는 방식으로 구현했다. 이 풀이를 보니 괜히 스택을 사용했나하는 생각이 들었다. 사실 그냥 스택의 `peek()`과 `pop()`을 사용해보고 싶었다..
+
+```kotlin
+class Solution {
+    fun solution(s: String): Int {
+        var answer: Int = 0
+
+        for(i in 0..s.length-1) {
+        	// 문자열 회전
+            var tmp = s.substring(i)+s.substring(0,i)
+            if(isRight(tmp)) {
+                answer+=1
+            }
+        }
+        return answer
+    }
+
+    fun isRight(str: String): Boolean {
+        var list = mutableListOf<Char>()
+        var endCh = charArrayOf(']',')','}')
+
+        for(ch in str) {
+        	// 닫는 괄호인 경우
+            if(endCh.contains(ch)) {
+            	// 여는 괄호가 없는데 닫는 괄호가 들어왔을 때 false
+                if(list.isEmpty()) {
+                    return false
+                }
+                var tmp=list.removeAt(list.size-1)
+                when(ch) {
+                	// 가장 최근 괄호와 쌍이 맞지 않으면 false
+                    ']' -> if(tmp!='[') return false
+                    ')' -> if(tmp!='(') return false
+                    '}' -> if(tmp!='{') return false
+                }
+            } else {
+            	// 닫는 괄호 외의 여는 괄호라면 List에 추가
+                list.add(ch)
+            }
+        }
+        // List에 남아있는 괄호가 없다면 true
+        return list.size==0
+    }
+}
+```
+
+### ✅ 개선한 풀이
+
+많은 걸 개선하진 않았지만, when 문이 아무래도 마음에 걸려서 그 부분만 조금 바꿔봤다. 이전보다는 낫..나? 
+
+첫 번째 풀이에서 `stack.push(it)` 코드가 많이 반복되길래 when의 조건을 합쳐주었고, 조건에 맞지 않으면 스택에 push하는 방식으로 변경했다. 
+
+```kotlin
+import java.util.Stack
+
+class Solution {
+    fun solution(s: String): Int {
+        var answer: Int = 0
+        
+        for (i in s.indices) {
+            val stack = Stack<Char>()
+            val str = s.substring(i) + s.substring(0, i)
+            
+            for (c in str) {
+                val recent = if (stack.isNotEmpty()) stack.peek() else ' '
+
+                when {
+                    (c == ')') && (recent == '(') -> stack.pop()
+                    (c == '}') && (recent == '{') -> stack.pop()
+                    (c == ']') && (recent == '[') -> stack.pop()
+                    else -> stack.push(c)
+                }
+            }
+            if (stack.isEmpty()) answer++
+        }
+        
+        return answer
+    }
+}
+```
+
+## 💭 후기
+
+계산기 과제를 안했다면 절대 풀이를 생각해낼 수 없었을 것 같다. 풀이 방식은 생각해냈지만 코드로 예쁘게 쓰는 게 좀 어려웠다. 정말 예쁘게 풀이하는 게 재밌는데.. 이번 문제에서는 그러지 못한 것 같아서 아쉽다. 그래도 스택을 써볼 수 있는 기회여서 재밌게 풀이했다.

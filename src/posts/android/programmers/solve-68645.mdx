@@ -1,0 +1,106 @@
+---
+title: '삼각 달팽이'
+date: '2024-07-11'
+description: '삼각 달팽이 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**삼각 달팽이**](https://school.programmers.co.kr/learn/courses/30/lessons/68645)
+
+## 💡 문제
+
+정수 n이 매개변수로 주어집니다. 다음 그림과 같이 밑변의 길이와 높이가 n인 삼각형에서 맨 위 꼭짓점부터 반시계 방향으로 달팽이 채우기를 진행한 후, 첫 행부터 마지막 행까지 모두 순서대로 합친 새로운 배열을 return 하도록 solution 함수를 완성해주세요.
+
+![](/posts/android/programmers/68645-1.png)
+
+### ⚠️ 제한사항
+
+- n은 1 이상 1,000 이하입니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (성공)
+
+문제의 원리는 다음 이미지와 같다. 채우는 변의 방향이 바뀔 때마다 채우는 숫자는 n에서부터 시작해 1씩 줄어든다. 
+
+![](/posts/android/programmers/68645-2.png)
+
+이걸 2차원 배열로 생각한다면 다음과 같다.
+
+![](/posts/android/programmers/68645-3.png)
+
+
+채우는 변의 방향은 처음엔 행 부분만 1씩 늘어나고, 다음엔 열 부분만 1씩 늘어나고, 다음엔 행과 열 모두 1씩 줄어든다. 변이 3개이기 때문에 이 3가지 방향이 반복된다.
+
+이걸 그대로 코드로 옮기고, 2차원 배열을 `flatten()`을 사용해 평탄화까지 해주면 답을 구할 수 있다!
+
+```kotlin
+class Solution {
+    fun solution(n: Int): IntArray {
+        // 삼각형 모양의 배열 (행의 길이가 1씩 늘어나는 배열)
+        // 모두 0으로 초기화
+        var answer = Array(n) { i -> Array(i+1) {0} }
+
+        // x: 행, y: 열
+        // 처음에 어차피 행을 늘릴 거라 -1부터 시작
+        var (x, y) = -1 to 0
+
+        // 채울 숫자
+        var cnt = 1
+
+        // i 번째 변
+        (0 until n).map { i ->
+            // 채워야 할 칸의 개수
+            // (아래, 오른쪽, 위) 방향 반복
+            // ( 0,    1,    2): i를 3으로 나눈 나머지
+            (i until n).map { j ->
+                when (i%3) {
+                    0 -> x++
+                    1 -> y++
+                    else -> (x--).also { y-- }
+                }
+                answer[x][y] = cnt++
+            }
+        }
+
+        return answer.flatten().toIntArray()
+    }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+코틀린은 언어가 참.. 좋은 것 같다. 메서드 체이닝도 편하고 스코프 함수도 너무너무 편하다. 
+
+이 풀이는 냅다 그냥 배열을 선언하고, 그 배열에 apply로 내가 작성한 코드와 비슷하게 칸을 채워준 다음 반환하게끔 작성했다. 사실 이렇게 풀려면 진짜 코틀린에 통달해야 할 듯. 
+
+```kotlin
+class Solution {
+    fun solution(n: Int) = Array(n) { num -> IntArray(num + 1) { 0 } }
+        .apply {
+            var row = 0
+            var column = 0
+            var movingMode = 0 // 0: 아래쪽, 1: 오른쪽, 2: 왼쪽 위 대각선
+            for (i in 1..(n * (n + 1) / 2)) {
+                this[row][column] = i
+                when(movingMode) {
+                    0 -> if(row + 1 >= n || this[row + 1][column] != 0) movingMode = 1
+                    1 -> if (column + 1 > row || this[row][column + 1] != 0) movingMode = 2
+                    2 -> if (row - 1 < 0 || column - 1 < 0 || this[row-1][column - 1] != 0) movingMode = 0
+                }
+                when (movingMode) {
+                    0 -> row++ // 아래쪽으로 이동
+                    1 -> column++ // 오른쪽으로 이동
+                    2 -> row-- and column-- // 왼쪽 위 대각선으로 이동
+                }
+            }
+        }
+        .fold(arrayListOf<Int>()) { acc, ints -> acc.apply { addAll(ints.toList()) } }
+        .toIntArray()
+}
+```
+
+## 💭 후기
+
+처음에는 정말 달팽이처럼 돌아야겠다!고 생각하지 않고.. 행마다 어떠한 규칙을 찾으려고 애를 썼었다. 그러나 수학적 지식이 마르다 못해 소멸해버린 나의 머리로는 도저히 구할 수가 없어서 다른 방법을 찾아보았다. 찾아보니 삼각 달팽이말고 사각형을 채우는 달팽이 문제가 있길래 그 풀이를 참고했다. 근데 사각형보다 삼각형이 쉬운듯 ㅎ

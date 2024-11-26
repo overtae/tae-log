@@ -1,0 +1,49 @@
+---
+title: '리사이클러뷰에서 검색을 해보자'
+date: '2024-07-23'
+description: 'Filterable 구현으로 가능하다'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 팀 프로젝트 개발 시작
+- 알고리즘 문제 풀이
+```
+>
+
+## 검색의 원리는 무엇일까?
+
+검색을 하면 해당 검색어(한글의 경우 자음이나 모음도 포함해서)가 포함된 결과 목록이 보여진다. 즉, 원본 리스트에서 검색어가 포함된 아이템들로 필터만 해준다면 간단히 구현할 수 있다.
+
+## 구현해보자
+
+먼저 리사이클러뷰의 어댑터는 ListAdapter를 상속 받게 한다. 그리고 추가적으로 Filterable을 상속 받게 해주자.
+
+```kotlin
+override fun getFilter(): Filter {
+    return object : Filter() {
+        override fun performFiltering(charSequence: CharSequence?): FilterResults {
+            return FilterResults().apply {
+                values = if (charSequence.isNullOrBlank()) contactData else onFilter(contactData, charSequence.toString())
+            }
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        override fun publishResults(
+            charSequence: CharSequence?,
+            filterResults: FilterResults
+        ) {
+            val results = filterResults.values as ArrayList<Contact>
+            submitList(results)
+        }
+    }
+}
+
+private fun onFilter(list: List<Contact>, constraint: String): List<Contact> {
+    return list.filter { it is Contact.SweetieInfo && it.name.lowercase().contains(constraint.lowercase()) }
+}
+```
+

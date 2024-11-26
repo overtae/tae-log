@@ -1,0 +1,136 @@
+---
+title: '내 앱에 오픈소스 라이선스 고지해보기'
+date: '2024-08-29'
+description: '구글 플레이 서비스의 oss-licenses-plugin'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 컴포즈 공부
+- 힐트 공부
+```
+>
+
+## 오픈소스 라이선스?
+
+개발을 할 때, 우리는 정말 많은 오픈소스 라이브러리들을 사용하게 된다. 여기서 오픈소스란, 라이선스 방식을 통해 배포된 소스 코드를 자유롭게 수정, 사용, 복사, 재배포할 수 있는 소프트웨어를 말한다. 즉, 우리 마음대로 기능을 추가하고, 버그를 수정할 수 있는 권리를 제공해주는 것이 오픈소스이다. 
+
+복사와 재배포까지 되는 거라면 오픈소스에는 정말 아무런 법적 책임이 없는 것일까? 당연하게도(?) 아니다. 일반 소프트웨어와 마찬가지로 오픈소스를 사용하기 위해서는 해당 오픈소스의 “라이선스”를 반드시 준수해야 한다. 이 라이선스를 위반할 경우 사용 권리가 박탈되고, 수익화도 중지된다. 
+
+라이선스에는 소스 코드 사용과 복제, 수정 및 배포 등에 대한 권한들이 명시적으로 나와있고, 오픈소스의 경우 이 라이선스를 광범위하게 부여하여 많은 사람들이 자유롭게 사용할 수 있게 한다. 
+
+보통 오픈소스 라이선스의 일반적인 의무 사항은 저작권 표시와 라이선스 고지, 소스 코드 공개이다. 재배포할 때 이 사항들이 의무인 것이지 그냥 혼자 테스트할 때 사용한다면 굳이 하지 않아도 된다.
+
+## 그래서 어떻게?
+
+내가 만든 앱에 사용된 모든 오픈소스 라이브러리를 찾아 라이선스를 복사해오고, 그걸 또 앱 화면에 일일이 표시해야 되는 걸까? 그렇게 하다간 앱 개발보다 라이선스 작성에 더 많은 시간이 들 것 같다.
+
+그래서 구글 플레이 서비스에는 오픈소스 라이선스 약관을 수집하는 Gradle 플러그인을 제공해주고 있다. 바로바로 [`oss-licenses-plugin`](https://developers.google.com/android/guides/opensource?hl=ko) 이다!
+
+## 적용해보기
+
+### 1. Gradle에 추가
+
+프로젝트 수준의 build.grade 에 다음과 같이 작성해준다.
+
+```kotlin
+buildscript {
+  repositories {
+    ...
+    google()
+  }
+  dependencies {
+    ...
+    classpath("com.google.android.gms:oss-licenses-plugin:0.10.6")
+  }
+}
+```
+
+다음으로 앱 수준의 build.gradle 에도 추가해준다.
+
+```kotlin
+plugins {
+		...
+    id("com.google.android.gms.oss-licenses-plugin")
+}
+
+dependencies {
+		...
+		implementation("com.google.android.gms:play-services-oss-licenses:17.1.0")
+}
+```
+
+### 2. 액티비티 추가
+
+별도의 액티비티 파일을 작성해주지 않아도 종속성만 추가해준다면 `OssLicensesMenuActivity`를 실행할 수 있게 된다. 
+
+```kotlin
+startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+```
+
+### 3. 제목 변경
+
+기본적으로 앱 바에 표시되는 화면 이름은 아래 이미지처럼 “Open source licenses”이다. 
+
+<p align="center">
+<img src="https://developers.google.com/static/android/guides/images/oss-licenses.svg?hl=ko" width="300" />
+</p>
+  
+제목이 마음에 들지 않는다면 다음 코드 한 줄만 작성해 쉽게 변경해줄 수도 있다. 
+
+```kotlin
+OssLicensesMenuActivity.setActivityTitle("나의 작고 소중한 오픈소스 라이선스")
+```
+
+### 4. 테마 변경
+
+위에서 나온 이미지를 보면 정말 디자인이 구리다. 내가 만든 앱의 다른 화면들과 통일성도 어쩌면 없을 수도 있다. 이 때는 테마를 활용해 화면을 꾸며줄 수 있다. 
+
+#### 1. 테마 작성
+
+나는 기본 테마가 `NoActionBar` 를 상속 받고 있어서 앱 바가 안보였는데, `AppCompat` 을 상속 받는 테마를 따로 만들어 앱 바가 보여질 수 있게 했다. 
+
+```xml
+<resources>
+    ...
+    <style name="Theme.OssLicense" parent="Theme.AppCompat">
+        <!-- App Bar Text color -->
+        <item name="android:textColorPrimary">@color/white</item>
+
+        <!-- App Bar color -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary</item>
+
+        <!-- Screen color -->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
+    </style>
+</resources>
+```
+
+각각의 속성들은 다음 이미지를 참고해서 작성해주었다. 
+
+<center>
+<img src="/posts/etc/today-i-learned/2024-08-29.svg" width="300" />
+</center>
+
+#### 2. 테마 적용
+
+매니페스트 파일에서 만든 테마를 적용시켜주면 커스텀이 완료된다.
+
+```xml
+<application>
+		...
+    <activity
+        android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+        android:theme="@style/Theme.OssLicense" />
+    <activity
+        android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+        android:theme="@style/Theme.OssLicense" />
+</application>
+```
+
+

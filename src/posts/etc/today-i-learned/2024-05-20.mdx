@@ -1,0 +1,159 @@
+---
+title: '화면 배치가 이렇게 어려울 줄이야'
+date: '2024-05-20'
+description: 'Android 앱 개발 종합반 2주차 강의 - 1'
+tags:
+  - '안드로이드'
+---
+
+오늘은 안드로이드 앱 개발 종합반 2주차 강의 중, 첫 번째 강의를 들으며 로또 번호 추천 앱의 화면을 만들어보았다. 생각보다 제약조건이 여기저기 많이 얽혀있어서 좀 복잡했던 것 같다. 
+
+## XML 파일 다뤄보기
+
+레이아웃은 뷰들을 화면에 끌어다 놓는 방식으로도 할 수 있지만, **xml 파일에 직접 작성**할 수도 있다. 편한 방식을 선택해서 사용하면 된다고 한다.  여러 속성들에 익숙해지면 직접 작성하는 게 편할 때도 있는 것 같다. 개인적으로 id를 설정해줄 때는 직접 작성하는 게 더 편하게 느껴졌다. 
+
+```xml
+<ImageView
+	<!-- 사이즈와 이미지 설정해주기 -->
+	android:layout_width="200dp"
+	android:layout_height="100dp"
+	android:src="@drawable/ic_lotto"
+	<!-- 제약 조건 설정 -->
+	android:layout_marginTop="30dp"
+	app:layout_constraintEnd_toEndOf="parent"
+	app:layout_constraintStart_toStartOf="parent"
+	app:layout_constraintTop_toTopOf="parent"
+	/>
+```
+
+위와 같이 작성하면, 다음 이미지와 같은 화면을 구성할 수 있다.
+
+![](/posts/etc/today-i-learned/2024-05-20-1.png)
+
+## 배경도 xml로
+
+`drawable` 폴더에 xml 파일을 작성해 뷰의 배경을 만들어줄 수 있다고 한다.
+
+>
+`shape = "oval"`
+>    
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 밑에 예약어들을 쓰려면 선언해주어야 함 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+  <!-- 색을 채운다. -->
+  <solid
+         android:color="#D7C400"/>
+  <!-- 크기 지정 -->
+  <size
+        android:width="44dp"
+        android:height="44dp"/>
+</shape>
+```
+
+>
+`shape="rectangle"`
+>    
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+  <!-- 색과 윤곽선 설정 -->
+  <solid
+        android:color="#D6EDEB"/>
+  <stroke
+        android:width="1dp"
+        android:color="#000000"/>
+</shape>
+```
+
+배경을 작성해주었다면, 다음 단계는 적용이겠지. 배경은 background 속성을 통해 설정해줄 수 있다. 
+
+```xml
+<TextView
+  ...
+  android:background="@drawable/circle_yellow" />
+```
+
+## LinearLayout
+
+저번에 BMI 계산기 앱을 만들 때, 뷰들을 가로로 배치하기 위해 ConstraintLayout 중 하나인 Chain이란 걸 사용했었다. 이번에는 그와 비슷한 역할을 하는 **LinearLayout**을 사용해 뷰들을 배치해보았다. LinearLayout은 **가로 또는 세로 방향으로 뷰들을 정렬하는 뷰 그룹**이라고 한다. 그러나 [문서](https://developer.android.com/develop/ui/views/layout/linear?hl=ko)를 살펴보면, 다음과 같이 나와있다.
+
+> **⭐ 참고:** 더 나은 성능과 도구 지원을 위해 [ConstraintLayout으로 레이아웃을 빌드](https://developer.android.com/training/constraint-layout?hl=ko)하세요. **`ConstraintLayout`** 사용의 이점을 자세히 알아보려면 [ConstraintLayout의 성능 이점 이해](https://android-developers.googleblog.com/2017/08/understanding-performance-benefits-of.html)를 참조하세요.
+> 
+
+엄청 많이 요약하자면, _**"ConstraintLayout이 더 유연하고 복잡하지 않고 성능적으로 이점이 있으니 그걸 사용하는 것을 권장한다"**_가 되겠다. 그래도 무지성으로 ConstraintLayout이 더 좋아! 하고 그것만 쓰는 것 보단, 아직은 여러가지 방법을 알아가야 하는 단계이니 어떻게 사용하는지 알아보자! 
+
+```xml
+<LinearLayout
+  ...
+  <!-- LinearLayout은 orientation이 필수 -->
+  android:orientation="horizontal">
+  
+  <!-- 이 곳에 배치할 뷰들을 작성 -->
+  
+</LinearLayout>
+```
+
+xml은 html과 작성 방식이 비슷한 것 같다. `<어쩌구>`로 열어주고, `</어쩌구>`로 닫아준다. 사이에는 내부에 들어갈 뷰들을 넣어주면 된다. 추가로 LinearLayout은 가로와 세로 두 가지 방향으로 정렬할 수 있는데, 이 정렬 방향을 orientation 속성으로 설정해줄 수 있다. 
+
+![](/posts/etc/today-i-learned/2024-05-20-2.png)
+
+LinearLayout을 이용해 요렇게 뷰들을 가로로 정렬해보았다.
+
+## 뷰 숨기기
+
+버튼을 눌렀을 때만 숫자가 보이게 하려면 어떻게 해야 될까? 이럴 때 사용할 수 있는 `visibility` 라는 속성이 있다고 한다! `visible`, `invisible`, `gone` 세 가지 상태를 줄 수 있고, 차이는 다음과 같다.
+
+- `visible`: 자리 차지 O, 화면 표시 O
+- `invisible`: 자리 차지 O, 화면 표시 X
+- `gone`: 자리 차지 X, 화면 표시 X
+
+```xml
+<TextView
+  ...
+  <!-- 숨길 수 있다. -->
+  android:visibility="gone"
+  tools:visibility="gone" />
+```
+
+### tools
+
+강의 자료에서는 `andriod`와 `tools`의 `visibility`를 모두 `"gone"`이라고 설정해주었는데, 하나만 해도 안보이길래 둘은 무슨 차이가 있는건지 궁금했다. 찾아봤더니 `tools`는 **Preview가 필요할 때 사용**한다고 한다. `tools`로 설정된 속성은 레이아웃 파일 프리뷰에서만 확인할 수 있고, **앱 빌드에는 영향을 주지 않는다**고 한다. 따라서 숨김 처리한 뷰들을 프리뷰에서 확인하고 싶을 땐 `tools:visibility="visible"`로 설정해주면 되는 것이다! 
+
+```xml
+<TextView
+  ...
+  android:visibility="gone"
+  <!-- 프리뷰에서는 이 텍스트 뷰가 보인다. -->
+  tools:visibility="visible" />
+```
+
+이미지의 왼쪽은 레이아웃 파일이고, 오른쪽은 앱 실행 화면이다. 노란색 원은 레이아웃 파일에서만 보이는 것을 확인할 수 있다.
+
+![](/posts/etc/today-i-learned/2024-05-20-3.png)
+
+## marginStart? End?
+
+뷰들을 이리저리 배치하다보니 xml 파일에 margin이라는 속성이 많이 보이기 시작했다. 그런데 그냥 마진이면 마진이지, 뒤에 Start, End, Left, Top 등이 붙어있는 경우가 많았다. right이나 left, top이나 bottom은 알겠는데, start와 end는 도대체 어디를 나타내는 것일까?
+
+영어나 한글과 같이 왼쪽에서 오른쪽으로 읽는 **LTR(Left To Right) 언어에서는 start가 왼쪽, end가 오른쪽**을 나타내고, 오른쪽에서 왼쪽으로 읽는 **RTL(Right To Left) 언어에서는 start가 오른쪽, end가 왼쪽**을 나타낸다고 한다. 즉, 일반적인 상황에서는 `start = left`, `end = right`라고 생각하면 된다. 그러나, 다양한 언어를 지원하는 앱을 만들 경우에는 left나 right 속성보다는 start나 end 속성을 사용하는 것이 언어마다 동일한 레이아웃을 보여주기 쉽다고 한다. 
+
+## constraintHorizontal_bias?
+
+```kotlin
+<Button
+	...
+	app:layout_constraintHorizontal_bias="0.5" />
+```
+
+이번에도 문득 궁금해졌다. xml 파일에 `layout_constraintHorizontal_bias` 라는 녀석이 적혀져있었기 때문이다. 사실 별 거는 아니었다. 제약 조건을 줄 때마다 보았던 다음과 같은 슬라이더가 있을 것이다.
+
+![](/posts/etc/today-i-learned/2024-05-20-4.png)
+
+슬라이더에 적혀져 있는 값을 뜻하는 녀석으로 기본 값은 0.5, 슬라이더 상의 50을 나타낸다. 50보다 작아지면 왼쪽으로 붙고, 커지면 오른쪽으로 붙는다.
+
+## 회고
+
+화면을 구성하는 일은 사실 쉬울 줄 알았는데, 생각보다 뷰가 많아지면 많아질수록 복잡해진다는 것을 느꼈다. 지금은 에뮬레이터에 설정해놓은 기기의 화면에서만 잘 보이게끔 배치하고 있지만, 나중에 반응형 작업을 할 때 많이 고생하게 될 것 같다. 어쩌면 로직 작성하는 게 더 쉬울지도 몰라... 그래도 아직 다가오지 않은 일이기 때문에 지금 배우는 것에 집중하는 것이 낫겠다. 

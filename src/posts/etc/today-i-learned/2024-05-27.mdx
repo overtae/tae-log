@@ -1,0 +1,53 @@
+---
+title: '버전 카탈로그?'
+date: '2024-05-27'
+description: 'Gradle 버전 카탈로그는 어떻게 사용하는 걸까?'
+tags:
+  - '안드로이드'
+---
+
+## 버전 카탈로그
+
+앱 개발 종합반 강의 복습 중 `viewpager2` 실습을 위해 `build.gradle` 파일을 먼저 수정했다. 그런데, 다음 코드를 보면 `viewpager2`만 문자열로 되어있는 걸 볼 수 있다. 사실 강의를 보면서 따라할 때는 별 문제도 없고, 실행도 잘 되길래 얘만 특별한가보다~ 하고 넘어갔었다. 그래도 계속 보이니까 궁금함을 참을 수 없었다.
+
+```kotlin
+implementation(libs.androidx.core.ktx)
+implementation(libs.androidx.appcompat)
+// 이 줄만 다르다.
+implementation("androidx.viewpager2:viewpager2:1.1.0")
+```
+
+사실 별 문제가 없는 게 맞긴 하지만, `use version catalog instead` 라는 경고를 주긴 한다. 오류가 아니라 경고라서 신경 쓰지 않아도 되는데 괜히 찝찝해서 찾아보았다.
+
+[안드로이드 문서](https://developer.android.com/build/migrate-to-catalogs?hl=ko)를 정말 간단히 요약하자면 **Gradle 버전 카탈로그를 사용하면 플러그인을 더 쉽고 안전하게 관리**할 수 있다는 내용이다. 그래서 Gradle 버전 카탈로그는 어떻게 사용하는걸까.
+
+먼저, `libs.versions.toml` 파일을 수정해야 한다. 이미 작성되어져 있는 다른 애들을 보고, 문자열로 작성되어져 있는 형태를 보면 `"group:name:version"` 으로 되어있는 걸 알 수 있다. 맞춰서 작성해주자.
+
+```kotlin
+// 버전을 나타내는 변수 정의
+[versions]
+agp = "8.4.1"
+kotlin = "1.9.0"
+...
+viewPager2 = "1.1.0"
+
+// 라이브러리 정의
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+...
+// viewpager2 추가
+viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewPager2" }
+
+// 플러그인 정의
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+```
+
+이렇게 정의한 것들은 `build.gradle`에서 사용할 수 있다. `libs` 뒤에 추가한 이름을 작성해주면 끝이 난다.
+
+```kotlin
+implementation(libs.viewpager2)
+```
+
+작성하고 보니 드디어 기존에 작성되어져 있던 애들과 동일한 형태를 띄게 되었다. 그치만 파일을 2개나 건드려야 해서 공부하기 위해 1회성으로 개발하는 경우에는 굳이 사용하진 않을 것 같다. 

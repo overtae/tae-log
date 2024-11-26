@@ -1,0 +1,76 @@
+---
+title: '사용자에게 알림주기'
+date: '2024-07-10'
+description: '앱을 개발한다면 알림 정도는 해봐야지!'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 큰 수 만들기
+- 앱개발 숙련 개인 과제 진행
+```
+>
+
+## 알림 채널 만들기
+
+안드로이드 8.0 이상부터는 알림 채널을 먼저 만들어야 한다고 한다. 알림 채널을 통해서 알림들을 그룹화할 수 있어서, 사용자로 하여금 각 그룹별로 알림을 허용하거나 비허용할 수 있게 해준다.
+
+만드는 법은 다음과 같다.
+
+```kotlin
+private val myNotificationID = 1
+private val channelID = "default"
+
+private fun createNotificationChannel() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(channelID, "default channel",
+            NotificationManager.IMPORTANCE_DEFAULT)
+        channel.description = "description text of this channel."
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+}
+```
+
+## 알림 생성
+
+알림 채널을 만들었다면 알림 객체를 생성해주고, 시스템에 전달하면 알림이 생긴다!
+
+```kotlin
+private fun sendNotification() {
+    val builder = NotificationCompat.Builder(this, channelId)
+    val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    val channel = getNotificationChannel(channelId, channelName)
+    manager.createNotificationChannel(channel)
+
+    val intent = Intent(this, MainActivity::class.java)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    val pendingIntent = PendingIntent.getActivity(
+        this,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    builder.run {
+        setSmallIcon(R.mipmap.ic_launcher)
+        setWhen(System.currentTimeMillis())
+        setContentTitle("키워드 알림")
+        setContentText("설정한 키워드에 대한 알림이 도착했습니다!!")
+        setContentIntent(pendingIntent)
+    }
+
+    manager.notify(notificationID, builder.build())
+}
+```
+
+결과는 뿅..
+
+![](/posts/etc/today-i-learned/2024-07-10.png)
+
+## 마치며
+
+앱스토어 앱을 사용하다보면 가끔씩 테스트 알림 같은 이상한 알림이 오는 경우가 종종 있었다. 그걸 보고 엇 알림 설정이 많이 어렵나..? 싶었는데 (간단한 알림은) 생각보다 쉬워서 다행이라 생각했다. 어라 근데 생각해보면 안드로이드 폰을 사용할 때는 테스트 알림이 안떴던 것 같기도..? iOS 알림이 더 어려운건가 싶다.

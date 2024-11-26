@@ -1,0 +1,83 @@
+---
+title: '문자열을 다뤄보았다'
+date: '2024-05-14'
+description: '뭐! 숫자로 된 문자열을 비교할 때 형 변환은 안해도 된다고?'
+tags:
+  - '안드로이드'
+---
+
+## 뭐! 숫자로 된 문자열을 비교할 때 형 변환을 안해도 된다고?
+
+오늘도 신나게 알고리즘 문제를 풀던 중, 문자열이 나타내는 수의 크기를 비교해야되는 상황이 있었다. 비교해야 될 문자열이 최대 18자리여서 까먹지 않고 Long 형으로 변환해 풀이했다. 
+
+```kotlin
+fun solution(t: String, p: String): Int {
+  return (0..t.length-p.length).filter {
+    t.substring(it, it+p.length).toLong() <= p.toLong()
+  }.size
+}
+```
+
+와! 까먹지 않고 풀었어! 하고 신나는 클릭으로 다른 사람의 풀이를 보는데 세상에. 엄청난 걸 알아버렸다.
+
+1234는 4321보다 작다. 그렇다면 “1234”는 “4321”보다 작을까?
+
+응, 그렇다. 나는 이걸 몰랐다. 마찬가지로 “a”는 “b”보다 작다. 문자나 문자열을 비교할 때 알파벳 순으로 비교가 된다고 한다. 
+
+그렇다. Long 형으로 바꾸는 것은 까먹지 않았지만, 굳이 안바꿔도 되었던 문제였다..
+
+```kotlin
+fun solution(t: String, p: String): Int {
+  return (0..t.length-p.length).filter {
+    t.substring(it, it+p.length) <= p
+  }.size
+}
+```
+
+오늘이라도 안 것에 감사하자..
+
+## 문자를 더해보자
+
+다음으로 풀었던 문제는 시저 암호였다. 문자열을 받아 각 문자에 n 만큼 더한 문자열을 구하면 되는 문제였다.
+
+코틀린의 자료형에 대해 배울 때, Char 형은 선언할 때는 문자로 해야하지만 이후에는 숫자로 취급이 가능하다고 했던 게 기억이 나 먼저 for 문을 사용해 풀었다.  
+
+```kotlin
+fun solution(s: String, n: Int): String {
+  var answer = ""
+  
+  for (c in s) {
+    if (c.isLowerCase())
+      answer += 'a' + (c + n - 'a') % 26
+    else if (c.isUpperCase())
+      answer += 'A' + (c + n - 'A') % 26
+    else answer += ' '
+  }
+  
+  return answer
+}
+```
+
+그런데 각 문자를 변경해야 하는 거라면 map을 쓰는 게 더 간단하겠다 싶어서 작성한 for 문을 토대로 map 으로도 바꿔서 풀어보았다.
+
+```kotlin
+s.map {
+  if (it.isLowerCase())
+    'a' + (it + n - 'a') % 26
+  else if (it.isUpperCase())
+    'A' + (it + n - 'A') % 26
+  else ' '
+}.joinToString("")
+```
+
+사실.. if 문 대신 when 문으로 작성하고 싶었는데, 조건을 어떤 식으로 작성해야 되는지 감이 안잡혀서 결국 포기했다. 이후에 다른 사람 풀이를 참고해보니, 괄호 없이 조건을 작성한 예가 있어서 가져와봤다. 이런 식으로도 쓸 수 있다는 걸 또 배우는 하루였다..
+
+```kotlin
+s.map {
+  when {
+    it.isLowerCase() -> 'a' + (it + n - 'a') % 26
+    it.isUpperCase() -> 'A' + (it + n - 'A') % 26
+    else -> ' '
+  }
+}.joinToString("")
+```

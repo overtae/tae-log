@@ -1,0 +1,143 @@
+---
+title: '바탕화면 정리'
+date: '2024-06-09'
+description: '바탕화면 정리 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**바탕화면 정리**](https://school.programmers.co.kr/learn/courses/30/lessons/161990)
+
+## 💡 문제
+
+머쓱이의 컴퓨터 바탕화면의 상태를 나타내는 문자열 배열 `wallpaper`가 매개변수로 주어질 때 바탕화면의 파일들을 한 번에 삭제하기 위해 최소한의 이동거리를 갖는 드래그의 시작점과 끝점을 담은 정수 배열을 return하는 solution 함수를 작성해 주세요. 드래그의 시작점이 `(lux, luy)`, 끝점이 `(rdx, rdy)`라면 정수 배열 `[lux, luy, rdx, rdy]`를 return하면 됩니다.
+
+### ⚠️ 제한사항
+
+- 1 ≤ `wallpaper`의 길이 ≤ 50
+- 1 ≤ `wallpaper[i]`의 길이 ≤ 50
+  - `wallpaper`의 모든 원소의 길이는 동일합니다.
+- `wallpaper[i][j]`는 바탕화면에서 `i + 1`행 `j + 1`열에 해당하는 칸의 상태를 나타냅니다.
+- `wallpaper[i][j]`는 "#" 또는 "."의 값만 가집니다.
+- 바탕화면에는 적어도 하나의 파일이 있습니다.
+- 드래그 시작점 `(lux, luy)`와 끝점 `(rdx, rdy)`는 `lux` < `rdx`, `luy` < `rdy`를 만족해야 합니다.
+
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (실패)
+
+- 정답은 주어지는 wallpaper 중에서 파일이 있는 점("#")들의 `(y축 최솟값, x축 최소값, y축 최대값, x축 최대값)`을 구하면 된다.
+- x, y축의 최대/최소값을 저장할 변수 4개를 만들어 wallpaper를 순회하며 그 값을 구한다.
+  - 1부터 50 사이의 값만 주어지기 때문에 초기값을 최소는 50으로, 최대는 1로 설정해준다.
+
+```kotlin
+class Solution {
+    fun solution(wallpaper: Array<String>): IntArray {
+        // (minY, minX, maxY, maxX)
+        var answer = intArrayOf(50, 50, 1, 1)
+        
+        wallpaper.mapIndexed { i, wall ->
+            if (wall.contains("#")) {
+            	// 값이 #인 점들 중 첫 번째 좌표 (최소 좌표)
+                if (answer[1] > wall.indexOf("#")) answer[1] = wall.indexOf("#")
+                // 값이 #인 점들 중 마지막 좌표 (최대 좌표)
+                if (answer[3] < wall.lastIndexOf("#")) answer[3] = wall.lastIndexOf("#")
+                // #을 포함한 행 중에서 최소 행 번호
+                if (answer[0] > i) answer[0] = i
+                // #을 포함한 행 중에서 최대 행 번호
+                if (answer[2] < i ) answer[2] = i
+            }
+        }
+        
+        return answer
+    }
+}
+```
+
+문제 예제를 살펴보면 최소 좌표값은 그냥 그 좌표 그대로 사용해도 드래그 영역안에 파일이 포함되지만, 최대 좌표값은 각각 x와 y에 1씩 더해주어야 최대 좌표값에 위치한 파일이 선택된다. 나는 이 점을 알지 못하고 냅다 좌표 그대로 사용했기 때문에 풀이에 실패했다. 
+
+### ✌️ 두 번째 풀이 (성공)
+
+같은 코드지만, maxY와 maxX 값에 1씩 더해준 풀이이다. 
+
+```kotlin
+class Solution {
+    fun solution(wallpaper: Array<String>): IntArray {
+        // (minY, minX, maxY + 1, maxX + 1)
+        var answer = intArrayOf(50, 50, 1, 1)
+        
+        wallpaper.mapIndexed { i, wall ->
+            if (wall.contains("#")) {
+                if (answer[1] > wall.indexOf("#")) answer[1] = wall.indexOf("#")
+                if (answer[3] < wall.lastIndexOf("#") + 1) answer[3] = wall.lastIndexOf("#") + 1
+                if (answer[0] > i) answer[0] = i
+                if (answer[2] < i + 1) answer[2] = i + 1
+            }
+        }
+        
+        return answer
+    }
+}
+```
+
+### 🔥 다른 사람의 풀이
+
+최대/최소 값을 구하는 데에는 정말 많은 방법이 존재한다. `kotlin.math` 패키지의 `min`과 `max` 함수를 사용하거나, 배열 내부 원소들을 정렬해서 최대 최소를 구하는 방법도 있다. 이 외에도 많은 방법이 있고, 심지어 정렬하는 방법에만 정말 여러가지가 있지만! 2가지만 가져와보았다. 
+
+첫 번째 다른 사람의 풀이는 구조 분해 할당을 이런식으로도 사용할 수 있구나 라는 것을 알게 된 풀이였다. 또 코틀린의 math를 임포트해 조건문 없이 최대/최소값을 구했다. 
+
+```kotlin
+import kotlin.math.*
+
+class Solution {
+    fun solution(wallpaper: Array<String>): IntArray {
+    	// Pair(50, 50)만 생각했었는데,
+        // a to b 로도 가능했다!
+        var (xMin, yMin) = (50 to 50)
+        var (xMax, yMax) = (0 to 0)
+        
+        (wallpaper.indices).forEach { x ->
+            (wallpaper[0].indices).forEach { y ->
+                if (wallpaper[x][y] == '#') {
+                    xMin = min(x, xMin)
+                    xMax = max(x, xMax)
+                    yMin = min(y, yMin)
+                    yMax = max(y, yMax)
+                }
+            }
+        }
+        return intArrayOf(xMin, yMin, xMax + 1, yMax + 1)
+    }
+}
+```
+
+두 번째 다른 사람의 풀이는 값이 #인 점들의 좌표를 Map 형식으로 다루고, 첫 번째 원소들을 기준으로 정렬해서 x의 최대/최소를, 두 번째 원소들을 기준으로 정렬해서 y의 최대/최소를 구해주었다.
+
+그런데 문득, 코틀린의 기본 sort 함수는 어떤 알고리즘을 사용하는지 궁금해졌다. 찾아보니 배열에는 Dual-Pivot QuickSort, 컬렉션에는 TimSort를 사용한다고 한다. 퀵정렬은 어디서 많이 들어봤지만 TimSort는 생소해 대충 찾아보았더니 삽입 정렬과 합병 정렬이 합쳐진 방식이라고 한다. 시간 복잡도는 O(NlogN)으로, 속도가 빠른 정렬에 속한다고 한다! 이미 기본 정렬 함수가 효율적인 방식을 제공해주니, 냅다 막 써도 정렬 자체에서 시간 초과가 걸리는 일은 잘 없을 것 같다. 
+
+```kotlin
+class Solution {
+    fun solution(wallpaper: Array<String>): IntArray {
+        val map = mutableListOf<Pair<Int, Int>>()
+
+        wallpaper.forEachIndexed { index, s ->
+            s.forEachIndexed { i, it ->
+                if(it == '#') {
+                    map.add(i to index)
+                }
+            }
+        }
+
+		// 정렬을 이용해 최대, 최소를 구함
+        val xSortedMap = map.sortedBy { it.first }
+        val ySortedMap = map.sortedBy { it.second }
+
+        return intArrayOf(ySortedMap.first().second, xSortedMap.first().first, ySortedMap.last().second+1, xSortedMap.last().first+1)
+    }
+}
+```
+
+## 💭 후기
+
+최대 좌표에 1을 더해주어야 한다는 걸 알아채는 데 시간이 좀 걸렸었다. 그래도 풀이는 재밌게 했었던 문제였다. 사실 그림 나오는 문제는 일단 재밌고 본다. 

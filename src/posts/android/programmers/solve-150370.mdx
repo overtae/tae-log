@@ -1,0 +1,175 @@
+---
+title: '개인정보 수집 유효기간'
+date: '2024-06-03'
+description: '개인정보 수집 유효기간 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**개인정보 수집 유효기간**](https://school.programmers.co.kr/learn/courses/30/lessons/150370)
+
+## 💡 문제
+
+고객의 약관 동의를 얻어서 수집된 1~`n`번으로 분류되는 개인정보 `n`개가 있습니다. 약관 종류는 여러 가지 있으며 각 약관마다 개인정보 보관 유효기간이 정해져 있습니다. 당신은 각 개인정보가 어떤 약관으로 수집됐는지 알고 있습니다. 수집된 개인정보는 유효기간 전까지만 보관 가능하며, 유효기간이 지났다면 반드시 파기해야 합니다. 모든 달은 28일까지 있다고 가정합니다.
+
+오늘 날짜를 의미하는 문자열 `today`, 약관의 유효기간을 담은 1차원 문자열 배열 `terms`와 수집된 개인정보의 정보를 담은 1차원 문자열 배열 `privacies`가 매개변수로 주어집니다. 이때 파기해야 할 개인정보의 번호를 오름차순으로 1차원 정수 배열에 담아 return 하도록 solution 함수를 완성해 주세요.
+
+### ⚠️ 제한사항
+
+- `today`는 "YYYY.MM.DD" 형태로 오늘 날짜를 나타냅니다.
+- 1 ≤ `terms`의 길이 ≤ 20
+  - `terms`의 원소는 "약관 종류 유효기간" 형태의 약관 종류와 유효기간을 공백 하나로 구분한 문자열입니다.
+  - 약관 종류는 A~Z중 알파벳 대문자 하나이며, `terms` 배열에서 약관 종류는 중복되지 않습니다.
+  - 유효기간은 개인정보를 보관할 수 있는 달 수를 나타내는 정수이며, 1 이상 100 이하입니다.
+- 1 ≤ `privacies`의 길이 ≤ 100
+  - `privacies[i]`는 i+1번 개인정보의 수집 일자와 약관 종류를 나타냅니다.
+  - `privacies`의 원소는 "날짜 약관 종류" 형태의 날짜와 약관 종류를 공백 하나로 구분한 문자열입니다.
+  - 날짜는 "YYYY.MM.DD" 형태의 개인정보가 수집된 날짜를 나타내며, today 이전의 날짜만 주어집니다.
+  - `privacies`의 약관 종류는 항상 `terms`에 나타난 약관 종류만 주어집니다.
+- `today`와 `privacies`에 등장하는 날짜의 YYYY는 연도, MM은 월, DD는 일을 나타내며 점(.) 하나로 구분되어 있습니다.
+  - 2000 ≤ YYYY ≤ 2022
+  - 1 ≤ MM ≤ 12
+  - MM이 한 자릿수인 경우 앞에 0이 붙습니다.
+  - 1 ≤ DD ≤ 28
+  - DD가 한 자릿수인 경우 앞에 0이 붙습니다.
+- 파기해야 할 개인정보가 하나 이상 존재하는 입력만 주어집니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (성공)
+
+- `{key=약관 종류, value=유효기간}` 형태의 Map을 생성해 쉽게 다루려 한다.
+- 개인 정보의 약관 종류에 맞게 수집 일자에 유효기간 만큼을 더한다.
+  - 더한 값에서 1일을 빼주어야 한다.
+    - 한 달은 28일이다. 4월 1일인 경우 3월 28일로 변경해주어야 한다.
+    - 일 년은 12개월이다. 18월인 경우 다음 해 6월로 변경해주어야 한다.
+    - 1월 1일인 경우 12월 28일로 변경해주어야 한다.
+- `"2024.01.01"`은 `"2022.01.01"`보다 큰 점을 이용해 기간이 지났는지 판단한다.
+
+```kotlin
+class Solution {
+    fun solution(today: String, terms: Array<String>, privacies: Array<String>): IntArray {
+        var t = terms.map { 
+            var (k, v) = it.split(" ")
+            k to v.toInt()
+        }.toMap()
+        var answer: IntArray = intArrayOf()
+
+        privacies.mapIndexed { i, p ->
+            var (date, type) = p.split(" ")
+            var (y, m, d) = date.split(".").map { it!!.toInt() }
+            var term = t[type]!!
+
+            y += term / 12
+            m += term % 12
+            d -= 1
+
+            if (d == 0) {
+                m -= 1
+                d = 28
+            }
+            if (m == 0) {
+                y -= 1
+                m = 12
+            }
+            if (m > 12) {
+                y += 1
+                m %= 12
+            }
+
+            var str = String.format("%d.%02d.%02d", y, m, d)
+            if (str < today) answer += i + 1
+        }
+
+        return answer
+    }
+}
+```
+
+여태까지의 풀이 중 제일 마음에 안드는 풀이 1위이다. 길이가 짧냐? 아니요. 가독성이 좋냐? 아니요. 앉아서 코드만 치다보니 운동 신경이 떨어져 두 마리 토끼를 다 놓치는 현상이 발생했다.
+
+마음에 안드는 부분(개선하고 싶은 부분)은 다음과 같다.
+
+먼저, terms 배열을 Map 형태로 바꾸는 과정이 마음에 들지 않았다. `groupBy`나 `associateBy` 같은 함수를 사용해보고자 했으나, 응용이 쉽지 않았다. 결국 `toMap()`을 사용해 형 변환 해주는 방법을 채택했다.
+
+두 번째로, 날짜를 문제 조건에 맞게 변환하는 과정이 마음에 들지 않는다. if 문을 세 번이나 써야 했을까? 
+
+### 🔥 다른 사람의 풀이
+
+아래 코드를 작성한 사람은 연도, 달, 일을 숫자로 다뤄 0일을 28일로 변환할 필요가 없게 풀이했다. 또한 groupBy를 사용해 Map을 만드는 방식을 알 수 있었다. 
+
+세상에나 연도와 월이 같고 일이 다르다면, 날짜에서 1을 뺀 값이 today보다 같거나 작기만 하면 되는 것이었다.. 
+
+```kotlin
+class Solution {
+    fun solution(today: String, terms: Array<String>, privacies: Array<String>): IntArray {
+        var answer =mutableListOf<Int>()
+        var tMap: Map<String, List<Int>> = terms.map{it.split(" ")}.groupBy({it[0]}, {it[1].toInt()})
+
+        privacies.indices.forEach{
+            when{
+                isOver(today, tMap[privacies[it].split(" ")[1]]!![0], privacies[it]) -> answer.add(it+1)
+            }
+        }
+        return answer.toIntArray()
+    }
+
+    fun isOver(today: String, months: Int, date: String): Boolean{
+        var tArr: IntArray = today.split(".").map{it.toInt()}.toIntArray()
+        var dArr: IntArray = date.substring(0..9).split(".").map{it.toInt()}.toIntArray()
+
+        dArr[1] = dArr[1]!! + months - 1
+        dArr[0] = dArr[0]!! + dArr[1]!!/12
+        dArr[1] = dArr[1]!!%12 + 1
+
+        return when{
+            dArr[0] < tArr[0] -> true
+            dArr[0] == tArr[0] && dArr[1] < tArr[1] -> true
+            dArr[0] == tArr[0] && dArr[1] == tArr[1] && dArr[2] <= tArr[2] -> true
+            else -> false
+        }
+    }
+}
+``` 
+
+### 🫥 다른 사람의 풀이 (이게 된다고?)
+
+그 와중에 미친 풀이도 있었다. 보자마자 이게 뭐야 소리가 나왔다. 원래 그냥 넘기려고 했었는데, `associate`를 사용한 게 눈에 보여서 가져와봤다. `associate`는 **특정 프로퍼티를 key와 value로 설정해 Map을 만들어준다**고 한다. 그리고 날짜를 비교할 때 `2024 * 12 * 28`로 계산해 일 수로 다룬 게 신기했다.
+
+영어 지문 풀이하듯이 하나씩 잘라서 살펴보면.. 이해할 수 있다.. 아마 이 분도 냅다 코드를 작성한 게 아니라 길게 작성해놓고 한 줄로 붙여 풀이했을 거다. 아니라면 그냥 코틀린을 만든 사람이 아닐까?
+
+```kotlin
+class Solution {
+    fun solution(today: String, terms: Array<String>, privacies: Array<String>) = privacies.indices.filter { privacies[it].split(" ").first().split("\\.".toRegex()).map(String::toInt).let { (y, m, d) -> (y * 12 * 28) + (m * 28) + d } + (terms.map { it.split(" ") }.associate { (a, b) -> a to b.toInt() }.getOrDefault(privacies[it].split(" ").last(), 0) * 28) <= today.split("\\.".toRegex()).map(String::toInt).let { (y, m, d) -> (y * 12 * 28) + (m * 28) + d } }.map { it + 1 }
+}
+
+```
+
+### ✅ 개선한 풀이
+
+다른 사람의 풀이 중에서 이거저거 조합해서 개선해보았다. 사실 개선이 맞는지는 모르겠지만.. 어쨌든 다시 풀어보았다.
+
+```kotlin
+class Solution {
+    fun solution(today: String, terms: Array<String>, privacies: Array<String>): IntArray {
+        var t = terms.map { it.split(" ") }.associate { (a, b) -> a to b.toInt() }
+        var td = today.split(".").map(String::toInt).let { (y, m, d) -> 
+            (y * 12 * 28) + (m * 28) + d }
+        var answer: IntArray = intArrayOf()
+        
+        privacies.mapIndexed { i, p ->
+            var (date, type) = p.split(" ")
+            var (y, m, d) = date.split(".").map(String::toInt)
+            var term = (y * 12 * 28) + ((m + t[type]!!) * 28) + d - 1
+            
+            if (term < td) answer += i + 1
+        }
+        
+        return answer
+    }
+}
+```
+
+## 💭 후기
+
+문제를 처음에 읽었을 때는 막막했는데, 풀다보니까 또 어거지로 풀어는 지는 게 신기했다. 이제 대충 코틀린에 익숙해지기도 했고, 자주 쓰이는 함수들도 다 알고있겠구나 싶었는데 아니었다. 또 groupBy나 association 함수들은 알고있어도 응용하기가 어려운 것 같다. 자만하지 말고, 계속 문법 공부를 해야겠다. 

@@ -1,4 +1,5 @@
 export const mainCategories: { [key: string]: string } = {
+  android: 'Android 프로그래밍',
   'computer-science': 'Computer Science',
   etc: '기타',
   'ios-programming': 'iOS 프로그래밍',
@@ -7,6 +8,10 @@ export const mainCategories: { [key: string]: string } = {
 }
 
 export const subCategories: { [key: string]: string } = {
+  // android
+  kotlin: 'Kotlin',
+  nbcamp: '내일배움캠프',
+
   // computer-science
   database: '데이터베이스',
   network: '네트워크',
@@ -15,6 +20,7 @@ export const subCategories: { [key: string]: string } = {
   // etc
   'git-and-github': 'Git & GitHub',
   programming: 'Programming',
+  'today-i-learned': 'Today I Learned',
 
   // ios-programming
   'auto-layout': 'Auto Layout',

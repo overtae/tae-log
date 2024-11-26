@@ -1,0 +1,99 @@
+---
+title: '액티비티 결과를 가져와보자'
+date: '2024-06-21'
+description: 'registerForActivityResult가 뭐지?'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 할인 행사 풀이
+- 개인 과제 디자인 해보기
+```
+>
+
+## 개요
+
+> **✅  구현할 기능**
+> 
+> 
+> 회원 가입 페이지에서 입력한 아이디/비밀번호가 회원 가입 버튼을 눌러 로그인 화면으로 이동할 때 자동으로 입력되도록 구현합니다.
+> 
+> 키워드: [`registerForActivityResult`](https://developer.android.com/training/basics/intents/result?hl=ko)
+> 
+
+## 결과를 위해 액티비티 실행하기
+
+키워드를 검색 해보니 다른 액티비티를 시작시키고 나서 그 액티비티로부터 결과를 받고자 할 때 사용하는 API라고 한다. 즉, **결과를 위한 액티비티를 시작할 때 사용**하는 것이 [`registerForActivityResult`](https://developer.android.com/reference/androidx/activity/result/ActivityResultCaller#registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback)) 이다.
+
+만약 결과를 위한 액티비티가 메모리를 많이 사용하는 경우에는 프로세스와 액티비티가 사라질 수 있다고 한다. 그래서 결과를 위한 액티비티를 실행하는 곳에서 콜백 함수를 작성해야 한다. 또 액티비티를 만들기 전에 `registerForActivityResult` 를 호출해야 안전하다고 한다. 
+
+```kotlin
+// ActivityResultLauncher 인스턴스 반환
+// contract: 결과를 생성하는 데 필요한 input 타입과 output 타입 정의 (결과 변환 방식)
+// callback: contract에 정의된 타입으로 객체를 받는다. onActivityResult() 메소드가 포함된 인터페이스
+val getResult = registerForActivityResult(contract) { callback }
+```
+
+### Contract
+
+[Contract 종류](https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContract)를 살펴보면 영상이나 문서, 이미지 등을 가져오는 등 어마무시한 걸 가져오는 애들이 많은데, 나에게 필요한 건 고작 같은 앱의 다른 액티비티에서 입력한 아이디와 비밀번호 문자열 2개다. 이걸 위한 Contract는 바로 [`StartActivityForResult`](https://developer.android.com/reference/androidx/activity/result/contract/ActivityResultContracts.StartActivityForResult) 로, 아무런 변환 없이 Intent를 받아 [ActivityResult](https://developer.android.com/reference/androidx/activity/result/ActivityResult) 형태로 반환해준다고 한다. 
+
+```kotlin
+val getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    // it 으로 ActivityResult에 접근 가능
+    // ActivityResult의 data로는 Intent가 들어온다.
+}
+```
+
+### 액티비티 실행
+
+실행은 `registerForActivityResult` 로부터 반환된 ActivityResultLauncher 인스턴스를 사용하면 된다. 인스턴스의 launch()를 호출하면 결과를 위한 액티비티가 시작된다. 시작한 액티비티가 종료되면 callback에 작성한 코드가 실행된다. Intent를 시작하는 `startActivity`와 비슷한 것 같다. 
+
+```kotlin
+val intent = Intent(this, SignUpActivity::class.java)
+getResult.launch(intent)
+```
+
+## 결과를 넘겨주기
+
+위에서 내가 사용하는 StartActivityForResult는 Intent를 받는다고 했다. 결과를 위한 액티비티에서 그냥 Intent를 만들어, putExtra로 전달할 값을 넣어주고, [`setResult()`](https://developer.android.com/reference/android/app/Activity#setResult(int,%20android.content.Intent))로 전달만 하면 된다.
+
+```kotlin
+val intent = Intent(this, SignInActivity::class.java)
+
+intent.putExtra("id", id)
+intent.putExtra("password", password)
+
+// setResult(resultCode: Int, data: Intent)
+// resultCode: RESULT_CANCELED, RESULT_OK
+// resultCode와 data는 원래 액티비티에게 전달된다.
+setResult(RESULT_OK, intent)
+
+// 전달만 하고 액티비티 종료 안시키면 안됨... (내가 그랬음 ㅎ..)
+finish()
+```
+
+## 결과 받기
+
+결과를 전달받았다면, callback이 호출된다. Intent를 넘겨주었기 때문에 특별히 새로 알아야 할 건 없다. 다만, 같이 넘겨준 resultCode를 사용하면 좋겠..지?
+
+```kotlin
+// resultCode가 RESULT_OK라면,
+if (it.resultCode == RESULT_OK) {
+    // Intent에서 값을 가져오자
+    val id = it.data?.getStringExtra("id") ?: ""
+    val password = it.data?.getStringExtra("password") ?: ""
+
+    idInput.setText(id)
+    passwordInput.setText(password)
+
+    showToast("회원 가입 성공")
+}
+```
+
+## 마치며
+
+하나 알아보는데 문서만 몇 개를 본 건지 모르겠다. 죄다 처음보는 단어들이라 눈앞이 깜깜해질 뻔 했지만, 번역만 있다면 나는 무적이다. 한글 최고최고 👍

@@ -1,0 +1,76 @@
+---
+title: '대충 만든 자판'
+date: '2024-05-29'
+description: '대충 만든 자판 문제 풀이'
+tags:
+  - '코딩 테스트'
+---
+
+> 📍 [**대충 만든 자판**](https://school.programmers.co.kr/learn/courses/30/lessons/160586)
+
+## 💡 문제
+
+1번 키부터 차례대로 할당된 문자들이 순서대로 담긴 문자열배열 `keymap`과 입력하려는 문자열들이 담긴 문자열 배열 `targets`가 주어질 때, 각 문자열을 작성하기 위해 키를 최소 몇 번씩 눌러야 하는지 순서대로 배열에 담아 return 하는 solution 함수를 완성해 주세요.
+
+단, 목표 문자열을 작성할 수 없을 때는 -1을 저장합니다.
+
+### ⚠️ 제한사항
+
+- 1 ≤ `keymap`의 길이 ≤ 100
+  - 1 ≤ `keymap`의 원소의 길이 ≤ 100
+  - `keymap[i]`는 i + 1번 키를 눌렀을 때 순서대로 바뀌는 문자를 의미합니다.
+  - 예를 들어 `keymap[0]` = "ABACD" 인 경우 1번 키를 한 번 누르면 A, 두 번 누르면 B, 세 번 누르면 A 가 됩니다.
+  - `keymap`의 원소의 길이는 서로 다를 수 있습니다.
+  - `keymap`의 원소는 알파벳 대문자로만 이루어져 있습니다.
+- 1 ≤ `targets`의 길이 ≤ 100
+  - 1 ≤ `targets`의 원소의 길이 ≤ 100
+  - `targets`의 원소는 알파벳 대문자로만 이루어져 있습니다.
+
+## ✅ 풀이
+
+### 👆 첫 번째 풀이 (성공)
+
+문제를 읽고 풀이가 바로 생각나긴 했다. 그러나 그 풀이가 이제.. 반복문 안에 반복문 안에 반복문 안에... 이런 형태였을 뿐이다. 그렇지만 이런 방법 말고는 생각나지 않으므로 나중에 수정할 생각으로 일단 코드를 싸지르고 보았다.
+
+사실 nullable min 값에 null safe 연산자랑 스코프 함수를 사용해서 어떻게어떻게 풀고 싶었는데, 각이 잘 안나와서 엘비스 연산자를 사용했다. 이 점이 좀 아쉽다. 
+
+```kotlin
+class Solution {
+    fun solution(keymap: Array<String>, targets: Array<String>): IntArray {
+        return targets.map { target ->
+            var cnt = target.map { t ->
+                keymap.map { it.indexOf(t) + 1 }.filter { it != 0 }.minOrNull() ?: -1
+            }
+
+            if (-1 in cnt) -1 else cnt.sum()
+        }.toIntArray()
+    }
+}
+```
+
+map이 3개나.. 한 줄 한 줄 작성하면서도 계속 이게 맞나..? 라고 생각하면서 작성했다.
+
+### 🔥 다른 사람의 풀이
+
+이왜진이라는 말을 아는가. 반복문을 세 번 사용하는 건 다들 동일했다. 문제 이름처럼 정말 자판을 대충 만들었나보다. 아래는 minOrNull 대신 minOf를 사용하는 방법이 있었다는 걸 알려주는 ~~(알려주었다기 보다는 내가 알게되었다..)~~ 다른 사람의 풀이이다. 
+
+전체적으로 비슷하지만, 변수에 할당해서 조건을 확인했던 나와는 다르게 let 을 사용한 게 기억에 남아서 가져왔다. 이놈의 let, run, apply녀석들은 아직 막 휘뚜루마뚜루 사용하기 쉽지 않은 것 같다. 사고가 거기까지 안흘러간다..
+
+```kotlin
+class Solution {
+    fun solution(keymap: Array<String>, targets: Array<String>): IntArray =
+        targets.map { str ->
+            str.map { c -> keymap.map { it.indexOf(c) + 1 }
+                .filterNot { it < 1 }
+                .let { list ->
+                    if (list.isEmpty()) -1
+                    else list.minOf { it }
+                }
+            }.let { if ( it.contains(-1)) -1 else it.sum() }
+        }.toIntArray()
+}
+```
+
+## 💭 후기
+
+코드를 작성하기 전에 반복문이 너무 많이 중첩되는 거 아닌가? 라는 생각에 시간이 지체된 부분이 조금 아쉽다. 처음부터 개쩌는 풀이를 완성할 수는 없으니 일단 지르고 보는 것도 필요한 것 같다. 정신 승리 해보자면 아직 개선의 여지가 있는 코드를 작성하는 게 나의 성장에 더 도움이 되는 일이 아닐까!? 

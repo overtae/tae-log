@@ -1,0 +1,64 @@
+---
+title: 'Fragment에서 View binding 사용하기'
+date: '2024-07-12'
+description: '그냥 사용하면 되는 게 아니었다니'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 연속된 부분 수열의 합 풀이
+- 개인 과제 진짜진짜로 마무리
+- 스탠다드반 3.5번째 강의
+```
+>
+
+## 개요
+
+Fragment에서 `findViewById`를 쓰던 `viewBinding`을 쓰던 별 차이 없을거라 생각했다. 다음과 같은 코드를 보기 전까진...
+
+```kotlin
+private var _binding: FragmentFirstBinding = null
+private val binding get() = _binding!!
+```
+
+`_binding` 변수를 한단계 거침으로써 `binding`이 null이 아니라는 것을 보장한다는데... 말이 너무 어려워서 한 번 알아보았다. 
+
+## 이상한 위치에 get()이 있네
+
+코드가 이해안되는 이유에는 처음 보는 위치에 있는 `get()` 때문인 것 같아 이것부터 알아보았다. 
+
+`get()`은 [Custom Getter](https://kotlinlang.org/docs/properties.html#getters-and-setters)를 의미한다. 다음과 같은 코드로 이해하면 조금 더 쉽다.
+
+```kotlin
+private val binding: FragmentFirstBinding
+	get() = _binding!!
+
+// 타입을 생략하면
+private val binding get() = _binding!!
+```
+
+개요에서 나온 코드에서는 `_binding` 변수의 타입을 유추할 수 있기 때문에 타입을 생략해서 작성했다.
+
+그렇다면 Getter가 하는 일이 뭘까? 말 그대로 "접근자"를 의미하며, **프로퍼티에 접근할 때마다 호출**된다. 그렇다면 위의 코드는 `binding` 변수에 접근할 때마다 `_binding` 변수의 null을 풀어 사용한다 정도로 이해가 가능하겠다.
+
+## 왜 이런 방식을 사용할까?
+
+위에서 한 번 적어두긴 했는데, 조금 더 정리해보자.
+
+- **Fragment 생명주기 관리**
+  - 바인딩 객체를 계속 참조하고 있으면 메모리 누수가 발생할 수 있다. 
+  - 그래서 Fragment의 뷰가 생성/해제될 때마다 바인딩 객체도 생성/해제해주어야 한다.
+    - `onCreateView()`에서 `_binding`에 뷰 바인딩 객체 할당
+    - `onDestroyView()`에서 null로 처리
+  - `_binding`을 사용해 뷰 바인딩 객체의 생성과 해제를 관리할 수 있다.
+- **Null 안정성**
+  - 뷰 바인딩 객체는 `onCreateView()` ~ `onDestroyView()` 생명주기 동안 생성되고 해제된다.
+  - 생명주기 내부에서 `binding`을 사용해 안전하게 접근할 수 있도록 한다.
+- **가독성**
+  - 사용할 때마다 null 체크 코드가 반복되지 않아 코드가 깔끔해진다.
+  - 변수 2개를 사용해 실제 바인딩 객체를 담고 있는 변수를 명시적으로 구분할 수 있다.
+
+

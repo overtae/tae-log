@@ -1,0 +1,196 @@
+---
+title: '현재 위치한 페이지가 어딘지 표시해보기'
+date: '2024-05-31'
+description: 'MBTI 테스트 앱을 개선해보았다'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 햄버거 만들기 문제 풀기
+- 마인드셋 특강
+- MBTI 테스트 앱 개조해보기
+```
+>
+
+## 개요
+
+MBTI 앱을 다 만들고 나서, 추가해보고 싶은 부분이 생겼다. 개인적으로 마지막을 미리 알고 있어야 안정감이 들어서, 시험을 볼 때나 책을 볼 때도 항상 마지막 장 부터 보는 습관이 있다. 그래서 MBTI 질문지에도 지금이 몇 번째 페이지인지 표시해준다면 더 좋지 않을까? 하는 생각이 들었다.
+
+## 디자인
+
+우선 내가 원하는 디자인을 간단하게 그려봤다. 
+
+### #1. 프로그래스바로 표현
+
+![](/posts/etc/today-i-learned/2024-05-31-1.png)
+
+### #2. 원으로 표현
+
+![](/posts/etc/today-i-learned/2024-05-31-2.png)
+
+두 가지 방법 중 뭐가 더 괜찮을까 고민하다 결국 2번으로 정했다. 
+
+## #2번 구현
+
+찾아보니 TabLayout을 이용하는 방법이 지금의 내가 하기에 가장 간단해 보여서 그것을 사용했다. TabLayout은 말 그대로 여러 탭을 다룰 때 쓰이는 레이아웃이지만, Indicator로 사용할 수도 있다고 한다.
+
+### 1. drawable 작성
+
+현재 페이지임을 표시하는 원과 현재 페이지가 아님을 표시하는 원 두 가지를 drawable로 작성해줘야 한다. 전에 로또 번호 생성기에서 만든 것처럼 xml로 작성해주었다. 
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:innerRadius="0dp"
+    android:shape="ring"
+    android:thickness="4dp"
+    android:useLevel="false">
+    <solid android:color="#9FA8DA" />
+    <size
+        android:width="10dp"
+        android:height="10dp" />
+</shape>
+```
+
+만들어주고 나서, 추가적으로 selector도 만들어주어야 한다고 한다. 선택되었을 때와 아닐  때의 drawable을 각각 설정해줄 수 있다! 
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/dot_selected" android:state_selected="true" />
+    <item android:drawable="@drawable/dot_not_selected" />
+</selector>
+```
+
+### 2. TabLayout 추가
+
+작성한 drawable을 배경으로 사용해줄 탭 레이아웃을 추가해주자. 위치는 ViewPager 바로 아래에 작성해 앱 최하단에 위치하도록 했다.
+
+여기서 tabIndicatorHeigth을 0dp로 설정해줘야 내가 디자인했던 모양이랑 똑같이 나온다. 안해주면 현재 페이지를 나타내는 원 아래에 긴 선이 추가적으로 생긴다. 
+
+추가로, 호옥시나 나중에 질문이 더 많아질 수 있으니 페이지가 무한대로 늘어났을 때 인디케이터들이 스크롤 되도록 tabMode를 scrollable로 설정해주었다. 
+
+```xml
+<com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/viewPager"
+        app:tabBackground="@drawable/dot_indicator"
+        app:tabGravity="center"
+        app:tabIndicatorHeight="0dp"
+        app:tabMinWidth="0dp"
+        app:tabMode="scrollable" />
+```
+
+### 3. ViewPager와 연결
+
+연결 과정은 정말 쉬웠다. 다음 두 줄의 코드만 작성해주면 끝이 난다. 
+
+```kotlin
+tabLayout = findViewById(R.id.tabLayout)
+TabLayoutMediator(tabLayout, viewPager) {_, _ ->}.attach()
+```
+
+<Quote>
+
+`{_, _ ->}` ?
+
+</Quote>
+
+원래 TabLayoutMediator의 마지막 인자로 각 탭의 값(이름)을 설정하는 함수를 넘겨줘야 한다. 그러나 내가 원하는 디자인은 drawble만 보여주면 되기 때문에 저렇게 작성해주었다. 마지막으로 attach() 를 사용해주면 연결이 된다. 
+
+### 결과
+
+완성된 화면은 다음과 같다. 디자인이 예상했던 것보다.. 좀 많이.. 별로라.. 폐기를 하기로 결정했다! 
+
+![](/posts/etc/today-i-learned/2024-05-31-3.png)
+
+## #1번 구현
+
+프로그래스 바 위젯이 이미 있어서 이번에도 쉽게 구현할 수 있을 것 같다.
+
+### 1. drawable 작성
+
+물론 기본 프로그레스바도 괜찮지만, 커스텀을 해보고 싶었다. 역시나 xml 파일로 가능하다고 해서 약간만 바꿔보았다.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 늘어나는 부분 -->
+    <item
+        android:id="@android:id/progress">
+        <scale
+            android:scaleWidth="100%">
+            <shape>
+                <corners android:radius="20dp"/>
+                <solid android:color="#9FA8DA"/>
+            </shape>
+        </scale>
+    </item>
+
+    <!-- 뒷 배경 -->
+    <item
+        android:id="@android:id/background">
+        <shape>
+            <corners android:radius="20dp"/>
+            <solid android:color="#0F000000"/>
+        </shape>
+    </item>
+</layer-list>
+```
+
+### 2. ProgressBar, TextView 추가
+
+내가 원하는 디자인은 프로그레스바 오른쪽 위쪽으로 진행도가 표시되는 형태였다. 따라서 그걸 표시해줄 텍스트뷰도 뷰페이저 위쪽에 추가해주었다.
+
+### 3. 코드 작성
+
+처음에는 단순히 다음 버튼을 눌렀을 때 프로그래스바의 상태를 업데이트하게끔 구현했다. 기존에 있던 `moveToNextQuestion()`에 다음과 같은 코드만 추가해주었다.
+
+```kotlin
+fun moveToNextQuestion() {
+    if (viewPager.currentItem == 3) {
+        ...
+    } else {
+        val nextItem = viewPager.currentItem + 1
+
+        if (nextItem < viewPager.adapter?.itemCount ?: 0) {
+		    // 요기에 추가
+            progressBar.setProgress(nextItem*25, true)
+		    progressTextView.text = "${nextItem}/4"
+
+            viewPager.setCurrentItem(nextItem, true)
+        }
+    }
+}
+```
+
+그런데 문제가 있었다. 다음 버튼을 눌러야 진행도가 변하는데, 첫 페이지는 다음 버튼을 눌러 진입하는 게 아니기 때문에 원하는 값이 나오지 않았다. 따라서 저 두 코드를 함수로 만들어 `onCreate()` 내부에도 추가해주었다. 
+
+```kotlin
+// 현재 페이지를 받아 프로그래스바 상태를 업데이트 해준다.
+private fun setCurrentProgress(current: Int) {
+	progressBar.setProgress(current*25, true)
+	progressTextView.text = "${current}/4"
+}
+```
+
+사실 조금 어거지로 구현하긴 했는데.. 미래에서 온 더 많이 배운 내가 리팩토링 해줄 것이다. 
+
+### 결과
+
+으음.. 내가 디자인을 못한다는 것을 까먹고 있었다. 그리 맘에 들지는 않지만, 제대로 동작하는 것에 만족하기로 했다.
+
+![](/posts/etc/today-i-learned/2024-05-31-4.gif)
+
+## 회고
+
+결과물 디자인이 마음에 안들긴 하지만, 내가 원하는 것을 구현했다는 거에 의미를 둔다면 성공적인 하루였던 것 같다. 
