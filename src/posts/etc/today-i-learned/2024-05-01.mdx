@@ -1,0 +1,88 @@
+---
+title: '버튼으로 글자를 바꾸는 앱 만들어보기'
+date: '2024-05-01'
+description: '안드로이드 스튜디오와의 어색한 첫만남'
+tags:
+  - '안드로이드'
+---
+
+오늘은 아직 낯설기만한 Android Studio를 사용해 간단한 앱을 만들고 실행까지 해보았다.
+
+## 프로젝트 생성
+
+![](/posts/etc/today-i-learned/2024-05-01-1.png)
+
+사진은 안드로이드 스튜디오 실행 후, New Project를 누르면 나오는 화면이다. 오늘은 간단하게 앱을 만들어 볼 거기 때문에 Empty Views Activity를 선택 후 프로젝트를 생성해주었다. 
+
+## setContentView
+
+```kotlin
+setContentView(R.layout.activity_main)
+```
+
+프로젝트를 생성하면 `MainActivity` 파일에 위와 같은 코드가 적혀있는 것을 볼 수 있다. `setContentView`는 화면에 컨텐츠를 그려주는 함수로, `res/layout/activity_main.xml`의 파일을 사용해 화면을 그리겠다는 의미로 이해했다.
+
+## 레이아웃 편집
+
+Design 모드로 `activity_main` 파일을 열어 버튼 하나를 배치해보았다.
+
+![](/posts/etc/today-i-learned/2024-05-01-2.png)
+
+버튼으로부터 Hello World!라는 텍스트까지 화살표가 이어져 있다. 버튼은 텍스트로부터 위로 92dp 만큼 떨어져 있다는 제약 조건(Constraints)이 있는 것이다. 이 제약 조건에는 세 가지 모드가 있다고 한다. 
+
+- Wrap Content: 위젯 안쪽의 내용물에 크기를 맞춘다.
+
+- Fixed: 원하는 값을 입력하여 가로 세로 속성 필드에 입력된 크기에 맞게 가로세로를 고정한다.
+
+- Match Constraint: 0dp로 설정하여 크기를 제약 조건인 Constraint 연결부에 맞춘다.
+
+앱을 만들다보면 상황마다 쓰이는 모드가 다를 것 같다.
+
+> dp가 뭐지?
+
+이제까지 px이나 cm 같은 단위는 많이 본 적 있는데, dp는 좀 생소하다. Device independence Pixel로 다양한 화면 크기에서 동일한 비율로 출력되도록 하는 픽셀 단위라고 한다. 서로 다른 크기를 가진 기기에서도 비율이 동일하면 레이아웃이 쉽게 깨지지 않을 것 같다.
+
+## 뷰 바인딩
+
+만든 화면(뷰)을 소스 코드와 연결해야 동작을 할 것이다.  오늘은 뷰 바인딩을 이용해 뷰와 소스 코드를 연결해보자.
+
+먼저 viewBinding 설정을 `build.gradle`에 추가한다. 
+
+```kotlin
+android {
+	...
+    viewBinding {
+        enable = true
+    }
+}
+```
+
+그 뒤에 `MainActivity`에 코드를 작성해준다.
+
+```kotlin
+val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+```
+
+파일명이 `activity_main` 이면 `ActivityMainBinding`으로 레이아웃 파일을 바인딩으로 생성해준다고 한다.
+
+코드 중 `inflate`가 보인다. 단어의 뜻은 부풀리다인데, 안드로이드에서는 xml을 소스 코드에서 사용하기 위해 메모리에 객체화 시키는 과정이라 한다. 
+
+## 동작 추가
+
+레이아웃을 객체화 시켰으니, 뷰에 만들어둔 버튼에 접근이 가능하다. 정확히는 버튼의 id에 접근이 가능하다. 동작을 추가하려면 이벤트 리스너가 필요할 것이다. 코틀린에서는 `setOnClickListener`를 사용해 추가한다고 한다.
+
+```kotlin
+binding.button.setOnClickListener {
+	binding.textView.text = "Bye World!"
+}
+```
+
+코드를 보니 버튼을 클릭하면 중괄호 안의 코드가 실행될 것 같다. id로 버튼을 접근한 것처럼, 텍스트뷰도 id로 접근해 텍스트를 Bye World!로 바꿔준다. 
+
+![](/posts/etc/today-i-learned/2024-05-01-3.png)
+
+
+## 마치며
+
+세미콜론도 없고, func가 아닌 fun을 쓰는 등 아직 코틀린에 대해 모르는 게 많아 더 친해져야 할 것 같다는 생각을 했다. 

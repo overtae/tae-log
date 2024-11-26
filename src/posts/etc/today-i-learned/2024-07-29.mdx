@@ -1,0 +1,46 @@
+---
+title: '난 볼은 못 차지만 트러블은 잘 차지'
+date: '2024-07-29'
+description: '팀 프로젝트를 하며 마주한 문제들'
+tags:
+  - '안드로이드'
+  - '트러블슈팅'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 팀 프로젝트 최종 점검
+- 팀 프로젝트 최종 발표
+- 팀원들과 회고 및 작별 인사
+```
+>
+
+## 문제가 많은 다중 선택
+
+![](/posts/etc/today-i-learned/2024-07-29.gif)
+
+쉬울 줄 알았던 다중 선택 구현에서 정말 많은 문제가 발생했었다. 
+
+먼저 처음 기획에서는 BottomNavigation 위치에 Toolbar를 표시하려고 했었지만, (BottomNavigation이 있는) MainActivity > (TabLayout이 있는) ContactFragment > (RecyclerView가 있는) AllContactFragment 총 3단계를 거쳐 데이터를 전달해야하는 문제가 발생했다. RecyclerView가 있는 프래그먼트에서, 각 아이템이 눌릴 때 MainActivity에 있는 Toolbar 위치를 조정해야 해서 아직 나의 실력으로는 무리라는 생각이 들었다.
+
+그렇게 한 단계를 줄여 ContactFragment에서 Toolbar를 표시하게 변경했고, 잘 작동을 하는 듯.. 했으나, "전체 연락처 삭제"를 하는 경우 앱이 죽는 문제가 발생했다. 
+
+### 1차 해결 과정
+
+에러 메시지는 NullPointerException이었고, 삭제 후에 리스트 갱신이 안된다고 처음엔 생각을 했었다.
+
+그래서 정보가 담겨있는 리스트를 계속 update해주게 변경했지만.. 여전히, 같은 에러가 발생했다. 
+
+### 2차 해결 과정
+
+패스트스크롤 코드가 position을 null인 경우를 생각하지 않고 참조하고 있어 생긴 문제였다. `list[position]` 대신 `getOrNull`을 사용해 해결할 수 있었다. 
+
+```kotlin
+val item = contactList.getOrNull(position)
+```
+
+## 마치며
+
+IDE에서 null 가능성이 있다면 항상 빨간 줄로 알려줬었기 때문에 정말 생각지도 못했었 곳을 고치게 되었다. IDE의 편리함에 익숙해지다보니 머리가 멍청해졌나보다...
+

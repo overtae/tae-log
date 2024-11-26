@@ -1,0 +1,50 @@
+---
+title: 'MVVM이란?'
+date: '2024-08-07'
+description: 'Model-View-ViewModel의 약자, MVVM!'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 추억 점수 풀이
+- 컴포즈 녹화 강의
+- 수준별 학습반 강의
+```
+>
+
+
+## MVVM
+
+- **M**odel **V**iew **V**iew**M**odel
+
+**Model (Data Layer)**
+
+- ViewModel에서 요청한 데이터를 처리, 반환
+- Local DB(SQLite, Room), Network 통신(Retrofit)을 이용함
+- 데이터 통신을 담당
+- 뷰 모델에서 데이터 처리를 하는 게 Model 이다.
+- ex. 로컬DB 혹은 Retrofit을 통해 통신하는 일을 모델 쪽에서 한다.
+
+**View (UI Layer)**
+
+- 보통 Activity, Fragment가 View 역할을 담당
+- 사용자의 Action을 받음 (텍스트 입력, 버튼 터치 등)
+- ViewModel의 데이터를 관찰해(Observe) UI를 갱신
+- 사용자의 Action을 감지하고 데이터 변화를 통해 UI 갱신 처리
+- 뷰 모델이 데이터 처리를 한 걸 갖고 화면에 표시
+
+**ViewModel (UI Layer)**
+
+- 사용자의 Action, LifeCycle에 의해 View에서 요청한 데이터, 비지니스 로직을 처리함
+- Model(Data Layer)에 요청한 데이터를 받음
+- 모델에서 받은 데이터들을 정리를 한다.
+- 모델이 요청한 데이터를 전달 받아 가공한다.
+- 가공하고 처리한 데이터를 view가 observing을 해서 전달해준다.
+- 뷰에게 STate 방식으로 데이터를 서빙해준다.
+
+### 나오게 된 배경
+
+뷰와 비즈니스 로직을 분리시키기 위해 나왔다. 

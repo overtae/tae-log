@@ -1,0 +1,94 @@
+---
+title: 'ChatGPT API 사용해보기'
+date: '2024-05-30'
+description: '채팅 생성 요청을 보내보았다'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 둘만의 암호 문제 풀기
+- 노코드로 수익형 AI 앱 만들기 3주차 숙제 제출
+- 노코드로 수익형 AI 앱 만들기 4주차 실습 및 숙제 제출
+```
+>
+
+## CRUD와 HTTP Request Method의 관계
+
+DB에서 데이터를 다룰 때 CRUD를 사용한다. REST API를 사용해 서버와 통신할 때는 HTTP Request Method를 사용한다고 한다. 이 둘 사이의 관계는 다음과 같다.
+
+- CREATE — POST
+- READ — GET
+- UPDATE — PUT, PATCH
+- DELETE — DELETE
+
+CREATE와 POST가 같다는 것은 아니고, 데이터를 생성할 때 POST, 데이터를 수정할 때 PUT을 사용한다는 느낌으로 이해하면 되겠다. 
+
+## Chat GPT API를 사용해보자!
+
+알고 싶은 엑셀 공식을 입력하면 Chat GPT가 알려주도록 해보자. [사이트](https://platform.openai.com/playground/chat?models=gpt-3.5-turbo-16k)에 가보면, 보낼 수 있는 요청들이 잘 정리되어 있다. 모든 기능을 사용하면.. 개쩌는 앱을 만들 수 있을지도 모르지만, 처음부터 개쩌는 앱을 만드는 건 어렵기 때문에 간단한 요청 먼저 사용해보았다. 
+
+### Create chat completion
+
+```kotlin
+POST https://api.openai.com/v1/chat/completions
+```
+
+데이터를 생성할 때 POST 요청을 사용한다고 했었다. Chat GPT는 채팅을 생성할 때 위와 같은 주소로 POST 요청을 보내면 된다. 
+
+채팅을 냅다 그냥 생성할 수는 없으니 어떤 내용의 채팅을 생성할 지 요청할 때 알려줘야 한다. 즉, **요청에 추가적인 “내용”이 필요**하다. 이 내용은 Header와 Body로 구성되어 있다. Header에는 많은 내용을 담지 않아 API마다 거의 동일하지만, Body는 API 별로 차이가 많이 난다고 한다. 
+
+그렇다면 ChatGPT의 Header와 Body에는 무엇을 담아야 할까?
+
+- **Header**
+    - Content-Type (형식): Request Body의 형식을 의미, ex. `"json"`
+    - Authorization (인증키): 발급 받은 API 키, ex. `"Bearer ${API_KEY}"`
+- **Body**
+  - [문서](https://platform.openai.com/docs/api-reference/chat/create)를 확인해보면 정말 많은 옵션들이 있는 것을 알 수 있다.
+  - 그 중에서도, 필수적으로 담아야 하는 데이터들만 알아보자.
+  - **messages:** `{role: String, content: String}[]` 형태의 주고 받은 채팅 내역
+    - **role:** 채팅을 보낸 사람을 의미, ex. system, assistant, user
+    - **content:** 채팅 내용
+  - **model:** gpt 모델을 의미, ex. gpt-4
+
+![](/posts/etc/today-i-learned/2024-05-30.png)
+
+바디를 헤더에 명시한 대로 JSON 형태로 작성하면 다음과 같다. 
+
+```kotlin
+curl https://api.openai.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+    "model": "gpt-3.5-turbo-16k",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ]
+  }'
+```
+
+### JavaScript Object Notation, JSON
+
+작성한 내용을 보면 뭔가 Map 같기도 하고.. 객체 같기도 한 형태로 작성되어져 있다. 이런 형태를 JSON이라고 하는데, 사전에 나오는 말들로 설명하자면 **Javascript 객체 문법으로 구조화된 데이터를 표현하기 위한 문자 기반의 표준 포맷**이라고 한다. JSON만이 가지는 다양한 이점들이 있겠지만 지금은 우선 표기법 관련 특징만 알아보았다.
+
+- 키와 값으로 구성됨, `키: 값` 형태로 작성
+- 숫자 값이 아닌 경우(글자)는 모두 따옴표로 감싸주어야 한다.
+- 객체는 중괄호로, 배열은 대괄호를 사용해 표기한다.
+- 전체 바디는 중괄호로 감싸준다.
+
+하나하나 따옴표로 감싸고, 키랑 값 넣어주고, 콜론 넣어주고.. 를 할 필요 없이 JSON으로 파싱해주는 함수가 있어서 간단하게 구현할 수 있다. 당연히 응답으로 오는 데이터들도 파싱해서 쉽게 사용할 수 있다!
+
+## 마치며
+
+ChatGPT나 다른 AI를 사용해서 다른 프로젝트도 만들어보고 싶다. 우선 ~~예전부터 생각만 해오던~~ 면접 질문 서비스나, 블로그에 플로팅으로 띄워 둘 챗 봇도 만들어보고 싶고.. 벨로그 썸네일 생성 AI 같은 것도 만들어 보고 싶다. 
+
+그러기 위해서는.. 정말.. 열심히 해야겠지.. 화이팅..!

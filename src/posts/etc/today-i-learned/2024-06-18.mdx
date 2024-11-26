@@ -1,0 +1,89 @@
+---
+title: 'AndroidManifest 파일에 대해 알아보자'
+date: '2024-06-18'
+description: '메인 액티비티 파일이 그냥 처음으로 실행되는 게 아니었다고?'
+tags:
+  - '안드로이드'
+---
+
+## 개요
+
+처음 캠프에서 과제들을 깃허브에 올려 제출하라고 했을 때, 나는 아직 부끄러운 코드들이 레포지토리 여러 개를 차지하는 게 싫어 하나의 레포지토리에 브랜치만 생성해 업로드를 했었다. Empty Views Activity가 있는 기본 구조에서 가지를 뻗어나가는 형식으로 실습이나 과제를 진행했었는데, 냅다 화면이 없는 과제가 주어진 것이다. 필요없는 파일이니까 MainActivity와 해당 레이아웃 파일을 삭제하고자 했으나 AndroidManifest 파일도 추가적으로 수정해주어야 했다. 당시에는 아무생각 없이 에러만 안나니까 된거겠지 하고 넘어갔었지만, 오늘 본 강의에서 AndroidManifest 파일의 정체가 나왔다. 
+
+## 프로젝트 구조
+
+먼저 프로젝트의 파일(폴더)들은 크게 다음과 같이 나눌 수 있다. 
+
+- `AndroidManifest.xml`: 앱의 메인 환경 파일
+- `build.gradle`: 빌드 설정 파일
+- res 폴더: 리소스 폴더 (정적이거나 추가적인 파일들)
+- `MainActivity.kt`: 실제 소스 코드 파일
+- `activity_main.xml`: 레이아웃 XML 파일
+
+## AndroidManifest.xml
+
+다음은 Empty Views Activity를 선택하면 기본으로 작성되는 코드다. 
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Playground"
+        tools:targetApi="31">
+        
+        <activity
+            android:name=".MainActivity" **->
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+```
+
+### `<application>`
+
+속성으로 앱 아이콘과 앱 이름 등을 설정해줄 수 있다. 
+
+`android:icon="@mipmap/ic_launcher"`: 앱 아이콘
+`android:label="@string/app_name"`: 앱 이름
+
+앱을 구성하고 있는 컴포넌트들을 태그 하위에 작성해야 한다.
+> **💡 안드로이드 4대 컴포넌트**
+`<activity>`: 액티비티 Activity
+`<service>`: 서비스 Service
+`<receiver>`: 브로드 캐스트 수신기 BroadcastReceiver
+`<provider>`: 콘텐츠 제공자 ContentProvider
+
+### `<activity>`
+
+`android:name=".MainActivity"`을 통해 액티비티 컴포넌트의 이름을 작성한다.
+
+### `<intent-filter>`
+
+안드로이드 컴포넌트 태그 하위에 작성한다. 해당 컴포넌트가 수신할 수 있는 인텐트를 걸러내는(filter) 역할을 한다. 
+
+### `<action>`
+
+`<intent-filter>`에 작업을 추가한다. 
+
+> **💡 `<action android:name="android.intent.action.MAIN" />`?**
+앱을 시작시키는 시작점으로서 해당 컴포넌트가 등록되어 있음을 나타낸다. 
+
+## 마치며
+
+사실 액티비티 파일을 지우면서 매니페스트에 인텐트 필터도 같이 지웠었는데, 나중에 액티비티를 추가하려고 보니까 앱 실행할 때 인텐트 필터가 없어서 실행하지 못한다는 에러가 났었다. 당시에는 그냥 기존 코드를 복붙해서 해결 했었는데, 오늘 이렇게 알게되서 다행이다. 아니었으면 알아볼 생각을 못했을 수도..

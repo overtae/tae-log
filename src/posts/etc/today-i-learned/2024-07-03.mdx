@@ -1,0 +1,50 @@
+---
+title: '뭐라고라고! Parcelable을 상속받고 구현을 안해도 된다고!'
+date: '2024-07-03'
+description: '사람이 편하게 살아야지'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 2개 이하로 다른 비트 문제 풀이
+- 팀 프로젝트 필수 구현 완료
+```
+>
+
+## 개요
+
+팀 프로젝트 중 클래스를 다른 액티비티에 전달해주기 위해 `Parcelable`을 상속 받아야 하는 경우가 생겼다. 그런데 내가 만든 클래스의 프로퍼티 내에는 `LocalDate` 타입과 `List<CustomClass>` 타입 이 존재해서 parcel을 어떤 함수로 읽어야 되는지 감이 안잡혔다.
+
+> 그러던 중...
+
+킹갓엠페러 팀원 분이 어노테이션만으로도 Parcelable을 구현할 수 있다고 해서 냅다 적용했다. 
+
+## @Parcelize
+
+이 어노테이션을 사용하기 위해 준비가 필요하다. 앱 수준의 `build.gradle` 파일에 다음과 같은 코드를 추가해줘야 한다.
+
+```kotlin
+plugins {
+    ...
+    // 추가
+    id("kotlin-parcelize")
+}
+```
+
+추가해주고 싱크까지 해주고 나면 사용할 수 있다.
+
+```kotlin
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+// 따로 구현할 필요 없음
+@Parcelize
+data class Components(val name: String, val desc: String, val img: Int) : Parcelable
+```
+
+그저 레전드 오브 레전드... 무친 편리성이다.
+
+

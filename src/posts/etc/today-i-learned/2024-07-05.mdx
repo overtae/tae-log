@@ -1,0 +1,47 @@
+---
+title: 'match_constraint를 알아보자'
+date: '2024-07-05'
+description: '크기를 제약 조건에 맞추는 일'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 다리를 지나는 트럭 풀이
+- 팀 프로젝트 마무리 및 발표 자료 준비
+- 앱 개발 입문 개인 과제 피드백 보고 반성
+```
+>
+
+## 개요
+
+이번에는 피드백을 깃허브의 이슈로 해주셨다. 코드 링크 하나하나 따오기 정말 귀찮으셨을텐데 쏘 스윗.. 아무튼 매주 피드백을 받고 새롭게 알아가는 것이 많아 두근두근하면서 읽어봤다. 
+
+## 크기를 리소스로 관리할 수 있다고?
+
+반복되는 스타일은 `styles.xml` 에서 관리할 수 있다고 했었다. 그런데 `dimens.xml` 에서 크기만 따로 관리할 수 있다고 한다. 일관된 간격이나 크기를 지정하고 싶을 때 사용하면 정말 편할 것 같다. 왜냐면 나는 이미 알아버렸다. 다 통일시켜 놨을 때 수정이 얼마나 편리해지는지를…
+
+```kotlin
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="title_text">30sp</dimen>
+  <dimen name="image_margin">5sp</dimen>
+  <dimen name="right_margin">16sp</dimen>
+</resources>
+```
+
+## match_parent 대신 match_constraint로!
+
+부모 뷰가 ConstraintLayout일 때, 자식 뷰가 부모 뷰 만큼의 크기를 갖게 하고 싶다면 여태 `match_parent`를 사용했었다. 그런데 이런 방법보다, 너비나 높이를 0dp로 준 다음, [제약 조건에 맞는 크기를 갖게 하는 것을 권고](https://developer.android.com/reference/androidx/constraintlayout/widget/ConstraintLayout#dimensions-constraints)한다고 한다. 이유는 `match_parent` 보다 제약사항들이 더 잘 적용되기 때문이다. 
+
+예를 들어, 부모 뷰와 같은 너비를 같게하고 싶다면 width는 0dp로 두고, start와 end 제약사항을 부모한테 맞추면 꽉 찬 너비를 만들 수 있다.
+
+추가로 ratio라는 게 있어서 너비나 높이 중 하나를 0dp로 설정하고, 비율을 설정해주면 비율에 맞게 너비와 높이가 지정된다고 한다! 이걸 왜 이제야 알았을까..
+
+```kotlin
+<Button android:layout_width="wrap_content"
+    android:layout_height="0dp"
+    app:layout_constraintDimensionRatio="1:1" />
+```

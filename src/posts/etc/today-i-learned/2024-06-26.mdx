@@ -1,0 +1,59 @@
+---
+title: '인텐트로 객체를 전달하고 싶은데... 어떻게 하지?'
+date: '2024-06-26'
+description: 'Parcelable을 구현하면 돼!'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 피로도 풀이
+- 스탠다드 세션 듣기
+- Parcelable 공부
+```
+>
+
+## Parcel이란
+
+`Parcelable`에 대해 알아보기 전에 `Parcel`을 간단하게만 알아보자. `Parcel`이라는 단어의 뜻은 *“꾸러미, 소포”*이다. [안드로이드 문서](https://developer.android.com/reference/android/os/Parcel)에는 `IBinder`를 통해 전송할 수 있는 메시지(데이터 및 객체 참조)를 위한 컨테이너라고 나와있다. 여기서 또.. `IBinder`란, 프로세스 내부 혹은 프로세스들 간 호출을 수행할 때 고성능을 발휘하도록 설계된 메커니즘의 핵심 부분인 **원격 객체에 대한 기본 인터페이스**라고 한다. 너무 말이 어려우니 그냥 상호작용을 위한 인터페이스구나!하고 이해했다. 
+
+정리하자면 `Parcel`은 **전송할 메시지를 위한 포장지** 느낌으로 이해하면 되겠다.
+
+## Parcelable이란
+
+영단어 뒤에 able이 붙으면 “~할 수 있는”이라는 의미를 가진 단어가 된다. 그렇다면! Parcel을 할 수 있다는 것은 무엇일까. “전송할 메시지를 포장할 수 있는”이라는 뜻이 되겠다. 
+
+[안드로이드 문서](https://developer.android.com/reference/android/os/Parcelable)에는 인스턴스가 Parcel에 의해 쓰여지고, 다시 복원할 수 있는 클래스를 위한 인터페이스라 나와있다. 나는 Parcel로 포장이 된 인스턴스를 다시 원본 상태의 인스턴스로 사용할 수 있다는 의미로 이해했다. 
+
+Parcelable은 인터페이스이기에, 구현이 필요하다. 필수 구현 요소는 다음과 같다. 
+
+```kotlin
+ class MyParcelable private constructor(`in`: Parcel) : Parcelable {
+     private val mData: Int = `in`.readInt()
+
+     override fun describeContents(): Int {
+         return 0
+     }
+
+     override fun writeToParcel(out: Parcel, flags: Int) {
+         out.writeInt(mData)
+     }
+
+     companion object CREATOR: Parcelable.Creator<MyParcelable?> {
+         override fun createFromParcel(`in`: Parcel): MyParcelable? {
+             return MyParcelable(`in`)
+         }
+
+         override fun newArray(size: Int): Array<MyParcelable?> {
+             return arrayOfNulls(size)
+         }
+     }
+ }
+ 
+```
+
+### 왜 쓰는거지?
+
+개인 과제 구현을 하면서, User 클래스 객체를 전해줘야 할 일이 생겼다. 그런데 글쎄 인텐트로는 객체를 전달할 수 없다고 한다! 이럴 때 User 클래스가 Parcelable 인터페이스를 상속 받아 필수 구현 메소드들을 구현해준다면, 인텐트의 `putExtra`를 사용해 전달해줄 수 있다!

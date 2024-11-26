@@ -1,0 +1,214 @@
+---
+title: '나의 키오스크 코드를 개선해보자'
+date: '2024-06-17'
+description: '작업 지연과 일정 시간마다 반복하는 동작 추가해보기'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 귤 고르기, 괄호 회전하기, 연속 부분 수열 합의 개수 풀이
+- 키오스크 과제 해설 보고 내 코드 개선해보기
+- Timer에 대해 알아보기
+```
+>
+
+## 작업이 끝난 후 대기 시간을 주고 싶을 때
+
+과제 구현 사항 중, 특정 작업이 끝나면 3초의 대기 후 다음 작업을 수해할 수 있는 기능이 있었다. 나는 아직 코루틴이며, 뭐 빌더며, 스코프며.. 너무 복잡한 개념이라 생각해 비교적 간단해 보이는 스레드를 사용해 구현했다. 
+
+찾아보니 `Thread.sleep()` 이라는 ms 단위의 숫자를 받아 스레드를 지연시켜주는 함수가 있어서 그걸 사용했다. 제일 간단해보여서 사용했는데, **전체 스레드를 일시 중지**해서 주의해서 사용해야 한다고 한다. 
+
+```kotlin
+while (true) {
+    println("\"SHAKESHACK BURGER 에 오신걸 환영합니다.\"")
+    println("아래 메뉴판을 보시고 메뉴를 골라 입력해주세요.\n")
+
+    when (val selectedMenuNumber = getMenuInput(order)) {
+        0 -> break
+        5 -> order.displayOrderMenu()
+        6 -> order.clearCart()
+        else -> {
+            handleSubMenu(selectedMenuNumber, order)
+            continue
+        }
+    }
+    Thread.sleep(3000)
+}
+```
+
+### 해설 코드
+
+지연을 위해 보통 `wait()`, `sleep()`, `delay()`가 사용된다고 한다. 과제 해설에서는 `delay()`를 사용했다. 
+
+`delay()`는 코루틴 패키지 중 하나로, `sleep()`과 같이 ms 단위의 숫자를 받아 코루틴을 지연시키는 함수이다. **메인 스레드를 차단하지 않는다**는 특징이 있어 비동기 프로그래밍에서 많이 사용된다고 한다. 
+
+```kotlin
+suspend fun globalDelay(time: Long) {
+    delay(time)
+}
+```
+
+> **✨ suspend?**
+> 
+> 
+> 한글로 말하면 일시 중단 함수이다. 말 그대로 **함수 내부에 일시 중단 지점을 포함할 수 있는 함수**를 말한다. 
+> 
+
+## 주기적으로 무언가를 실행하고 싶을 때
+
+과제 구현 사항 중에 5초마다 주문 대기수를 출력하는 기능이 있었다. 나는 메뉴판을 보여주는 스레드 하나, 주문 대기수를 출력하는 스레드 하나를 만들어서 구현했다. 반복적으로 출력을 해줘야하기 때문에 while 문을 사용하기로 결정했다. 
+
+스레드의 경우는 아직 스레드에 대해 익숙하지 않아서 강의에서 나온 코드를 복사해서 사용했다. 
+
+```kotlin
+fun main() {
+    thread(start = true) {
+        displayMenu()
+    }
+
+    thread(start = true) {
+		// displayMenu() 함수가 끝나도, 무한히 반복한다.
+        while (true) {
+            Thread.sleep(5000)
+            println("\n현재 주문 대기수: ${orderList.size}\n")
+        }
+    }
+}
+```
+
+작성하면서도 *이러면 주문 대기수를 영원히 출력하는 것이 아닌가..?* 라는 생각이 들었지만, 일단은 냅다 구현을 해봤다. 역시나 주문 대기수 출력은 무한히 반복되었고.. 나는 고칠 방법을 찾아보기로 했다. 
+
+찾아보니 Handler 라는 것을 통해 다른 스레드에 메시지를 보낼 수 있다는데, 좀.. 일이 커지는 것 같아서 야매로 고쳐보기로 했다. `displayMenu()` 의 상태를 나타내는 변수를 하나 만들어주는 것이다! 
+
+```kotlin
+fun main() {
+    var isKioskFinished = false
+
+    thread(start = true) {
+        displayMenu()
+        isKioskFinished = true
+    }
+
+    thread(start = true) {
+		    // displayMenu() 함수가 끝나면, 반복을 종료한다.
+        while (!isKioskFinished) {
+            Thread.sleep(5000)
+            println("\n현재 주문 대기수: ${orderList.size}\n")
+        }
+    }
+}
+```
+
+올바른 방식은 아닌 것 같지만 내 머리로는 이게 최선이었다고 생각한다.. 
+
+### 해설 코드
+
+나는 반복문을 사용해 구현한 기능을 해설에서는 `Timer` 라는 것을 사용해 구현했다. `Timer` 는 Worker 스레드에서 동작하는 기능으로, **일정한 시간을 주기로 반복 동작을 수행**할 때 쓰인다고 한다. 
+
+```kotlin
+import java.util.Timer
+import java.util.TimerTask
+
+fun checkOrderWaiting() {
+    var timer = Timer()
+    timer.schedule(object : TimerTask() {
+        override fun run() {
+            println("\n현재 주문 대기수: ${orderList.size}\n")
+        }
+    }, 0, 5000)
+}
+```
+
+타이머 객체를 생성하는 것 까지는 이해했는데, `schedule` 함수의 인자로 이상한 걸 넘겨주고 있다. [문서](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.concurrent/java.util.-timer/schedule.html)를 봐도 처음보는 키워드들이 널려있다. 하나씩 알아보자.
+
+![](/posts/etc/today-i-learned/2024-06-17.png)
+
+### inline 함수
+
+fun 키워드 앞에 적혀있는 inline 키워드로 `Timer.schedule`이 inline 함수라는 것을 알 수 있다. 이 inline 함수는 무슨 함수일까? 
+
+코틀린은 람다 함수(고차 함수)를 사용하게 되면 매번 무명 함수 객체로 변환하게 되고, 이게 메모리의 낭비로 이어질 수 있다고 한다. inline 함수는 이걸 줄이기 위해 만들어졌다. 객체를 생성하지 않고, 함수 본문을 복사하는 방식으로 동작하기 때문에 **함수 호출 비용을 줄일 수 있다.** 
+
+```kotlin
+inline fun test() {
+	println("Hello")
+}
+
+fun main() {
+	// println("Hello") 가 여기 작성되어 있는 것과 같이 동작한다.
+	test()
+}
+```
+
+### crossinline
+
+crossinline은 inline 함수의 인자로 전달 받은 람다나 함수가 비지역 반환을 못하게 막는 키워드이다. 비지역 반환을 막음으로써 예상치 못한 함수 종료를 막을 수 있고, 더 안전하게 람다를 사용할 수 있다.
+
+> **✨ 비지역 반환?**
+> 
+> 
+> 람다 표현식이나 특정 블록의 스코프를 벗어나 **바깥쪽 함수나 스코프로 반환**하는 것
+> 
+> ex. `test` 함수 안에 `map` 함수에서 `return`을 사용하면 `test` 함수가 종료된다.
+> 
+
+### Receiver 타입
+
+action의 타입을 보면 `TimerTask.() -> Unit` 이라 적혀있다. 여기서 TimerTask는 action의 리시버 타입으로, 마치 **TimerTask 객체의 메소드처럼 동작**할 수 있게 해준다. 따라서 람다에서 **TimerTask 객체의 멤버에 직접 접근**할 수 있다! 살짝 확장 함수 비슷한 느낌인 것 같다. 
+
+### object : TimerTask()
+
+[문서](https://docs.oracle.com/javase/8/docs/api/java/util/TimerTask.html)를 확인해보면, TimerTask 는 구현이 필요한 추상 클래스라고 나와있다. `object: TimerTask()` 라는 표현은 TimerTask를 구현하는 익명 객체를 생성한다는 의미로, **클래스 정의와 객체 생성을 동시에 처리**할 수 있다고 한다. 따로 클래스를 정의하지 않고도 구현할 수 있기 때문에 간결한 코드 작성에 도움이 된다. 
+
+다음 코드는 TimerTask 의 `run()` 함수를 오버라이드하여 구현한, TimerTask 클래스의 이름이 없는 인스턴스(익명 객체)를 생성한다고 이해할 수 있겠다. 
+
+```kotlin
+timer.schedule(object : TimerTask() {
+    override fun run() {
+        println("\n현재 주문 대기수: ${orderList.size}\n")
+    }
+}, 0, 5000)
+```
+
+### 해설 적용
+
+코드를 똑같이 쳤는데 내가 구현한 것처럼 `displayMenu()` 함수가 종료되어도 주문 대기수는 계속 출력되었다. 찾아보니 Timer를 중지시키는 `cancel()`이라는 함수가 있었다. 이걸 이용해 다시 작성해보았다.
+
+정말 조금만 변경했다. `checkOrderWaiting` 함수가 Timer 객체를 반환하게 해주고,
+
+```kotlin
+fun checkOrderWaiting(): Timer {
+    val timer = Timer()
+    timer.schedule(object : TimerTask() {
+        override fun run() {
+            println("\n현재 주문 대기수: ${orderList.size}\n")
+        }
+    }, 0, 5000)
+    return timer
+}
+```
+
+메인 함수에서는 반환된 timer 객체를 받아 `displayMenu()`가 종료되면 같이 종료될 수 있게 해주었다. 
+
+```kotlin
+suspend fun main() {
+    val timer = checkOrderWaiting()
+		...
+    timer.cancel()
+}
+```
+
+## 회고
+
+클래스란 산을 아직 다 넘지도 않았는데 비동기라는 더 거대한 산을 맞닥뜨린 기분이다. 그래도 오르지 못하는 산은 없으니까 계속 하다보면 익숙해지겠지란 마음으로 공부하는 중이다. 
+
+기능을 보고 *이런 식으로 구현하면 되겠다*라는 결론을 내는 데에 많은 시간이 드는 것 같다. 또 결론을 냈다고 해서 그 결론대로 코드를 작성하다보면 생각과는 다르게 동작하는 경우가 많아 수정하게 되는 일이 자주 발생한다. 여러 종류의 기능을 개발 해보고 다양한 코드들을 접해봐야 감이 잡힐 것 같은 느낌이다. 
+
+저번 과제인 계산기 때보다 내가 더 성장했을까? 아닌 것 같다. 매일 알고리즘 문제를 풀어서 유용한 함수나 기능들은 알고 있지만, 적재적소에 가져다 쓰는 게 어려운 것 같다. 아니 어렵다. 
+
+스레드와 코루틴의 경우도 개념을 이해했다고 생각했는데 막상 코드로 작성하려고 보니까 너무 막막했다. 아마 내가 여태 직접 루틴을 생성하고, 스레드를 다루고 이런 작업들을 안해봐서 더 어려운 것 같다. ~~(사실 당연함;;)~~ 
+
+다음 주차인 앱 개발 주차를 마치고 나서는 성장했음에 뿌듯해하는 내가 있었으면 좋겠다. 화이팅

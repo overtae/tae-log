@@ -1,0 +1,141 @@
+---
+title: 'BMI 계산기 앱 만들어보기'
+date: '2024-05-17'
+description: 'Android 앱 개발 종합반 1주차 강의'
+tags:
+  - '안드로이드'
+---
+
+오늘은 Android 앱 개발 종합반 1주차 강의를 들으며 BMI 계산기 앱을 만들어보았다.
+
+## Chain
+
+ConstraintLayout 중 하나인 Chain에 대해 알게되었다. Chain은 가로나 세로축의 뷰들이 그룹처럼 동작할 수 있게 해준다. 다음 세 가지 속성을 가진다.
+
+<table>
+  <thead>
+      <tr>
+      <th>packed</th>
+      <th>spread</th>
+      <th>spread inside</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="/posts/etc/today-i-learned/2024-05-17-1.png" /></td>
+      <td><img src="/posts/etc/today-i-learned/2024-05-17-2.png" /></td>
+      <td><img src="/posts/etc/today-i-learned/2024-05-17-3.png" /></td>
+    </tr>
+    <tr>
+      <td>뷰들을 함께 묶은 후, 사용한 공간 내에서 중앙에 배치</td>
+      <td>사용 가능한 공간 내에서 일정한 간격으로 뷰 배치</td>
+      <td>바깥쪽 뷰를 가장자리에 붙이고, 사용 가능한 공간 내에서 나머지 뷰들을 동일한 간격으로 배치</td>
+    </tr>
+  </tbody>
+</table>    
+
+## 중앙 정렬
+
+`EditText`의 `gravity` 속성을 `"center"`로 준다면, 중앙으로 정렬할 수 있다. 여기서 나오는 **`gravity` 속성은 뷰그룹 내의 내용물을 정렬**하는 속성으로, `center` 외에도 `left`나 `right` 등이 있다. `EditText` 뿐만 아니라 다양한 뷰그룹에 적용할 수 있다. 다음은 `gravity` 속성을 신장에만 주었을 때의 화면이다.
+
+![](/posts/etc/today-i-learned/2024-05-17-4.png)
+
+## 새로운 화면 추가
+
+`MainActivity` 파일에서 우클릭 후, `New > Activity` 를 눌러 원하는 액티비티를 선택하면 새로운 파일을 만들 수 있다. 생성되면서 **자동으로 레이아웃 파일도 같이 생성**된다. 사실 여태 복붙을 했었는데.. 이런 방법이 있다는 것을 이제야 알게되었다. 
+
+![](/posts/etc/today-i-learned/2024-05-17-5.png)
+
+## Toast
+
+앱을 사용하다보면 종종 화면 아래에 메시지가 잠깐 나왔다 사라지는 걸 경험할 수 있는데, 이를 Toast 메시지라 한다. 안드로이드는 정말 편리하게도 이런 메시지를 별도의 함수 구현 없이 Toast를 통해 쉽게 만들 수 있다.
+
+```kotlin
+Toast.makeText(this, "신장을 입력해주세요.", Toast.LENGTH_SHORT).show()
+```
+
+[공식 문서](https://developer.android.com/reference/android/widget/Toast#makeText(android.content.Context,%20int,%20int))의 `makeText`는 다음과 같이 설명되어 있다.
+
+```kotlin
+public static Toast makeText (Context context, 
+	int resId, // The resource id of the string resource to use. Can be formatted text.
+    int duration) // How long to display the message.
+```
+
+### context 가 뭐지?
+
+`context`란 **대상(앱)의 메타 정보를 모아 갖고 있는 것**이라 한다. 일단 지금은, `context`를 요구하는 모든 메소드엔 `this`를 주면 된다고 알고 있으면 될 것 같다.
+
+## Intent
+
+액티비티 간 데이터를 전달하려면 어떻게 해야 될까? [Android 용어 정리](https://velog.io/@overtae/Android-%EA%B0%9C%EB%B0%9C-%EC%9A%A9%EC%96%B4-%EC%A0%95%EB%A6%AC#1-%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-4%EB%8C%80-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8) 중 안드로이드 4대 컴포넌트를 정리할 때 잠깐 나왔었던 녀석으로, **컴포넌트 간에 상호작용할 때 쓰이는 Intent**를 사용하면 된다. Intent는 어떤 정보를 담는지에 따라 명시적, 암시적 Intent로 구분할 수 있다.
+
+- **명시적 인텐트**
+실행하고자 하는 컴포넌트의 **클래스명**을 인텐트에 담는 방식
+→ 주로 같은 앱의 컴포넌트를 실행할 때 이용
+
+- **암시적 인텐트**
+클래스명이 아닌 **Intent Filter 정보**를 활용하는 방식
+→ 주로 클래스명을 알 수 없는 외부 앱의 컴포넌트를 실행할 때 이용
+
+### Activity 간 데이터 전달
+
+인텐트가 뭐하는 애인지는 알겠고.. 어떻게 사용하는지도 알아보자. 역시나 [공식 문서](https://developer.android.com/reference/android/content/Intent#Intent(android.content.Context,%20java.lang.Class%3C?%3E))를 살펴보면, 다음과 같이 나와있다.
+
+```kotlin
+public Intent (Context packageContext, 
+	Class<?> cls) // The component class that is to be used for the intent.
+```
+
+우선 `context`에는 `this`를 넣어주고, 데이터를 전달하고자 하는 클래스를 다음에 넣어주면 될 것 같다.
+
+```kotlin
+val intent = Intent(this, ResultActivity::class.java)
+
+intent.putExtra("height", height)
+intent.putExtra("weight", weight)
+startActivity(intent)
+```
+
+`putExtra()`를 이용해 `"height"`에는 `height` 변수의 값을, `"weight"`에는 `weight` 변수의 값을 담은 뒤 `ResultActivity`를 실행시키는 코드로 이해할 수 있겠다. 받아오는 작업은 간단했다. `height`과 `weight`의 값이 정수형이었기 때문에, `getIntExtra()`를 사용해 받아올 수 있었다.
+
+```kotlin
+val height = intent.getIntExtra("height", 0)
+val weight = intent.getIntExtra("weight", 0)
+```
+
+## finish()
+
+인텐트를 사용해 A 액티비티에서 B 액티비티로 이동하면 A 액티비티는 어떻게 되는걸까? 아예 사라져 버리는걸까? 
+
+_답은 아니다._ **A 액티비티는 B 액티비티 아래에 깔리게 된다**고 한다. 따라서 뒤로가기를 할 경우 A 액티비티로 다시 이동하게 된다. 이 점을 이용하면 두 액티비티를 간단하게 이동할 수 있다. 
+
+이때 사용하는 것이 바로 `finish()`다. `finish()`를 사용하면 현재 액티비티를 끝내게 되고, 아래 깔려있던 액티비티로 이동하게 된다. 사용은 정말 간단하다.
+
+```kotlin
+finish() // 왕 간단...
+```
+
+## 소수점 처리
+
+만든 앱이 BMI를 계산하는 앱이었는데, 계산 결과가 예쁘게 딱 떨어지지 않았다. 
+
+![](/posts/etc/today-i-learned/2024-05-17-6.png)
+
+나는 단순히 `String.format()` 을 사용하면 되지 않을까? 하고 생각했는데, 계산을 통해서도 가능한 일이었다! 
+
+```kotlin
+var value = weight / (height/100.0).pow(2.0)
+value = round(value*10)/10
+```
+
+여기서 `round()` 는 반올림을 해주는 함수다. 즉, 원래의 수의 10을 곱하고 반올림을 한 뒤 다시 10으로 나눠주면 소수점 첫째 자리 까지만 나오게 할 수 있다! 
+
+![](/posts/etc/today-i-learned/2024-05-17-7.png)
+
+## 회고
+
+간단한 앱이었지만 화면 전환 방법과 화면 간에 데이터를 어떻게 주고 받는지 알 수 있었다. 가장 기억에 남는 건 인텐트 같다. 데이터를 루트 폴더에 저장하는 게 아니라 내부적으로 주고받을 수 있다는 점이 신기했다. 또 토스트 메시지가 정말 편리한 것 같다. 조금 더 알아보고 예쁘게 꾸며보고 싶다.
+
+아직, 강의 중간중간 모르는 내용들이 많았지만 오늘처럼 하나씩 알아가다보면 머지않은 미래엔 모르는 내용보단 아는 내용이 많아지겠지. 
+

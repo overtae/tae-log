@@ -1,0 +1,147 @@
+---
+title: '계산기 앱을 만들어보자'
+date: '2024-06-07'
+description: '안드로이드 앱인데 디자인은 iOS인...'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 알고리즘 최댓값 최솟값 문제 풀이
+- 알고리즘 신고 결과 받기 문제 풀이
+- Kotlin 문법 종합반 4주차 강의
+- 개인 과제 Lv4까지 하기
+```
+>
+
+## 반복되는 뷰를 코드로 할 수는 없을까?
+
+핸드폰 계산기 앱을 보면 같은 모양의 버튼이 주루룩 나열되어 있는 것을 알 수 있다. 
+
+![](/posts/etc/today-i-learned/2024-06-07-1.png)
+
+그런데 과연 저 버튼 하나하나를, xml 파일에 작성해줘야 하는 걸까? 그런.. 비효율적인 방식이 정말 맞는 걸까? 라는 생각이 들었다. 그래서 찾아보았더니 코드로도 뷰를 그릴 수 있다고 한다. 물론 xml 보다는 초큼 복잡해보이기는 하지만 단순 노동을 줄일 수 있다면 당연히 써야 하지 않겠는가.
+
+먼저, 전체 화면 레이아웃은 GridLayout을 사용했고, 화면 상단에 숫자가 표시되는 부분은 직접 xml로 만들기로 했다. 정말 딱 반복이 되는 버튼들만 코드로 구현할 생각이다. 반복 되는 버튼들의 xml은 다음과 같다.
+
+```xml
+<TextView
+    android:layout_columnWeight="1"
+    android:layout_rowWeight="1"
+    android:layout_margin="5dp"
+    android:text="C"
+    android:gravity="center"
+    android:autoSizeMaxTextSize="50sp"
+    android:autoSizeTextType="uniform"
+    android:padding="0dp"
+    android:textColor="@color/dark_gray"
+    android:background="@drawable/light_gray_circle" />
+```
+
+안드로이드 기본 Button 스타일을 바꾸기 귀찮아서 TextView를 사용했다. ㅎㅎ.. 어차피 onClick 핸들러를 달 수 있다는 것은 동일하니까 괜찮을거라 생각했다. ~~(사실 아닐지도 모름)~~ 
+
+유동적으로 텍스트 크기를 조절하기 위해 autoSizeTextType을 사용해주었고, 버튼들 사이의 간격을 주고자 margin도 주었다. 배경은 연한 회색, 진한 회색, 주황색의 원 모양의 drawble을 만들어서 지정해주었다. 
+
+<Quote>
+
+여기서 잠깐..
+
+</Quote>
+
+계산기 앱을 보면 숫자 0은 원이 아니라 모서리가 둥근 직사각형 모양임을 확인할 수 있다. 그래서 진한 회색의 경우 shape을 oval이 아니라 rectangle로 설정해 코너 radius 값을 큰 값으로 주었다. 
+
+```xml
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/gray" />
+
+    <corners android:radius="100dp" />
+
+    <size
+        android:width="40dp"
+        android:height="40dp" />
+</shape>
+```
+
+### 코드를 작성해보자!
+
+우선 버튼 내부에 들어갈 문자열들을 2차원 리스트로 만들어주었다. 
+
+```kotlin
+private val stringList = listOf(
+    listOf("C", "+/-", "%", "/"),
+    listOf("7", "8", "9", "*"),
+    listOf("4", "5", "6", "-"),
+    listOf("1", "2", "3", "+"),
+    listOf("0", ".", "="),
+)
+```
+
+그렇다면, 이 리스트를 순회하면서 하나씩 TextView를 생성해 GridLayout에 넣어주기만 하면 된다! 글자색과 배경의 경우는 따로 함수를 만들어서 알맞은 Drawable을 반환하도록 해주었다. 
+
+```kotlin
+stringList.map {
+    it.map { str ->
+        val textView = TextView(this).apply {
+            text = str
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 0)
+
+			// 연한 회색, 회색, 주황색의 배경을 설정해준다.
+            setTextColor(getTextColor(str))
+            background = getBackground(str)
+
+			// 유동적인 텍스트 크기를 설정해준다.
+            TextViewCompat.setAutoSizeTextTypeWithDefaults(
+                this,
+                TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
+            )
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                this, 1, 40, 1, TypedValue.COMPLEX_UNIT_SP
+            )
+
+			// 레이아웃 관련 속성 정의
+            val layoutParams = GridLayout.LayoutParams().apply {
+                width = 0
+                height = 0
+                
+                // 요 애들이 rowWeight과 columnWeight을 의미한다.
+                rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                // 0만 가로로 2칸을 차지하게 설정해준다.
+                columnSpec = if (str == "0") GridLayout.spec(GridLayout.UNDEFINED, 2, 1f)
+		                else GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                
+                // px 값으로 받기 때문에 기존 5dp에서 변환이 필요하다.
+                setMargins(
+                    (5 * resources.displayMetrics.density).toInt(),
+                    (5 * resources.displayMetrics.density).toInt(),
+                    (5 * resources.displayMetrics.density).toInt(),
+                    (5 * resources.displayMetrics.density).toInt()
+                )
+            }
+            setLayoutParams(layoutParams)
+            }
+        }
+
+		// gridLayout에 추가해준다.
+        gridLayout.addView(textView)
+    }
+}
+```
+
+코드가 조금 길긴 하지만, xml로 냅다 작성하는 것보다는 짧기 때문에 괜찮은 것 같다. 
+
+### 결과 화면
+
+![](/posts/etc/today-i-learned/2024-06-07-2.png)
+
+잘 나와서 정말 다행이다. 
+
+## 회고
+
+사실 의존성 주입이 이해가 안 가 화면 구성으로 피신했다. 그냥 재미로 만들어만 보고 주말의 내가 의존성 주입을 열심히 공부해와서 과제를 완료할 것이다. 아마도..
+
+xml로 작성하면 대충 어떻게 배치될 지 눈으로 확인할 수 있는데, 코드로 했더니 눈 감고 코딩하는 것 같았다. 아마 더 좋은 방법이 있을 것 같은데.. 나의 정보력으로는 이게 한계였다. 그래도 원하는 화면은 나온 것 같아서 만족 중이다. 

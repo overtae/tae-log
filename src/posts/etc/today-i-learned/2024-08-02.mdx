@@ -1,0 +1,68 @@
+---
+title: "🤔 Abstract classes can't be instantiated!"
+date: '2024-08-02'
+description: 'Shared Preference 저장 중 발생한 문제 해결'
+tags:
+  - '안드로이드'
+  - '트러블슈팅'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 심화 주차 개인 과제
+- 숙련 주차 특강 복습
+```
+>
+
+## 문제 상황
+
+보관함에 저장한 리스트 객체 데이터를 Shared Preference로 저장을 했었다. 원래는 잘 됐었지만 객체를 sealed class로 바꾸자 마자 다음과 같은 에러가 발생했다. 
+
+```kotlin
+val listType = object : TypeToken<MutableList<ListItem>>() {}.type
+// 이 줄에서 json으로 변환하는 도중 에러 발생..
+return gson.fromJson(jsonString, listType)
+```
+
+> com.google.gson.JsonIOException: Abstract classes can't be instantiated! Register an InstanceCreator or a TypeAdapter for this type.
+> 
+
+이 타입에 대해 TypeAdapter를 지정해달라는 뜻.. 같다. 그래서 찾아보니 CustomDeserializer를 사용하면 해결된다고 한다. 
+
+## 해결
+
+타입이 다 문자열이여서 구현하는데에는 어려운 점은 없었다. 다음과 같이 클래스를 만들어주고,
+
+```kotlin
+	class CustomerDeserializer : JsonDeserializer<ListItem> {
+    	override fun deserialize(
+        	json: JsonElement,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): ListItem {
+        	val jsonObject = json.asJsonObject
+        	return if (jsonObject.has("thumbnail")) ListItem.VideoItem(
+        		thumbnail = jsonObject.get("thumbnail").asString,
+        		title = jsonObject.get("title").asString,
+        		datetime = jsonObject.get("datetime").asString,
+        		isBookmarked = jsonObject.get("isBookmarked").asBoolean
+    		)
+    		else ListItem.ImageItem(
+    			thumbnailUrl = jsonObject.get("thumbnailUrl").asString,
+    			siteName = jsonObject.get("siteName").asString,
+  	  			datetime = jsonObject.get("datetime").asString,
+    			isBookmarked = jsonObject.get("isBookmarked").asBoolean
+    		)
+    	}
+}
+```
+
+`GsonBuilder()`를 사용해 적용해줄 수 있다. 
+        
+```kotlin
+private val gson =
+	GsonBuilder().registerTypeAdapter(ListItem::class.java, CustomerDeserializer()).create()
+```
+
+

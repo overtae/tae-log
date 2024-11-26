@@ -1,0 +1,72 @@
+---
+title: '잘가라 findViewById'
+date: '2024-07-09'
+description: '어서와라 viewBinding'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 앱개발 숙련 강의 수강
+- 개인 과제 UI만 구현
+```
+>
+
+## 개요
+
+이제 findViewById 대신 viewBinding을 사용한다고 한다. 사전 캠프 때 Kotlin Gitbook에서 잠깐 나왔던 개념이었다. 본 캠프가 시작되고 나서부터는 viewBinding을 쓰지 말라고 해서 안썼지만, 드디어 이번 주차 부터는 사용할 수 있게 되었다.
+
+## viewBinding, 뭐가 더 좋길래?
+
+`findViewById`와 비교해서 크게 다음 2가지의 이점이 있다.
+
+1. **Null 안전성 (Null Safety)**
+   - 앱이 레이아웃의 각 뷰를 직접 참조할 수 있게 해주는 **안전한 코드를 자동으로 생성**
+   - **뷰가 아직 화면에 나타나지 않았는데 그 뷰를 사용하려고 할 때 생길 수 있는 문제**들을 예방
+2. **Type 안전성 (Type Safety)**
+   - XML 레이아웃 파일에서의 타입과 자동 생성된 바인딩 클래스의 필드 타입이 항상 일치
+
+사실 1번의 경우는 IDE에서 자동으로 id를 알려줘서 불편함을 못 느꼈지만, 2번 문제를 좀 많이 겪었었다. 내가 항상 뇌 빼고 코딩해서 그런건지는 몰라도 이 뷰가 ImageView였는지.. ImageButton이었는지.. 도통 생각나지 않아 귀찮게 xml 파일을 열어서 확인하는 일이 정말 많았다! 그런데 이 viewBinding 효자 자식은 그럴 일이 없다고 하니까 너무 행복하다.
+
+## 설정 방법
+
+### 1. 빌드 옵션 설정
+
+```kotlin
+android {
+    ...
+    buildFeatures {
+        viewBinding true
+    }
+}
+```
+
+### 2. 사용
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+	// 레이아웃 파일 바인딩
+    // 1.
+	// activity_main.xml = ActivityMainBinding
+	private lateinit var binding: ActivityMainBinding
+	// 2.
+	private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+		
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        
+        // 1. 의 경우
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        
+        // binding.[id] 로 접근 가능!
+        binding.myTextView.text = "Hello"
+    }
+}
+```
+
+## 마치며
+
+이제.. 쾌적한 개발 가능해지나? 정말 쾌적해지나? 두근두근

@@ -1,0 +1,58 @@
+---
+title: 'Sweetie! requireContext! Get!'
+date: '2024-08-05'
+description: 'getContext와 requireContext의 차이점은?'
+tags:
+  - '안드로이드'
+---
+
+> ✨ **오늘 공부한 것**
+>
+```
+- 레포지토리 패턴 녹화 강의 듣기
+- compose 강의 듣기
+- 개인 과제 디자인 손보기
+```
+>
+
+## 개요
+
+안드로이드 개발을 하다보면 자주 나오는 녀석이 바로 context이다. 앱 내의 리소스 같은 시스템 자원에 접근할 때 꼭 필요한 녀석으로, 자신이 어떤 어플리케이션을 나타내고 있는지 알려주는 ID 역할을 한다고 한다. 
+
+프래그먼트에서 액티비티의 컨텍스트를 가져오고 싶을 때 getContext와 requireContext 등을 사용하게 되는데, 이 둘의 차이가 조금 궁금해져서 알아보았다. 
+
+## getContext() vs. requireContext()
+
+사실 이름에 나와있듯이, getContext는 정말 context를 get하는 녀석이고, requireContext는 context를 필요로하는 녀석으로 null인 경우 없이 context를 가져올 수 있다. 
+
+두 함수의 정의를 찾아보아도 getContext에는 Nullable 어노테이션이, requireContext에는 NonNull 어노테이션이 적혀있다. 
+
+정리해보자면, 다음과 같다. 
+
+- [getContext()](https://developer.android.com/reference/androidx/fragment/app/Fragment#getContext()) — Nullable
+  - context가 호스트에 붙어있지 않을 때 Null 반환
+  ```kotlin
+  @Nullable
+  public Context getContext() {
+    return mHost == null ? null : mHost.getContext();
+  }
+  ```
+    
+
+- [requireContext()](https://developer.android.com/reference/androidx/fragment/app/Fragment#requireContext()) — NonNull
+  - getContext()에서 반환된 context가 Null인 경우 throw IllegalStateException
+  - → 프래그먼트가 액티비티에 attach 되지 않은 경우가 있을 수도 있음
+  - 따라서 requireContext()를 통해 Context가 Null이 아님을 보장할 수 있다.
+  - 즉, Null이 아닌 context를 전달하고 싶다? requireContext 쓰셈 ㅇㅇ
+  ```kotlin
+  @NonNull
+  public final Context requireContext() {
+    Context context = getContext();
+    if (context == null) {
+      throw new IllegalStateException("Fragment " + this + " not attached to a context.");
+    }
+    return context;
+  }
+  ```
+    
+
