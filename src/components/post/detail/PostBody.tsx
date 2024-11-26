@@ -3,7 +3,10 @@ import { Post } from '@/types/post'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
 import rehypePrettyCode, { type Options } from 'rehype-pretty-code'
+import 'katex/dist/katex.min.css'
 
 /** @type {import('rehype-pretty-code').Options} */
 const options: Options = {
@@ -28,8 +31,8 @@ const PostBody = ({ post }: PostBodyProps) => {
       components={MdxComponents}
       options={{
         mdxOptions: {
-          remarkPlugins: [remarkGfm],
-          rehypePlugins: [rehypeSlug, [rehypePrettyCode, options]],
+          remarkPlugins: [remarkGfm, remarkMath],
+          rehypePlugins: [rehypeSlug, rehypeKatex, [rehypePrettyCode, options]],
         },
       }}
     />
