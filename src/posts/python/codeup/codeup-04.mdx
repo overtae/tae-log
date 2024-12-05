@@ -1,0 +1,180 @@
+---
+title: '[파이썬 기초 100제] 4강 출력변환'
+date: '2022-01-21'
+---
+
+## 문제 31
+
+10진수를 입력받아 8진수(octal)로 출력해보자.
+
+<Toggle open summary="TIP">
+
+8진수는 '0o12'처럼 숫자 앞에 '0o'를 붙여준다. 이것으로 '12'가 8진수의 '12'임을 인지한다.
+
+10진수를 8진수로 변환하는 함수는 oct()이며, '0o12'와 같이 출력되므로 앞 두자리를 생략하고 출력하면된다. 따라서 '0o12'[2:]를 해주면 되는 것.
+
+</Toggle>
+
+> 풀이
+
+```python
+# 답
+x = int(input())
+print(oct(x)[2:])
+# 나의 답
+x = oct(input())
+print(x[2:])
+```
+
+문자열은 oct() 함수로 변환이 불가해 정수형으로 바꿔준 뒤 넣어주어야 한다.
+
+변환 후 문자열(배열)로 반환이 되므로 앞의 문자 두 개를 자르기 위해 배열의 세번째부터 끝까지 출력하겠다는 의미의 [2:]를 추가해주어야 한다.
+
+## 문제 32
+
+10진수를 입력받아 16진수(hexadecimal)로 출력해보자.
+
+<Toggle open summary="TIP">
+
+16진수는 '0xa'처럼 숫자 앞에 '0x'를 붙여준다. 이것으로 'a'가 16진수의 'a'임을 인지한다.
+
+10진수를 16진수로 변환하는 함수는 hex()이며, '0xa'와 같이 출력되므로 앞 두자리를 생략하고 출력하면된다. 따라서 '0xa'[2:]를 해주면 되는 것.
+
+</Toggle>
+
+> 풀이
+
+```python
+x = int(input())
+print(hex(x)[2:])
+```
+
+## 문제 33
+
+10진수를 입력받아 16진수(hexadecimal)로 출력해보자.
+
+16진수(대문자)로 출력한다.
+
+<Toggle open summary="TIP">
+
+소문자를 대문자로 변환하려면 문자열의 메소드(함수)인 upper()를 이용하면 된다.
+
+</Toggle>
+
+> 풀이
+
+```python
+# 답
+hexadecimal = int(input())
+hexConv = hex(hexadecimal)[2:]
+print( hexConv.upper())
+# 나의 답
+x = hex(int(input()))[2:]
+print(upper(x))
+```
+
+upper 메소드는 .으로 접근해야 된다는 걸 기억하자.
+
+## 문제 34
+
+8진수로 입력된 정수 1개를 10진수로 바꾸어 출력해보자.
+
+<Toggle open summary="TIP">
+
+10진수로 변환하고자 할 때는 int()를 이용하면 된다.
+
+첫번째 파라미터로는 변환하고자하는 숫자의 문자열('0o12')을,
+
+두번째 파라미터로는 첫번째 값이 몇 진수인지를 정수로 입력하면 된다.
+
+</Toggle>
+
+> 풀이
+
+```python
+# 답
+octal = '0o' + input()
+print( int(octal, 8) )
+# 나의 답
+x = int(input())
+print(x)
+```
+
+int()에 첫번째 파라미터엔 입력 받은 문자열을 두번째 파라미터엔 몇 진수인지 입력해야된다고 한다
+
+```python
+x = int(input(), 8)
+print(x)
+```
+
+입력 받은 값에 0o를 안붙여주어도 결과값은 같은데 왜인지 모르겠다.
+
+## 문제 35
+
+16진수로 입력된 정수 1개를 8진수로 바꾸어 출력해보자.
+
+<Toggle open summary="TIP">
+
+16진수 >> 10진수 >> 8진수 순서대로 변환
+
+</Toggle>
+
+> 풀이
+
+```python
+# 답
+hexadecimal = '0x' + input()
+integer = int(hexadecimal, 16)
+print( oct(integer)[2:] )
+# 나의 답
+x = int('0x' + input(), 16)
+print(oct(x))
+```
+
+oct()로 변환을 하면 앞의 0o가 붙게되고 이를 잘라내어야 한다는 것을 기억하자.
+
+## 문제 36
+
+영문자 1개를 입력받아 아스키 코드표의 10진수 값으로 출력해보자.
+
+아스키 코드란? 문자를 이진수의 7비트로 표현한 것
+
+ex) A => 1100001
+
+<Toggle open summary="TIP">
+
+문자열에 대응되는 아스키코드를 반환해주는 함수 ord()를 이용하면 된다.
+
+</Toggle>
+
+> 풀이
+
+```python
+x = ord(input())
+print(x)
+```
+
+## 문제 37
+
+10진 정수 1개를 입력받아 아스키 문자로 출력해보자.
+
+> 풀이
+
+```python
+# 답
+x = chr(int(input()))
+print(x)
+# 나의 답
+x = str(int(input()))
+print(x)
+```
+
+정수를 아스키 문자로 출력할 때는 chr()을 써주도록 하자.
+
+나의 답은 문자열을 정수로 바꾸고 다시 문자열로 변환시키는 바보같은 코드였다..
+
+<Callout type="info">
+
+이 게시물은 [우리밋_woorimIT](https://www.youtube.com/watch?v=7sykajCtgCw&list=PLSK4WsJ8JS4dOszA7Zr8paqI81Mv27tNq&index=2)님의 유튜브를 참고하였습니다.
+
+</Callout>

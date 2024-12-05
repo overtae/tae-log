@@ -1,0 +1,165 @@
+---
+title: '[파이썬 기초 100제] 8강 논리 연산'
+date: '2022-01-26'
+---
+
+## 문제 53
+
+1(true, 참) 또는 0(false, 거짓) 이 입력되었을 때 반대로 출력하는 프로그램을 작성해보자.
+
+<Toggle open summary="TIP">
+
+파이썬에서 비교/관계 연산(==, !=, \>, \<, \>=, \<=)이 수행될 때,
+0은 거짓(false)으로 인식되고, 0이 아닌 모든 수는 참(true)으로 인식된다.
+
+참 또는 거짓의 논리값을 역(반대)으로 바꾸기 위해서는
+논리(logical)연산자 'not'를 사용할 수 있다.
+이러한 논리연산을 NOT 연산이라고 부른다.
+
+참, 거짓의 논리값(boolean value)인 불 값을 다루어주는 논리연산자는
+'not', 'and', 'or'가 있다.
+
+** 불 대수(boolean algebra)는 수학자 불이 만들어낸 것으로
+참/거짓만 가지는 논리값과 그 연산을 다룬다.
+
+참 또는 거짓의 논리값을 역(반대)으로 바꾸기 위해서는 논리(logical)연산자 'not'를 사용할 수 있다.
+
+</Toggle>
+
+> 풀이
+
+```python
+boolNum = int(input())
+print(not boolNum)
+# 0이 아닌 모든 것은 참이다.
+```
+
+## 문제 54
+
+두 개의 참(1) 또는 거짓(0)이 입력될 때, 모두 참일 때에만 참을 출력하는 프로그램을 작성해보자.
+
+<Toggle open summary="TIP">
+
+파이썬에서는 AND연산값이 참이면 뒤에 있는 값을 출력하게 된다.
+
+ex) '앞' and '뒤' >> '뒤'
+
+</Toggle>
+
+> 풀이
+
+```python
+a, b = map(int, input().split())
+print(a and b)
+# and는 &&이다.
+```
+
+## 문제 55
+
+두 개의 참(1) 또는 거짓(0)이 입력될 때, 하나라도 참이면 참을 출력하는 프로그램을 작성해보자.
+
+<Toggle open summary="TIP">
+
+파이썬에서는 OR연산값이 참이면 참인 값을 출력하게 된다.
+
+ex) '참' or 0 >> '참' , 0 or True >> True
+
+</Toggle>
+
+> 풀이
+
+```python
+a, b = map(int, input().split())
+print(a or b)
+# or은 ||이다.
+```
+
+## Bonus 문제
+
+1개의 정수형 입력이 들어오면 논리 연산을 이용하여 '홀수'와 '짝수'를 판별하여라
+
+<Toggle open summary="TIP">
+
+입력이 2로 나눠지면 짝수이고, 그렇지 않으면 홀수임을 이용한다.
+
+파이썬에서의 AND와 OR의 특징을 이용한다. => 파이썬에서는 이러한 연산을 "삼항 연산"으로 정의한다.
+
+</Toggle>
+
+> 풀이
+
+```python
+a = int(input())
+print(a % 2 == 0 and "짝수" or "홀수")
+# 혹은,
+print(a % 2 and "홀수" or "짝수")
+# and 연산자는 둘 다 참일 경우 뒤의 값을,
+# or 연산자는 참인 값을 출력하기 때문에 가능하다.
+```
+
+## 문제 56
+
+두 가지의 참(1) 또는 거짓(0)이 입력될 때, 참/거짓이 서로 다를 때에만 참을 출력하는 프로그램을 작성해보자.
+
+<Toggle open summary="TIP">
+
+이러한 논리연산을 XOR(exclusive or, 배타적 논리합)연산이라고도 부른다. 이를 표현하기 위해서는 (a AND (NOT b)) OR ((NOT a) AND b)처럼 하면 된다.
+
+</Toggle>
+
+> 풀이
+
+```python
+a, b = map(int, input().split())
+print((not a and b) or (a and not b))
+# XOR 연산을 해주면 된다.
+```
+
+답에서는 `(not b)` 이렇게 괄호로 따로 묶어주었는데 안묶어도 결과가 같아서 묶지 않았다.
+
+## 문제 57
+
+두 개의 참(1) 또는 거짓(0)이 입력될 때, 참/거짓이 서로 같을 때에만 참이 계산되는 프로그램을 작성해보자.
+
+<Toggle open summary="TIP">
+
+![](/posts/python/codeup/03.png)
+
+</Toggle>
+
+> 풀이
+
+```python
+a, b = map(int, input().split())
+print((a and b) or (not a and not b))
+```
+
+## 문제 58
+  
+두 개의 참(1) 또는 거짓(0)이 입력될 때, 모두 거짓일 때에만 참이 계산되는 프로그램을 작성해보자.
+
+<Toggle open summary="TIP">
+
+![](/posts/python/codeup/04.png)
+
+</Toggle>
+
+> 풀이
+
+```python
+a, b = map(int, input().split())
+# 답
+print(not(a or b))
+# not a and not b와 같은 조건이다.
+
+# 나의 답
+print(not(a and b))
+```
+
+not 연산자로 묶게 될 경우 and는 or로 바뀐다는 것을 알아두자.
+
+<Callout type="info">
+
+이 게시물은 [우리밋_woorimIT](https://www.youtube.com/watch?v=7sykajCtgCw&list=PLSK4WsJ8JS4dOszA7Zr8paqI81Mv27tNq&index=2)님의 유튜브를 참고하였습니다.
+
+</Callout>

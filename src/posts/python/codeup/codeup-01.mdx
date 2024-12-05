@@ -1,0 +1,141 @@
+---
+title: '[파이썬 기초 100제] 1강 출력'
+date: '2022-01-17'
+---
+
+## 문제 1
+
+Hello 출력하기
+
+> 풀이
+
+```python
+print('Hello')
+```
+
+## 문제 2
+
+Hello World 출력하기
+
+> 풀이
+
+```python
+print('Hello World')
+```
+
+## 문제 3
+
+Hello World 출력하기
+
+(두 줄에 걸쳐 줄을 바꿔 출력하기)
+
+> 풀이
+
+```python
+# 방법 1
+print('Hello\nWorld')
+# 방법 2
+print('''\
+Hello
+World
+''')
+# 방법 3
+print("""\
+Hello
+World
+""")
+```
+
+<Toggle open summary="TIP">
+
+따옴표를 `'''`(작은따옴표) 혹은 `"""`(큰따옴표) 와 같이 3개씩 사용하면 입력하는 모양대로 출력된다.
+
+처음 따음표 `'''` 뒤에 역슬래시`\`를 해주어야 직관적으로 코딩할 수 있게 된다.
+
+만약 역슬래시를 안해주면 한 줄의 공백 후에 출력이 된다.
+
+```python
+print('''
+AA
+BB
+''')
+
+# 출력
+(한 줄 공백)
+AA
+BB
+```
+
+</Toggle>
+
+## 문제 4
+
+'Hello' 출력하기
+
+(단, 작은 따옴표도 함께 출력한다.)
+
+> 풀이
+
+```python
+print("'Hello World'")
+# 큰따옴표 안에 작은 따옴표를 넣어주면 된다.
+```
+
+## 문제 5
+
+"Hello World" 출력하기
+
+(단, 큰따옴표도 함께 출력한다.)
+
+> 풀이
+
+```python
+print('"Hello World"')
+```
+
+## 문제 6
+
+"!@#$%^&*()" 출력하기
+
+(단, 큰따옴표도 함께 출력한다.)
+
+> 풀이
+
+```python
+print('"!@#$%^&*()"')
+```
+
+## 문제 7
+
+"C:\Download\hello.cpp" 출력하기
+
+(단, 큰따옴표도 함께 출력한다.)
+
+> 풀이
+
+```python
+print('"C:\Download\hello.cpp"')
+```
+
+## 문제 8
+
+`┌┬┐`<br/>
+`├┼┤`<br/>
+`└┴┘` 출력하기
+
+> 풀이
+
+```python
+print('''\
+┌┬┐
+├┼┤ 
+└┴┘
+''')
+# 큰따옴표나 작은 따옴표 3개를 이용하면 된다.
+```
+
+<Callout type="info">
+
+이 게시물은 [우리밋_woorimIT](https://www.youtube.com/watch?v=7sykajCtgCw&list=PLSK4WsJ8JS4dOszA7Zr8paqI81Mv27tNq&index=2)님의 유튜브를 참고하였습니다.
+
+</Callout>
