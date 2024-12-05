@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     default: blog.subTitle,
   },
   description: blog.description,
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 }
 
 export const viewport: Viewport = {
@@ -36,3 +39,8 @@ export default function RootLayout({
     </html>
   )
 }
+
+;<meta
+  name="google-site-verification"
+  content="tkbXTRWs4Fg4rsuB5oqCsduMEj0FmX7Y4JA6nXUnHso"
+/>
