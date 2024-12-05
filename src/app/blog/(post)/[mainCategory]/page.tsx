@@ -20,7 +20,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { mainCategory } = await params
   const cg = getCategoryPublicName(mainCategory)
-  const title = `${cg} | ${blog.title}`
+  const title = `${cg}`
   const url = `${baseURL}/${mainCategory}`
 
   return {

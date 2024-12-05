@@ -28,7 +28,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { mainCategory, subCategory } = await params
   const cg = subCategories[subCategory]
-  const title = `${cg} | ${blog.title}`
+  const title = `${cg}`
   const url = `${baseURL}/${mainCategory}/${subCategory}`
 
   return {
