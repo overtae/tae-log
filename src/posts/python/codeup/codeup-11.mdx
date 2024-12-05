@@ -1,0 +1,215 @@
+---
+title: '[파이썬 기초 100제] 11강 조건/선택 실행 구조'
+date: '2022-02-04'
+---
+
+## 문제 65
+
+세 정수 a, b, c가 입력되었을 때, 짝수만 출력해보자.
+
+<Toggle open summary="TIP">
+
+조건문 이용
+
+filter() 이용
+
+'\*(asterisk)' 이용
+
+익명함수 lambda 이용
+
+</Toggle>
+
+> 풀이
+
+```python
+# 방법 1
+a, b, c = map(int, input().split())
+if not a%2: print(a)
+if not b%2: print(b)
+if not c%2: print(c)
+
+# 방법 2
+a, b, c = map(int, input().split())
+print(*(filter(lambda num: not(num % 2), [a, b, c])))
+# 조건식 not(num % 2)의 num에 a, b, c가 차례대로 들어가고 결과가 참인 값만 반환된다.
+# filter()는 filter 타입으로 반환되기 때문에 리스트나 튜플에 넣어주어야 한다.
+# *를 사용하면 대괄호나 괄호 없이 리스트나 튜플 안의 값들만 출력할 수 있다.
+
+print(list(filter(lambda num: not(num % 2), [a, b, c])))
+# 입력 : 1 2 3, 출력 : [2]
+print(*(filter(lambda num: not(num % 2), [a, b, c])))
+# 입력 : 1 2 3, 출력 : 2
+
+# 나의 답
+a = map(int, input().split())
+for i in a:
+  if not(i % 2):
+    print(i, end=' ')
+```
+
+내가 쓴 답의 경우 숫자를 3개만 입력 받는 것이 아니기 때문에 변수 3개에 나눠 받는 것이 좋아보인다.
+
+## 문제 66
+
+세 정수 a, b, c가 입력되었을 때, 짝(even)/홀(odd)을 출력해보자.
+
+<Toggle open summary="TIP">
+
+map() 함수 배우기
+
+</Toggle>
+
+> 풀이
+
+```python
+a, b, c = map(int, input().split())
+
+# 방법 1
+print(*(filter(lambda num: 'odd' if num % 2 else 'even', [a, b, c])))
+
+# 방법 2
+print('odd' if a % 2 else 'even')
+print(b % 2 and 'odd' or 'even')
+print(['even', 'odd'][c % 2])
+```
+
+## 문제 67
+
+정수 1개가 입력되었을 때, 음(minus)/양(plus)과 짝(even)/홀(odd)을 출력해보자.
+
+입력 : -4
+
+출력 : 
+
+minus
+
+even
+
+> 풀이
+
+```python
+a = int(input())
+print('minus' if a < 0 else 'plus')
+print('odd' if a % 2 else 'even')
+```
+
+`and-or`를 사용하는 방법도 있다.
+
+## 문제 68
+
+점수(정수, 0 ~ 100)를 입력받아 평가를 출력해보자.
+
+**평가 기준**
+
+| 점수 범위 | 평가 |
+| --------- | ---- |
+| 90 ~ 100  | A    |
+| 70 ~ 89   | B    |
+| 40 ~ 69   | C    |
+| 0 ~ 39    | D    |
+
+로 평가되어야 한다.
+
+<Toggle open summary="TIP">
+
+if-elif-else를 이용한다.
+
+</Toggle>
+
+> 풀이
+
+```python
+a = int(input())
+if a >= 90:
+  print('A')
+elif a >= 70:
+  print('B')
+elif a >= 40:
+  print('C')
+else:
+  print('D')
+```
+
+## 문제 69
+
+평가를 문자(A, B, C, D, ...)로 입력받아 내용을 다르게 출력해보자.
+
+| 평가          | 내용    |
+| ------------- | ------- |
+| A             | best!!! |
+| B             | good!!  |
+| C             | run!    |
+| D             | slowly~ |
+| 나머지 문자들 | what?   |
+
+> 풀이
+
+```python
+a = input()
+if a == 'A':
+  print('best!!!')
+elif a == 'B':
+  print('good!!')
+elif a == 'C':
+  print('run!')
+elif a == 'D':
+  print('slowly~')
+else:
+  print('what?')
+```
+
+## 문제 70
+
+월이 입력될 때 계절 이름이 출력되도록 해보자.
+
+| 월        | 계절 이름 |
+| --------- | --------- |
+| 12, 1, 2  | winter    |
+| 3, 4, 5   | spring    |
+| 6, 7, 8   | summer    |
+| 9, 10, 11 | fall      |
+
+> 풀이
+
+```python
+a = int(input())
+
+# 방법 1
+if a==12 or a==1 or a==2:
+  print('winter')
+elif a==3 or a==4 or a==5:
+  print('spring')
+elif a==6 or a==7 or a==8:
+  print('summer')
+else:
+  print('fall')
+
+# 방법 2
+if a in [12,1,2]:
+  print('winter')
+elif a in [3,4,5]:
+  print('spring')
+elif a in [6,7,8]:
+  print('summer')
+else:
+  print('fall')
+
+# 나의 답
+if a >= 3 and a <= 5:
+  print('spring')
+elif a >= 6 and a <= 8:
+  print('summer')
+elif a >= 9 and a <= 11:
+  print('fall')
+else:
+  print('winter')
+```
+
+내가 쓴 답의 경우 15가 들어와도 winter이 출력된다.
+`in`을 이용하거나 `or`과 조건식을 이용해 범위를 1부터 12까지 정해주어야 한다.
+
+<Callout type="info">
+
+이 게시물은 [우리밋_woorimIT](https://www.youtube.com/watch?v=7sykajCtgCw&list=PLSK4WsJ8JS4dOszA7Zr8paqI81Mv27tNq&index=2)님의 유튜브를 참고하였습니다.
+
+</Callout>

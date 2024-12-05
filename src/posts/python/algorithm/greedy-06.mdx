@@ -1,0 +1,120 @@
+---
+title: '[파이썬 알고리즘] 큰 수의 법칙 문제 풀이'
+date: '2022-07-03'
+description: '그리디 알고리즘을 이용하여 문제를 풀어보자'
+tags:
+  - '그리디'
+---
+
+### ❓ 문제
+
+![](/posts/python/algorithm/greedy/05-01.png)
+
+![](/posts/python/algorithm/greedy/05-02.png)
+
+
+### ✏ 나의 풀이
+
+```python showLineNumbers
+_, m, k = map(int, input().split())
+# 오름차순 정렬
+n = sorted(map(int, input().split()))
+
+# 큰 수를 더하는 횟수
+c = (m // (k + 1)) * k + (m % (k + 1))
+
+print(c * n[-1] + (m - c) * n[-2])
+```
+
+### 💡 문제 해결 아이디어
+
+입력값 중에서 가장 큰 수와 두 번째로 큰 수만 저장하면 된다.
+
+연속으로 더할 수 있는 횟수는 최대 K번이므로 **‘가장 큰 수를 K번 더하고 두 번째로 큰 수를 한 번 더하는 연산’**을 반복하면 된다.
+
+
+### ✔️ 파이썬 답안 예시 1
+
+```python showLineNumbers
+# N, M, K를 공백을 기준으로 구분하여 입력 받기
+n, m, k = map(int, input().split())
+# N개의 수를 공백을 기준으로 구분하여 입력 받기
+data = list(map(int, input().split()))
+
+data.sort() # 입력 받은 수들 정렬하기
+first = data[n - 1] # 가장 큰 수
+second = data[n - 2] # 두 번째로 큰 수
+
+result = 0
+
+while True:
+  for i in range(k): # 가장 큰 수를 K번 더하기
+    if m == 0: # m이 0이라면 반복문 탈출
+      break
+    result += first
+    m -= 1 # 더할 때마다 1씩 빼기
+  if m == 0: # m이 0이라면 반복문 탈출
+    break
+  result += second # 두 번째로 큰 수를 한 번 더하기
+  m -= 1 # 더할 때마다 1씩 빼기
+
+print(result) # 최종 답안 출력
+```
+
+> 만약 M이 100억 이상으로 커진다면?
+
+M번 반복해야 하므로 시간 초과 판정을 받게 될 것이다.
+
+<Toggle open summary="그럼 어떻게 풀어야 할까?">
+
+수학적으로 접근해보자.
+
+가장 먼저 **반복되는 수열에 대해서 파악**이 필요하다.
+
+가장 큰 수와 두 번째로 큰 수가 더해질 때는 특정한 수열 형태로 일정하게 반복해서 더해지는 특징이 있다.
+
+예를 들어, `M = 8, K = 3`인 상황에서 가장 큰 수가 6, 두 번째로 큰 수가 5일 때 `{6, 6, 6, 5}`가 반복되어 더해진다.
+
+여기서 `(가장 큰 수 * K) + (두 번째로 큰 수 * 1)`이 반복되는 것과, 수열이 반복되는 횟수는 M을 (K+1)로 나눈 몫이라는 것을 알 수 있다.
+
+반복되는 수열의 수에 K를 곱해주게 된다면 가장 큰 수가 더해지는 횟수가 되는 것이다.
+
+이때, M이 (K+1)로 나누어 떨어지지 않는 경우도 고려해야 한다.
+
+간단히 M을 (K+1)로 나눈 나머지를 따로 구해주면 된다.
+
+</Toggle>
+
+### ✔️ 파이썬 답안 예시 2
+
+```python showLineNumbers
+# N, M, K를 공백을 기준으로 구분하여 입력 받기
+n, m, k = map(int, input().split())
+# N개의 수를 공백을 기준으로 구분하여 입력 받기
+data = list(map(int, input().split()))
+
+data.sort() # 입력 받은 수들 정렬하기
+first = data[n - 1] # 가장 큰 수
+second = data[n - 2] # 두 번째로 큰 수
+
+# 가장 큰 수가 더해지는 횟수 계산
+count = int(m / (k + 1)) * k
+count += m % (k + 1)
+
+result = 0
+result += (count) * first # 가장 큰 수 더하기
+result += (m - count) * second # 두 번째로 큰 수 더하기
+
+print(result) # 최종 답안 출력
+```
+
+### 💬 풀이 평가
+
+시간이 얼마나 걸리는지 확인은 해보지 않았지만 답과 근접하게 푼 것 같다.
+
+
+<Callout type="info">
+
+이 게시물은 한빛미디어의 [이것이 코딩 테스트다](https://book.naver.com/bookdb/book_detail.nhn?bid=16439154) 교재를 참고하였습니다.
+
+</Callout>

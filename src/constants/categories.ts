@@ -30,7 +30,7 @@ export const subCategories: { [key: string]: string } = {
   // python
   algorithm: '알고리즘',
   baekjoon: '백준',
-  'code-up': '코드업',
+  codeup: '코드업',
   codingdojang: '코딩도장',
   flask: 'Flask',
   programmers: '프로그래머스',

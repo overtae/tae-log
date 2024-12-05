@@ -1,0 +1,197 @@
+---
+title: '[파이썬 알고리즘] 스택과 큐, 재귀 함수'
+date: '2022-07-15'
+description: '스택과 큐, 재귀함수'
+tags:
+  - 'DFS/BFS'
+  - '자료구조'
+  - '스택'
+  - '큐'
+---
+
+## 그래프 탐색 알고리즘 : DFS/BFS
+
+탐색이란 **많은 양의 데이터 중에서 원하는 데이터를 찾는 과정**을 말한다.
+
+대표적인 그래프 탐색 알고리즘으로는 DFS와 BFS가 있다.
+
+이는 코딩 테스트에서 매우 자주 등장하는 유형이기에 반드시 알고있어야 한다.
+
+DFS와 BFS를 이해하려면 기본 자료구조인 스택과 큐, 더해서 재귀 함수에 대해 알고있어야 한다. 따라서 스택과 큐, 재귀 함수 먼저 정리하려고 한다.
+
+## 자료구조
+
+자료구조란 **데이터를 표현하고 관리하고 처리하기 위한 구조**를 말한다.
+
+그 중 스택과 큐는 자료구조의 기초 개념으로 Push와 Pop의 함수로 구성된다.
+
+- Push : 데이터 삽입
+- Pop : 데이터 삭제
+
+이 외에도 저장 공간을 초과할 때 발생하는 **오버플로(Overflow)**나 저장 공간이 비어있을 때 삭제 연산을 수행하면 발생하는 **언더플로(Underflow)**도 고려해야한다.
+
+### 스택 Stack
+
+![](/posts/python/algorithm/dfs-bfs/stack.png)
+
+**먼저 들어온 데이터가 나중에 나가는 자료구조**이다. 이를 선입후출(First In Last Out) 구조 또는 후입선출(Last In First Out) 구조라고 한다.
+
+입구와 출구가 동일한 형태로 스택을 시각화 할 수 있다.
+
+파이썬에서 스택을 이용할 때에는 별도의 라이브러리 사용 없이 `append()`와 `pop()` 메소드를 이용하면 된다.
+
+- `append()` : 리스트 가장 뒤쪽에 데이터 삽입
+- `pop()` : 리스트 가장 뒤쪽에서 데이터 제거, 반환
+
+### 큐 Queue
+
+큐의 경우 대기 줄과 같이 나중에 온 사람일수록 나중에 들어가는 *공정한* 자료구조로 비유된다.
+
+이를 선입선출(First In First Out) 구조라 한다.
+
+![](/posts/python/algorithm/dfs-bfs/queue.png)
+
+큐는 위와 같이 입구와 출구가 뚫려 있는 터널로 시각화할 수 있다.
+
+파이썬으로 큐를 구현할 때에는 **collections 모듈에서 제공하는 deque(데크) 자료구조를 활용**하자.
+
+deque는 스택과 큐의 장점을 모두 채택한 것으로, 데이터를 넣고 빼는 속도가 리스트에 비해 효율적이고 queue 라이브러리보다 더 간단하기 때문이다.
+
+deque를 이용한다면 `append()`와 `popleft()` 메소드를 사용하면 된다.
+
+- `append()` : deque 가장 오른쪽에 데이터 삽입
+- `popleft()` : deque 가장 왼쪽 데이터 제거, 반환
+
+간단한 예제로 알아보자.
+
+```python showLineNumbers
+# 삽입(1) - 삽입(2) - 삽입(3) - 삭제() - 삽입(1) - 삭제()
+
+from collections import deque
+
+queue = deque() # Queue 구현
+
+queue.append(1)
+queue.append(2)
+queue.append(3)
+queue.popleft()
+queue.append(1)
+queue.popleft()
+
+# 먼저 들어온 순
+print(queue) # deque([3, 1])
+
+# 나중에 들어온 순
+queue.reverse()
+print(queue) # deque([1, 3])
+```
+
+예제에서 출력 결과를 보면 그림으로 이해했던 것과는 반대의 순서인 것을 확인할 수있다.
+
+따라서 이 점을 주의하고, 그림과 같은 순서로 확인하고 싶다면 `reverse()` 메서드를 사용하도록 하자.
+
+collections 모듈의 deque 객체에 대한 자세한 설명은 [파이썬 공식 문서](https://docs.python.org/ko/3/library/collections.html#collections.deque)를 참고하자.
+
+## 재귀 함수 Recursive Function
+
+재귀 함수란 **자기 자신을 다시 호출하는 함수**를 말한다.
+
+이전에 팩토리얼 관련한 문제를 풀 때 재귀 함수를 사용했었다.
+
+```python showLineNumbers
+def factorial(x):
+  return (x * f(x-1)) if x else 1
+  # 음수가 들어올 경우는 생각하지 않았다.
+```
+
+위와 같은 함수의 경우 x가 1씩 작아져 0이 되면 끝나게 되지만 만약 아무 조건이 없다면 어떻게 될까?
+
+```python showLineNumbers
+def infinite():
+  print('무한한 반복')
+  return infinite()
+  # RecursionError: maximum recursion depth exceeded while pickling an object
+```
+
+무한히 평생 반복할 것 같지만, **RecursionError**라는 오류 메세지를 출력하고 멈추게 된다.
+
+이는 재귀의 최대 깊이를 초과했다는 내용으로 파이썬 인터프리터의 호출 횟수 제한을 벗어났기 때문에 발생한 오류이다.
+
+따라서 무한한 재귀 호출은 불가능하므로 염두해두자. *(이를 요구하는 문제가 출제되는 일이 없기도하다.)*
+
+### 재귀 함수의 종료 조건
+
+재귀 깊이 초과 메세지를 피하기 위해 재귀 함수가 언제 끝날지 **종료 조건을 반드시 명시**해야 한다.
+
+컴퓨터 내부에서 재귀 함수의 수행은 **스택 자료구조**를 이용한다.
+
+함수를 계속 호출했을 때 가장 마지막에 호출한 함수가 먼저 수행을 끝내야 그 앞의 함수 호출이 종료되기 때문이다.
+
+따라서 스택 자료구조를 활용해야 하는 알고리즘은 재귀 함수를 이용하여 간편히 구현될 수 있다.
+
+대표적인 예로, DFS가 있다.
+
+## 팩토리얼
+
+팩토리얼 역시 재귀 함수의 대표적인 예제이다. 아래 코드로 알아보자.
+
+```python showLineNumbers title="반복적으로 구현"
+def factorial:
+  result = 1
+  for i in range(1, n+1):
+    result *= i
+  return result
+```
+
+```python showLineNumbers title="재귀적으로 구현"
+def factorial:
+  if n <=1:
+    return 1
+  return n * factorial(n - 1)
+```
+
+
+재귀적으로 구현한 방식이 조금 더 간결한 것을 알 수 있다.
+
+## 유클리드 호제법
+
+유클리드 호제법은 **두 개의 자연수에 대한 최대공약수**를 구하는 대표적인 알고리즘으로 아래와 같은 아이디어를 말한다.
+
+***“두 자연수 A, B에 대하여 (A > B) A를 B로 나눈 나머지를 R이라고 할 때, A와 B의 최대공약수는 B와 R의 최대공약수와 같다.”***
+
+이를 이용하여 최대공약수를 빠르게 구할 수 있다. 아래 예제로 알아보자
+
+> A = 192, B = 162
+
+| 단계 |    A |    B |
+| ---: | ---: | ---: |
+|    1 |  192 |  162 |
+|    2 |  162 |   30 |
+|    3 |   30 |   12 |
+|    4 |   12 |    6 |
+
+이를 파이썬 코드로 구현한다면 아래와 같을 것이다.
+
+```python showLineNumbers
+def gcd(a, b):
+  if a % b == 0:
+    return b
+  else:
+    return gcd(b, a % b)
+```
+
+## 점화식
+
+점화식은 아래와 같이 수학에서 수열의 각각의 항들의 관계를 나타낸 식이다.
+
+$$a_n = 2a_{n-1} + 1$$
+
+재귀 함수는 이런 점화식을 소스코드로 옮긴 것이다.
+
+따라서 반복문과 비교했을 때 간결해질 수 있는 것이다.
+
+<Callout type="info">
+
+이 게시물은 한빛미디어의 [이것이 코딩 테스트다](https://book.naver.com/bookdb/book_detail.nhn?bid=16439154) 교재를 참고하였습니다.
+
+</Callout>
